@@ -1,0 +1,65 @@
+﻿<Window x:Class="_01electronics_inventory.SortGridViewGenericProductsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_01electronics_inventory"
+        mc:Ignorable="d"
+        Title="SortGridViewGenericProductsWindow"  Height="600" Width="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        <Label Content="SORT GENERIC PRODUCTS" Style="{StaticResource secondaryHeaderTextStyle}" Background="#105A97" Grid.Row="0"/>
+        <ScrollViewer  Grid.Row="1">
+            <WrapPanel >
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <CheckBox Content="Category" Style="{StaticResource checkBoxStyleForSort}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="OnCheckCategory" x:Name="categoryCheckBox"/>
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <CheckBox Content="Type" Style="{StaticResource checkBoxStyleForSort}" HorizontalAlignment="Left" VerticalAlignment="Top" Click="OnCheckType" x:Name="typeCheckBox"/>
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <CheckBox Content="Brand" Style="{StaticResource checkBoxStyleForSort}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="OnCheckBrand" x:Name="brandCheckBox"/>
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <CheckBox Content="Model" Style="{StaticResource checkBoxStyleForSort}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="OnCheckModel" x:Name="modelCheckBox"/>
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <CheckBox Content="Pricing Criteria" Style="{StaticResource checkBoxStyleForSort}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="OnCheckPricingCriteria" x:Name="pricingCriteriaCheckBox"/>
+                    </WrapPanel>
+                </Border>
+
+            </WrapPanel>
+        </ScrollViewer>
+
+        <Button Grid.Row="2" Style="{StaticResource buttonStyle}" Content="Save" Click="OnButtonClickSave"/>
+
+    </Grid>
+</Window>

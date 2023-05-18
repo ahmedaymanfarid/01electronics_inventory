@@ -1,0 +1,78 @@
+﻿<Page x:Class="_01electronics_inventory.AddRentryUploadFilesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:_01electronics_inventory"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AddRentryUploadFilesPage">
+
+    <Grid Background="White">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="90"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="#105A97">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Background="#105A97" Name="RFQHeader" Content="UPLOAD FILES PAGE" Style="{StaticResource secondaryHeaderTextStyle}"/>
+
+        </Grid>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            
+
+            <Border x:Name="itemsBorder" Grid.Column="0" Style="{StaticResource unselectedSecondaryTabBorder}" >
+                <Label Content="Items Info" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnLabelMouseLeftButtonDown" />
+            </Border>
+
+
+            <Border Grid.Column="1" Style="{StaticResource selectedSecondaryTabBorder}" >
+                <Label Content="ReEntry permit Files" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
+            </Border>
+
+
+        </Grid>
+
+        <ScrollViewer Grid.Row="2" Margin="24" Name="scrollViewer" VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <StackPanel Name="uploadFilesStackPanel" Drop="OnDropUploadFilesStackPanel"  AllowDrop="True" Background="White" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        </ScrollViewer>
+
+        <Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Click="OnBackButtonClick"  Content="BACK" IsEnabled="True" Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  IsEnabled="false" Content="Next"  Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" IsEnabled="False" Margin="24"/>
+            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Content="Cancel" Click="OnCancelButtonClick"  Margin="24"/>
+
+        </Grid>
+
+    </Grid>
+</Page>

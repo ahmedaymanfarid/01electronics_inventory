@@ -1,0 +1,122 @@
+﻿<Page x:Class="_01electronics_inventory.AddRentryItemPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:_01electronics_inventory"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AddRentryItemPage">
+
+    <Grid Background="#EDEDED">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="100" />
+            <RowDefinition />
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="#105A97">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Background="#105A97" Name="RFQHeader" Content="RENTRY PERMIT ITEMS" Style="{StaticResource secondaryHeaderTextStyle}"/>
+
+        </Grid>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+
+          
+            <Border Grid.Column="0" Style="{StaticResource selectedSecondaryTabBorder}" >
+                <Label Content="Items Info" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
+            </Border>
+
+
+            <Border Grid.Column="1" Style="{StaticResource unselectedSecondaryTabBorder}" >
+                <Label Content="Rentry permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnReEntryPermitFilesMouseLeftButtonDown" />
+            </Border>
+
+
+        </Grid>
+
+       
+
+            <Grid Grid.Row="2" x:Name="Home">
+
+
+            <Grid.RowDefinitions>
+
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+
+
+            </Grid.RowDefinitions>
+                
+            <WrapPanel Grid.Row="0">
+
+                <Label  Content="RE Entry Date" Style="{StaticResource labelStyle}" FontWeight="Bold" Width="134"></Label>
+                <DatePicker  x:Name="ReEntryDate" Style="{StaticResource datePickerStyle}"></DatePicker>
+
+            </WrapPanel>
+
+            <WrapPanel Grid.Row="1">
+
+                <Label  Content="Release Permits" Style="{StaticResource labelStyle}" FontWeight="Bold" Width="134"></Label>
+                <ComboBox  x:Name="releasePermitsComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnreleasePermitsComboBoxSelectionChanged" ></ComboBox>
+
+            </WrapPanel>
+           
+
+            </Grid>
+
+
+
+            <ScrollViewer CanContentScroll="True" x:Name="releasePermitItemsScrollViewer" Grid.Row="3" Margin="0,30,0,0">
+
+
+                <Grid x:Name="ReleasePermitItemsGrid" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+
+
+                </Grid>
+
+            </ScrollViewer>
+
+       
+       
+        
+      
+        <Grid Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" Click="backButton_Click"  IsEnabled="False" Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="nextButton_Click"  Content="Next" IsEnabled="False"  Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnFinishButtonClick"  IsEnabled="True" Margin="24"/>
+            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Click="OnCancelButtonClick"  Content="Cancel"  Margin="24"/>
+
+        </Grid>
+
+    </Grid>
+</Page>

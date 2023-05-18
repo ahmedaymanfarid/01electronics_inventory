@@ -1,0 +1,113 @@
+﻿<Page x:Class="_01electronics_inventory.AddReservationItemsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:_01electronics_inventory"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AddReservationItemsPage">
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="0" Name="addReservationsHeader" Content="ADD RESERVATION ITEMS INFO" Background="#105A97" Style="{StaticResource secondaryHeaderTextStyle}"/>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Border  Grid.Column="0" Style="{StaticResource unselectedSecondaryTabBorder}" >
+                <Label Content="Basic Info" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnMouseLeftButtonDownBasicInfoLabel"/>
+            </Border>
+            <Border x:Name="itemsBorder" Grid.Column="1" Style="{StaticResource selectedSecondaryTabBorder}" >
+                <Label Content="Items Info" Style="{StaticResource selectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnMouseLeftButtonDownItemsInfoLabel" />
+            </Border>
+        </Grid>
+
+        <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto">
+            <WrapPanel>
+                <Grid Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Label Grid.Row="0" Name="selectFilterTypeLabel" Style="{StaticResource tableHeaderItem}" Content="Select Filter Type *"/>
+
+                    <Grid Grid.Row="1" Name="filterTypeGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" Name="companyCheckBox" Foreground="#105A97" Content="Company" Style="{StaticResource checkBoxVariableStyle}" Checked="OnCheckCompanyCheckBox" Unchecked="OnUnCheckCompanyCheckBox"/>
+                        <CheckBox Grid.Column="1" Name="genericCheckBox" Foreground="#105A97" Content="Generic" Style="{StaticResource checkBoxVariableStyle}" Checked="OnCheckGenericCheckBox" Unchecked="OnUnCheckGenericCheckBox"/>
+                    </Grid>
+
+                    <Label Grid.Row="2" Name="selectProductTypeLabel" Style="{StaticResource tableHeaderItem}" Content="Select Product Category *"/>
+
+                    <WrapPanel Grid.Row="3" Name="productTypeGrid">
+                        <ComboBox Name="categoryComboBox" IsEnabled="False" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelChangeCategoryComboBox" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" Foreground="LightGray" Text="Category"/>
+                        <ComboBox Name="typeComboBox" IsEnabled="False" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelChangeTypeComboBox" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" Foreground="LightGray" Text="Type"/>
+                        <ComboBox Name="brandComboBox" IsEnabled="False" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelChangeBrandComboBox" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" Foreground="LightGray" Text="Brand"/>
+                        <ComboBox Name="modelComboBox" IsEnabled="False" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelChangeModelComboBox" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" Foreground="LightGray" Text="Model"/>
+                        <ComboBox Name="specsComboBox" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelChangeSpecsComboBox" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="False" Foreground="LightGray" Text="Spec"/>
+                    </WrapPanel>
+
+                    <WrapPanel Grid.Row="4">
+                        <Label Name="selectNumberOfItemsLabel" Style="{StaticResource tableItemLabel}" Foreground="#105A97" Content="Number of selected Items"/>
+                        <Label Name="numberOfSelectedItemsLabel" Style="{StaticResource tableItemLabel}" Foreground="#105A97" Content="0"/>
+                    </WrapPanel>
+
+                    <Grid Grid.Row="5" Name="addReservationGrid">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Name="itemsGrid" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            
+                        </Grid>
+                        <WrapPanel Grid.Row="1" Name="selectedItemsWrapPanel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            
+                        </WrapPanel>
+                    </Grid>
+                </Grid>
+            </WrapPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="Back" Click="OnClickBackButton"  Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Content="Next" IsEnabled="False" Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnBtnClickFinish" Margin="24"/>
+            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Content="Cancel" Click="OnBtnClickCancel"  Margin="24"/>
+
+        </Grid>
+
+    </Grid>
+
+</Page>

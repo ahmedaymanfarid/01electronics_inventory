@@ -1,0 +1,88 @@
+﻿<Page x:Class="_01electronics_inventory.ReleasePermitPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:_01electronics_inventory"
+      mc:Ignorable="d" 
+      Background="#EDEDED"
+      Title="ReleasePermitPage">
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.25*" MinWidth="240"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" MinHeight="300" Background="#105A97">
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="dashboardLabel" Text="Dashboard" MouseLeftButtonDown="OnButtonClickedDashboard"/>
+            <TextBlock Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="rfpsLabel" Text="RFPs" MouseLeftButtonDown="OnButtonClickedRFPs"/>
+            <TextBlock Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="workOrdersLabel" Text="Work Orders" MouseLeftButtonDown="OnButtonClickedWorkOrders"/>
+            <TextBlock Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="maintenanceContractsLabel" Text="Maintenance Contracts" MouseLeftButtonDown="OnButtonClickedMaintenanceContracts"/>
+            <TextBlock Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="companyProductsLabel" Text="Company Products" MouseLeftButtonDown="OnButtonClickedCompanyProducts"/>
+            <TextBlock Grid.Row="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="genericProductsLabel" Text="Generic Products" MouseLeftButtonDown="OnButtonClickedGenericProducts"/>
+            <TextBlock Grid.Row="6" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="storeLocationsLabel" Text="Warehouse Locations" MouseLeftButtonDown="OnButtonClickedStoreLocations"/>
+            <TextBlock Grid.Row="7" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="entryPermitsLabel" Text="Entry Permits" MouseLeftButtonDown="OnButtonClickedEntryPermits"/>
+            <TextBlock Grid.Row="8" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="releasePermitsLabel" Text="Release Permits" MouseLeftButtonDown="OnButtonClickedReleasePermits"  Background="#EDEDED" Foreground="#105A97"/>
+            <TextBlock Grid.Row="9" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="stockAvailabilityLabel" Text="Stock Availability" MouseLeftButtonDown="OnButtonClickedStockAvailability"/>
+            <TextBlock Grid.Row="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="rentryPermitItems" Text="Rentry Permits" MouseLeftButtonDown="OnButtonClickedRentryPermit"/>
+            <TextBlock Grid.Row="11" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="reservationsPermitItems" Text="Reservations" MouseLeftButtonDown="OnButtonClickedReservations"/>
+        </Grid>
+
+        <Grid ShowGridLines="False" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition/>
+                <RowDefinition Height="60"/>
+
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+
+                <Label Grid.Row="0" VerticalAlignment="Stretch" Margin="24,24,24,24" Content="RELEASE PERMITS" Style="{StaticResource primaryHeaderTextStyle}"/>
+
+            </Grid>
+
+
+            <Grid Grid.Row="1">
+                <ScrollViewer CanContentScroll="True">
+
+                    <StackPanel x:Name="ReleasePermitStackPanel" Margin="10,0,0,0" Background="White"></StackPanel>
+                </ScrollViewer>
+
+
+            </Grid>
+
+
+            <Grid Grid.Row="3" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Add" Style="{StaticResource buttonStyle}" Click="OnAddButtonClick" Name="addButton" />
+                <Button Grid.Column="1" Content="Export" Style="{StaticResource buttonStyle}" Name="exportButton" />
+
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+</Page>

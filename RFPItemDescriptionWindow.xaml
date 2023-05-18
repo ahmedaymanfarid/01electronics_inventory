@@ -1,0 +1,131 @@
+﻿<Window x:Class="_01electronics_inventory.RFPItemDescriptionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_01electronics_inventory"
+        mc:Ignorable="d"
+        Title="RFPItemDescriptionWindow" Height="700" Width="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        <Label Content="RFP ITEM MAPPING" Style="{StaticResource secondaryHeaderTextStyle}" Background="#105A97" Grid.Row="0"/>
+        <ScrollViewer Grid.Row="1">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition MinHeight="100"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition MinHeight="100"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition MinHeight="100"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Background="#105A97">
+                    <CheckBox Content="Map To Generic Product" Style="{StaticResource checkBoxStyle2}" Click="OnCheckMapToGenericProduct" x:Name="mapGenericProductCheckBox"/>
+
+                </Grid>
+                <ScrollViewer  Grid.Row="1">
+                    <WrapPanel >
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Category *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="categoryComboBox"  SelectionChanged="OnSelChangedCategoryComboBox"/>
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Type *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="typeComboBox" SelectionChanged="OnSelChangedTypeComboBox" />
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Brand *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="brandComboBox" SelectionChanged="OnSelChangedBrandComboBox" />
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Model *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="modelTextBlock"/>
+                            </WrapPanel>
+                        </Border>
+                    </WrapPanel>
+                </ScrollViewer>
+                <Grid Grid.Row="2" Background="#105A97">
+                    <CheckBox Content="Map To Company Product" Style="{StaticResource checkBoxStyle2}" Click="OnCheckMapToCompanyProduct" x:Name="mapCompanyProductCheckBox"/>
+                </Grid>
+                <ScrollViewer  Grid.Row="3">
+                    <WrapPanel>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Category *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="categoryCompanyComboBox" SelectionChanged="OnSelChangedCompanyCategoryComboBox" />
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Type *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="typeCompanyComboBox" SelectionChanged="OnSelChangedCompanyTypeComboBox"/>
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Brand *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="brandCompanyComboBox" SelectionChanged="OnSelChangedCompanyBrandComboBox"/>
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Model *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="modelCompanyTextBlock"/>
+                            </WrapPanel>
+                        </Border>
+                    </WrapPanel>
+                </ScrollViewer>
+                <Grid Grid.Row="4" Background="#105A97">
+                    <CheckBox Content="Enter Description" Style="{StaticResource checkBoxStyle2}" Click="OnCheckEnterDescription" x:Name="descriptionCheckBox"/>
+                </Grid>
+                <Border Style="{StaticResource borderCard}" Grid.Row="5">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <Label Style="{StaticResource labelStyleCard}" Content="Description *"/>
+                        <TextBox Style="{StaticResource TextBlockStyleCard}" Name="descriptionTextBox"/>
+                    </WrapPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+        <Button Grid.Row="2" Style="{StaticResource buttonStyle}" Content="Save" Click="OnButtonClickSave"/>
+
+    </Grid>
+</Window>
