@@ -23,10 +23,10 @@ namespace _01electronics_inventory
 
         MaintenanceContract maintContracts;
 
-        private List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT> categories = new List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT>();
-        private List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> products = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-        private List<COMPANY_WORK_MACROS.BRAND_STRUCT> brands = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-        private List<COMPANY_WORK_MACROS.MODEL_STRUCT> models = new List<COMPANY_WORK_MACROS.MODEL_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> categories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> products = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> models = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
 
         //private List<COMPANY_WORK_MACROS.MaintContract_PRODUCT_STRUCT> MaintContractProduct1 = new List<COMPANY_WORK_MACROS.MaintContract_PRODUCT_STRUCT>();
 
@@ -186,7 +186,7 @@ namespace _01electronics_inventory
                     if (i != 0)
                         currentCategoryCombo.IsEnabled = false;
                     for (int j = 0; j < categories.Count(); j++)
-                        currentCategoryCombo.Items.Add(categories[j].category);
+                        currentCategoryCombo.Items.Add(categories[j].category_name);
                     productCategoryWrapPanel.Children.Add(currentCategoryCombo);
                 }
 
@@ -217,7 +217,7 @@ namespace _01electronics_inventory
                     currentTypeCombo.SelectionChanged += new SelectionChangedEventHandler(TypeComboBoxesSelectionChanged);
                     currentTypeCombo.IsEnabled = false;
                     for (int j = 0; j < products.Count(); j++)
-                        currentTypeCombo.Items.Add(products[j].typeName);
+                        currentTypeCombo.Items.Add(products[j].product_name);
                     productTypeWrapPanel.Children.Add(currentTypeCombo);
                     currentTypeCombo.IsEnabled = false;
                 }
@@ -250,7 +250,7 @@ namespace _01electronics_inventory
                     currentBrandCombo.SelectionChanged += new SelectionChangedEventHandler(BrandComboBoxesSelectionChanged);
                     currentBrandCombo.IsEnabled = false;
                     for (int j = 0; j < brands.Count(); j++)
-                        currentBrandCombo.Items.Add(brands[j].brandName);
+                        currentBrandCombo.Items.Add(brands[j].brand_name);
                     productBrandWrapPanel.Children.Add(currentBrandCombo);
                 }
 
@@ -683,12 +683,12 @@ namespace _01electronics_inventory
                         if (k != 0)
                             currentProductCheckBox.IsChecked = true;
 
-                        maintContracts.SetMaintContractProductCategory(k + 1, categories[currentCategoryComboBox.SelectedIndex].categoryId, categories[currentCategoryComboBox.SelectedIndex].category);
+                        maintContracts.SetMaintContractProductCategory(k + 1, categories[currentCategoryComboBox.SelectedIndex].category_id, categories[currentCategoryComboBox.SelectedIndex].category_name);
 
-                        if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].categoryId))
+                        if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].category_id))
                             return;
                         for (int i = 0; i < products.Count; i++)
-                            currentTypeComboBox.Items.Add(products[i].typeName);
+                            currentTypeComboBox.Items.Add(products[i].product_name);
                     }
                 }
 
@@ -734,14 +734,14 @@ namespace _01electronics_inventory
 
             if (currentTypeComboBox.SelectedItem != null)
             {
-                if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].categoryId))
+                if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].category_id))
                     return;
                 currentBrandComboBox.IsEnabled = true;
-                InitializeBrandCombo(products[currentTypeComboBox.SelectedIndex].typeId);
+                InitializeBrandCombo(products[currentTypeComboBox.SelectedIndex].type_id);
                 currentBrandComboBox.Items.Clear();
                 for (int m = 0; m < brands.Count; m++)
                 {
-                    currentBrandComboBox.Items.Add(brands[m].brandName);
+                    currentBrandComboBox.Items.Add(brands[m].brand_name);
                 }
 
                 for (int k = 0; k < numberOfProductsAdded; k++)
@@ -751,7 +751,7 @@ namespace _01electronics_inventory
                         if (k != 0)
                             currentProductCheckBox.IsChecked = true;
 
-                        maintContracts.SetMaintContractProductType(k + 1, products[currentTypeComboBox.SelectedIndex].typeId, products[currentTypeComboBox.SelectedIndex].typeName);
+                        maintContracts.SetMaintContractProductType(k + 1, products[currentTypeComboBox.SelectedIndex].type_id, products[currentTypeComboBox.SelectedIndex].product_name);
                     }
                 }
             }
@@ -792,9 +792,9 @@ namespace _01electronics_inventory
             {
                 if (currentTypeComboBox.SelectedItem != null)
                 {
-                    if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].categoryId))
+                    if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].category_id))
                         return;
-                    InitializeBrandCombo(products[currentTypeComboBox.SelectedIndex].typeId);
+                    InitializeBrandCombo(products[currentTypeComboBox.SelectedIndex].type_id);
 
                     currentModelComboBox.IsEnabled = true;
                     if (!commonQueries.GetCompanyModels(products[currentTypeComboBox.SelectedIndex], brands[currentBrandComboBox.SelectedIndex], ref models))
@@ -802,15 +802,15 @@ namespace _01electronics_inventory
 
                     for (int i = 0; i < models.Count(); i++)
                     {
-                        COMPANY_WORK_MACROS.MODEL_STRUCT temp = models[i];
-                        currentModelComboBox.Items.Add(temp.modelName);
+                        PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT temp = models[i];
+                        currentModelComboBox.Items.Add(temp.model_name);
                     }
                 }
                 for (int k = 0; k < numberOfProductsAdded; k++)
                 {
                     if (currentProductGrid == mainWrapPanel.Children[k])
                     {
-                        maintContracts.SetMaintContractProductBrand(k + 1, brands[currentBrandComboBox.SelectedIndex].brandId, currentBrandComboBox.SelectedItem.ToString());
+                        maintContracts.SetMaintContractProductBrand(k + 1, brands[currentBrandComboBox.SelectedIndex].brand_id, currentBrandComboBox.SelectedItem.ToString());
                     }
                 }
             }
@@ -845,9 +845,9 @@ namespace _01electronics_inventory
 
             if (currentModelComboBox.SelectedItem != null)
             {
-                if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].categoryId))
+                if (!commonQueries.GetCompanyProducts(ref products, categories[currentCategoryComboBox.SelectedIndex].category_id))
                     return;
-                InitializeBrandCombo(products[currentTypeComboBox.SelectedIndex].typeId);
+                InitializeBrandCombo(products[currentTypeComboBox.SelectedIndex].type_id);
 
                 if (!commonQueries.GetCompanyModels(products[currentTypeComboBox.SelectedIndex], brands[currentBrandComboBox.SelectedIndex], ref models))
                     return;
@@ -855,7 +855,7 @@ namespace _01electronics_inventory
                 for (int k = 0; k < numberOfProductsAdded; k++)
                 {
                     if (currentProductGrid == mainWrapPanel.Children[k])
-                        maintContracts.SetMaintContractProductModel(k + 1, models[currentModelComboBox.SelectedIndex].modelId, models[currentModelComboBox.SelectedIndex].modelName);
+                        maintContracts.SetMaintContractProductModel(k + 1, models[currentModelComboBox.SelectedIndex].model_id, models[currentModelComboBox.SelectedIndex].model_name);
                 }
             }
             else

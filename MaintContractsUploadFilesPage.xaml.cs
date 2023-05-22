@@ -110,7 +110,7 @@ namespace _01electronics_inventory
             downloadBackground.RunWorkerCompleted += OnDownloadBackgroundComplete;
             downloadBackground.WorkerReportsProgress = true;
 
-            serverFolderPath = BASIC_MACROS.OUTGOING_QUOTATION_FILES_PATH + maintContracts.GetMaintContractID() + "/";
+            serverFolderPath = BASIC_MACROS.QUOTATION_FILES_PATH + maintContracts.GetMaintContractID() + "/";
 
 
             if (!ftpObject.CheckExistingFolder(serverFolderPath))
@@ -472,7 +472,7 @@ namespace _01electronics_inventory
 
         private void OnClickCancelButton(object sender, RoutedEventArgs e)
         {
-            //if (viewAddCondition != COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+            //if (viewAddCondition != COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
             //{
             //    if (ftpFiles.Count() == 0 && wrapPanel.Children.Count == 0)
             //        ftpObject.DeleteFtpDirectory(serverFolderPath, BASIC_MACROS.SEVERITY_HIGH);

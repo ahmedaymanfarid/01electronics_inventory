@@ -28,15 +28,15 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> categoryList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> typeList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> productbrandList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> brandList;
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> categoryList;
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> typeList;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> productbrandList;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brandList;
 
         List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT> measureUnitList;
-        List<BASIC_STRUCTS.PRICING_CRITERIA> pricingCriteria;
+        List<PRODUCTS_STRUCTS.PRICING_CRITERIA> pricingCriteria;
 
-        GenericModel genericModel;
+        GenericModel product_model;
         System.Windows.Controls.ComboBox additionalInfo;
 
         public AddGenericProductWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser)
@@ -46,22 +46,22 @@ namespace _01electronics_inventory
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
 
-            categoryList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY>();
-            typeList= new List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS>();
-            productbrandList= new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
-            brandList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
+            categoryList = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            typeList= new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            productbrandList= new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            brandList = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
 
             measureUnitList = new List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT>();
-            pricingCriteria = new List<BASIC_STRUCTS.PRICING_CRITERIA>();
+            pricingCriteria = new List<PRODUCTS_STRUCTS.PRICING_CRITERIA>();
             
-            genericModel = new GenericModel();
+            product_model = new GenericModel();
 
             integrityChecks = new IntegrityChecks(ref commonQueries);
             additionalInfo = new System.Windows.Controls.ComboBox();
             //EDIT STYLE NAME
             additionalInfo.Style = (System.Windows.Style)FindResource("comboBoxStyleCard2");
             additionalInfo.SelectionChanged += OnSelChangedAdditionalInfo;
-            genericModel.SetAddedBy(loggedInUser.GetEmployeeId());
+            product_model.SetAddedBy(loggedInUser.GetEmployeeId());
             InitializeComponent();
             DisableComboBoxes();
             FillCategoryComboBox();
@@ -172,7 +172,7 @@ namespace _01electronics_inventory
         {
             brandComboBox.Text=additionalInfo.SelectedItem.ToString();
             brandComboBox.SelectedIndex = int.MaxValue;
-            genericModel.SetBrandId(brandList[additionalInfo.SelectedIndex].brand_id);
+            product_model.SetBrandId(brandList[additionalInfo.SelectedIndex].brand_id);
             
         }
         private void OnSelChangedTypeComboBox(object sender, SelectionChangedEventArgs e)
@@ -298,32 +298,32 @@ namespace _01electronics_inventory
                                                     /////////////////////////////////////////////////////////////////
                                                     if (modelTextBlock.Text != string.Empty)
                                                     {
-                                                        genericModel.SetModelName(modelTextBlock.Text);
+                                                        product_model.SetModelName(modelTextBlock.Text);
                                                         if (itemUnitComboBox.SelectedIndex != -1)
                                                         {
-                                                            genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                            product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                             if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                             {
-                                                                genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                                product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                                 if (hasSerialNumberCheckBox.IsChecked == true)
                                                                 {
-                                                                    genericModel.SetModelHasSerialNumber(true);
-                                                                    genericModel.SetCategoryName(categoryComboBox.Text);
-                                                                    if (!genericModel.IssuNewCategory())
+                                                                    product_model.SetModelHasSerialNumber(true);
+                                                                    product_model.SetCategoryName(categoryComboBox.Text);
+                                                                    if (!product_model.IssuNewCategory())
                                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                     else
                                                                     {
-                                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                                        if (!genericModel.IssuNewProduct())
+                                                                        product_model.SetProductName(typeComboBox.Text);
+                                                                        if (!product_model.IssuNewProduct())
                                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                         else
                                                                         {
-                                                                            genericModel.SetBrandName(brandComboBox.Text);
-                                                                            if (!genericModel.IssuNewBrand())
+                                                                            product_model.SetBrandName(brandComboBox.Text);
+                                                                            if (!product_model.IssuNewBrand())
                                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                             else
                                                                             {
-                                                                                if (!genericModel.IssuNewModel())
+                                                                                if (!product_model.IssuNewModel())
                                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                                 else
                                                                                 {
@@ -337,23 +337,23 @@ namespace _01electronics_inventory
                                                                 }
                                                                 else
                                                                 {
-                                                                    genericModel.SetModelHasSerialNumber(false);
-                                                                    genericModel.SetCategoryName(categoryComboBox.Text);
-                                                                    if (!genericModel.IssuNewCategory())
+                                                                    product_model.SetModelHasSerialNumber(false);
+                                                                    product_model.SetCategoryName(categoryComboBox.Text);
+                                                                    if (!product_model.IssuNewCategory())
                                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                     else
                                                                     {
-                                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                                        if (!genericModel.IssuNewProduct())
+                                                                        product_model.SetProductName(typeComboBox.Text);
+                                                                        if (!product_model.IssuNewProduct())
                                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                         else
                                                                         {
-                                                                            genericModel.SetBrandName(brandComboBox.Text);
-                                                                            if (!genericModel.IssuNewBrand())
+                                                                            product_model.SetBrandName(brandComboBox.Text);
+                                                                            if (!product_model.IssuNewBrand())
                                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                             else
                                                                             {
-                                                                                if (!genericModel.IssuNewModel())
+                                                                                if (!product_model.IssuNewModel())
                                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                                 else
                                                                                 {
@@ -378,18 +378,18 @@ namespace _01electronics_inventory
                                                     }
                                                     else
                                                     {
-                                                        genericModel.SetCategoryName(categoryComboBox.Text);
-                                                        if (!genericModel.IssuNewCategory())
+                                                        product_model.SetCategoryName(categoryComboBox.Text);
+                                                        if (!product_model.IssuNewCategory())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
-                                                            genericModel.SetProductName(typeComboBox.Text);
-                                                            if (!genericModel.IssuNewProduct())
+                                                            product_model.SetProductName(typeComboBox.Text);
+                                                            if (!product_model.IssuNewProduct())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                             {
-                                                                genericModel.SetBrandName(brandComboBox.Text);
-                                                                if (!genericModel.IssuNewBrand())
+                                                                product_model.SetBrandName(brandComboBox.Text);
+                                                                if (!product_model.IssuNewBrand())
                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                 else
                                                                 {
@@ -405,13 +405,13 @@ namespace _01electronics_inventory
                                                 }
                                                 else
                                                 {
-                                                    genericModel.SetCategoryName(categoryComboBox.Text);
-                                                    if (!genericModel.IssuNewCategory())
+                                                    product_model.SetCategoryName(categoryComboBox.Text);
+                                                    if (!product_model.IssuNewCategory())
                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                     else
                                                     {
-                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                        if (!genericModel.IssuNewProduct())
+                                                        product_model.SetProductName(typeComboBox.Text);
+                                                        if (!product_model.IssuNewProduct())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
@@ -423,17 +423,17 @@ namespace _01electronics_inventory
                                             }
                                             else
                                             {
-                                                genericModel.SetBrandName(brandComboBox.Text);
+                                                product_model.SetBrandName(brandComboBox.Text);
                                                 if (brandComboBox.SelectedIndex != -1)
-                                                    genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                                                    product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
 
                                                 if (modelTextBlock.Text != string.Empty)
                                                 {
-                                                    genericModel.SetModelName(modelTextBlock.Text);
+                                                    product_model.SetModelName(modelTextBlock.Text);
 
                                                     if (itemUnitComboBox.SelectedIndex != -1)
                                                     {
-                                                        genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                        product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                     }
                                                     else
                                                     {
@@ -441,7 +441,7 @@ namespace _01electronics_inventory
                                                     }
                                                     if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                     {
-                                                        genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                        product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                     }
                                                     else
                                                     {
@@ -449,23 +449,23 @@ namespace _01electronics_inventory
                                                     }
                                                     if (hasSerialNumberCheckBox.IsChecked == true)
                                                     {
-                                                        genericModel.SetModelHasSerialNumber(true);
-                                                        genericModel.SetCategoryName(categoryComboBox.Text);
-                                                        if (!genericModel.IssuNewCategory())
+                                                        product_model.SetModelHasSerialNumber(true);
+                                                        product_model.SetCategoryName(categoryComboBox.Text);
+                                                        if (!product_model.IssuNewCategory())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
-                                                            genericModel.SetProductName(typeComboBox.Text);
-                                                            if (!genericModel.IssuNewProduct())
+                                                            product_model.SetProductName(typeComboBox.Text);
+                                                            if (!product_model.IssuNewProduct())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                             {
-                                                                genericModel.SetBrandName(brandComboBox.Text);
-                                                                if (!genericModel.IssuproductBrand())
+                                                                product_model.SetBrandName(brandComboBox.Text);
+                                                                if (!product_model.IssuproductBrand())
                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                 else
                                                                 {
-                                                                    if (!genericModel.IssuNewModel())
+                                                                    if (!product_model.IssuNewModel())
                                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                     else
                                                                     {
@@ -478,23 +478,23 @@ namespace _01electronics_inventory
                                                     }
                                                     else
                                                     {
-                                                        genericModel.SetModelHasSerialNumber(false);
-                                                        genericModel.SetCategoryName(categoryComboBox.Text);
-                                                        if (!genericModel.IssuNewCategory())
+                                                        product_model.SetModelHasSerialNumber(false);
+                                                        product_model.SetCategoryName(categoryComboBox.Text);
+                                                        if (!product_model.IssuNewCategory())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
-                                                            genericModel.SetProductName(typeComboBox.Text);
-                                                            if (!genericModel.IssuNewProduct())
+                                                            product_model.SetProductName(typeComboBox.Text);
+                                                            if (!product_model.IssuNewProduct())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                             {
-                                                                genericModel.SetBrandName(brandComboBox.Text);
-                                                                if (!genericModel.IssuproductBrand())
+                                                                product_model.SetBrandName(brandComboBox.Text);
+                                                                if (!product_model.IssuproductBrand())
                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                 else
                                                                 {
-                                                                    if (!genericModel.IssuNewModel())
+                                                                    if (!product_model.IssuNewModel())
                                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                     else
                                                                     {
@@ -510,18 +510,18 @@ namespace _01electronics_inventory
                                                 }
                                                 else
                                                 {
-                                                    genericModel.SetCategoryName(categoryComboBox.Text);
-                                                    if (!genericModel.IssuNewCategory())
+                                                    product_model.SetCategoryName(categoryComboBox.Text);
+                                                    if (!product_model.IssuNewCategory())
                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                     else
                                                     {
-                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                        if (!genericModel.IssuNewProduct())
+                                                        product_model.SetProductName(typeComboBox.Text);
+                                                        if (!product_model.IssuNewProduct())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
                                                           
-                                                            if (!genericModel.IssuproductBrand())
+                                                            if (!product_model.IssuproductBrand())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                             {
@@ -536,8 +536,8 @@ namespace _01electronics_inventory
                                         }
                                         else
                                         {
-                                            genericModel.SetCategoryName(categoryComboBox.Text);
-                                            if (!genericModel.IssuNewCategory())
+                                            product_model.SetCategoryName(categoryComboBox.Text);
+                                            if (!product_model.IssuNewCategory())
                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                this.Close();
                                             //System.Windows.Forms.MessageBox.Show("Type must be specified", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -545,8 +545,8 @@ namespace _01electronics_inventory
                                     }
                                     else
                                     {
-                                        genericModel.SetProductName(typeComboBox.Text);
-                                        genericModel.SetProductId(typeList[typeComboBox.SelectedIndex].product_id);
+                                        product_model.SetProductName(typeComboBox.Text);
+                                        product_model.SetProductId(typeList[typeComboBox.SelectedIndex].type_id);
                                         if (brandComboBox.SelectedIndex == -1 && additionalInfo.SelectedIndex == -1 )
                                         {
                                             if (brandComboBox.Text != string.Empty)
@@ -557,26 +557,26 @@ namespace _01electronics_inventory
                                                 /////////////////////////////////////////////////////////////////
                                                 if (modelTextBlock.Text != string.Empty)
                                                 {
-                                                    genericModel.SetModelName(modelTextBlock.Text);
+                                                    product_model.SetModelName(modelTextBlock.Text);
                                                     if (itemUnitComboBox.SelectedIndex != -1)
                                                     {
-                                                        genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                        product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                         if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                         {
-                                                            genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                            product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                             if (hasSerialNumberCheckBox.IsChecked == true)
                                                             {
-                                                                genericModel.SetModelHasSerialNumber(true);
+                                                                product_model.SetModelHasSerialNumber(true);
 
-                                                                if (!genericModel.IssuNewModel())
+                                                                if (!product_model.IssuNewModel())
                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                 else
                                                                     this.Close();
                                                             }
                                                             else
                                                             {
-                                                                genericModel.SetModelHasSerialNumber(false);
-                                                                if (!genericModel.IssuNewModel())
+                                                                product_model.SetModelHasSerialNumber(false);
+                                                                if (!product_model.IssuNewModel())
                                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                 else
                                                                     this.Close();
@@ -599,8 +599,8 @@ namespace _01electronics_inventory
                                                 }
                                                 else
                                                 {
-                                                    genericModel.SetBrandName(brandComboBox.Text);
-                                                    if (!genericModel.IssuNewBrand())
+                                                    product_model.SetBrandName(brandComboBox.Text);
+                                                    if (!product_model.IssuNewBrand())
                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                     else
                                                         this.Close();
@@ -617,31 +617,31 @@ namespace _01electronics_inventory
                                         }
                                         else
                                         {
-                                            genericModel.SetBrandName(brandComboBox.Text);
+                                            product_model.SetBrandName(brandComboBox.Text);
                                             if (brandComboBox.SelectedIndex != -1)
-                                                genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                                                product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
                                            
                                             if (modelTextBlock.Text != string.Empty)
                                             {
-                                                genericModel.SetModelName(modelTextBlock.Text);
+                                                product_model.SetModelName(modelTextBlock.Text);
                                                 if (itemUnitComboBox.SelectedIndex != -1)
                                                 {
-                                                    genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                    product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                     if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                     {
-                                                        genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                        product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                         if (hasSerialNumberCheckBox.IsChecked == true)
                                                         {
-                                                            genericModel.SetModelHasSerialNumber(true);
-                                                            if (!genericModel.IssuNewModel())
+                                                            product_model.SetModelHasSerialNumber(true);
+                                                            if (!product_model.IssuNewModel())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                                 this.Close();
                                                         }
                                                         else
                                                         {
-                                                            genericModel.SetModelHasSerialNumber(false);
-                                                            if (!genericModel.IssuNewModel())
+                                                            product_model.SetModelHasSerialNumber(false);
+                                                            if (!product_model.IssuNewModel())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                                 this.Close();
@@ -664,7 +664,7 @@ namespace _01electronics_inventory
                                             }
                                             else
                                             {
-                                                if (!genericModel.IssuproductBrand())
+                                                if (!product_model.IssuproductBrand())
                                                     System.Windows.Forms.MessageBox.Show("Already Exists", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                 else
                                                     this.Close();
@@ -685,8 +685,8 @@ namespace _01electronics_inventory
                             }
                             else
                             {
-                                genericModel.SetCategoryName(categoryComboBox.Text);
-                                genericModel.SetCategoryId(categoryList[categoryComboBox.SelectedIndex].category_id);
+                                product_model.SetCategoryName(categoryComboBox.Text);
+                                product_model.SetCategoryId(categoryList[categoryComboBox.SelectedIndex].category_id);
 
                                 if (typeComboBox.SelectedIndex == -1)
                                 {
@@ -706,28 +706,28 @@ namespace _01electronics_inventory
                                                 /////////////////////////////////////////////////////////////////
                                                 if (modelTextBlock.Text != string.Empty)
                                                 {
-                                                    genericModel.SetModelName(modelTextBlock.Text);
+                                                    product_model.SetModelName(modelTextBlock.Text);
                                                     if (itemUnitComboBox.SelectedIndex != -1)
                                                     {
-                                                        genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                        product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                         if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                         {
-                                                            genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                            product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                             if (hasSerialNumberCheckBox.IsChecked == true)
                                                             {
-                                                                genericModel.SetModelHasSerialNumber(true);
+                                                                product_model.SetModelHasSerialNumber(true);
                                                                
-                                                                    genericModel.SetProductName(typeComboBox.Text);
-                                                                    if (!genericModel.IssuNewProduct())
+                                                                    product_model.SetProductName(typeComboBox.Text);
+                                                                    if (!product_model.IssuNewProduct())
                                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                     else
                                                                     {
-                                                                        genericModel.SetBrandName(brandComboBox.Text);
-                                                                        if (!genericModel.IssuNewBrand())
+                                                                        product_model.SetBrandName(brandComboBox.Text);
+                                                                        if (!product_model.IssuNewBrand())
                                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                         else
                                                                         {
-                                                                            if (!genericModel.IssuNewModel())
+                                                                            if (!product_model.IssuNewModel())
                                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                         else
                                                                             this.Close();
@@ -739,19 +739,19 @@ namespace _01electronics_inventory
                                                             }
                                                             else
                                                             {
-                                                                genericModel.SetModelHasSerialNumber(false);
+                                                                product_model.SetModelHasSerialNumber(false);
                                                                
-                                                                    genericModel.SetProductName(typeComboBox.Text);
-                                                                    if (!genericModel.IssuNewProduct())
+                                                                    product_model.SetProductName(typeComboBox.Text);
+                                                                    if (!product_model.IssuNewProduct())
                                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                     else
                                                                     {
-                                                                        genericModel.SetBrandName(brandComboBox.Text);
-                                                                        if (!genericModel.IssuNewBrand())
+                                                                        product_model.SetBrandName(brandComboBox.Text);
+                                                                        if (!product_model.IssuNewBrand())
                                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                         else
                                                                         {
-                                                                            if (!genericModel.IssuNewModel())
+                                                                            if (!product_model.IssuNewModel())
                                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                         else
                                                                             this.Close();
@@ -774,15 +774,15 @@ namespace _01electronics_inventory
                                                 }
                                                 else
                                                 {
-                                                    genericModel.SetCategoryName(categoryComboBox.Text);
+                                                    product_model.SetCategoryName(categoryComboBox.Text);
                                                    
-                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                        if (!genericModel.IssuNewProduct())
+                                                        product_model.SetProductName(typeComboBox.Text);
+                                                        if (!product_model.IssuNewProduct())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
-                                                            genericModel.SetBrandName(brandComboBox.Text);
-                                                            if (!genericModel.IssuNewBrand())
+                                                            product_model.SetBrandName(brandComboBox.Text);
+                                                            if (!product_model.IssuNewBrand())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                             this.Close();
@@ -796,10 +796,10 @@ namespace _01electronics_inventory
                                             }
                                             else
                                             {
-                                                genericModel.SetCategoryName(categoryComboBox.Text);
+                                                product_model.SetCategoryName(categoryComboBox.Text);
                                                
-                                                    genericModel.SetProductName(typeComboBox.Text);
-                                                    if (!genericModel.IssuNewProduct())
+                                                    product_model.SetProductName(typeComboBox.Text);
+                                                    if (!product_model.IssuNewProduct())
                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                 else
                                                     this.Close();
@@ -809,17 +809,17 @@ namespace _01electronics_inventory
                                         }
                                         else
                                         {
-                                            genericModel.SetBrandName(brandComboBox.Text);
+                                            product_model.SetBrandName(brandComboBox.Text);
                                             if (brandComboBox.SelectedIndex != -1)
-                                                genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                                                product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
 
                                             if (modelTextBlock.Text != string.Empty)
                                             {
-                                                genericModel.SetModelName(modelTextBlock.Text);
+                                                product_model.SetModelName(modelTextBlock.Text);
 
                                                 if (itemUnitComboBox.SelectedIndex != -1)
                                                 {
-                                                    genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                    product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                 }
                                                 else
                                                 {
@@ -827,7 +827,7 @@ namespace _01electronics_inventory
                                                 }
                                                 if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                 {
-                                                    genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                    product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                 }
                                                 else
                                                 {
@@ -835,20 +835,20 @@ namespace _01electronics_inventory
                                                 }
                                                 if (hasSerialNumberCheckBox.IsChecked == true)
                                                 {
-                                                    genericModel.SetModelHasSerialNumber(true);
-                                                    genericModel.SetCategoryName(categoryComboBox.Text);
+                                                    product_model.SetModelHasSerialNumber(true);
+                                                    product_model.SetCategoryName(categoryComboBox.Text);
                                                     
-                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                        if (!genericModel.IssuNewProduct())
+                                                        product_model.SetProductName(typeComboBox.Text);
+                                                        if (!product_model.IssuNewProduct())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
-                                                            genericModel.SetBrandName(brandComboBox.Text);
-                                                            if (!genericModel.IssuproductBrand())
+                                                            product_model.SetBrandName(brandComboBox.Text);
+                                                            if (!product_model.IssuproductBrand())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                             {
-                                                            if (!genericModel.IssuNewModel())
+                                                            if (!product_model.IssuNewModel())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                                 this.Close();
@@ -858,20 +858,20 @@ namespace _01electronics_inventory
                                                 }
                                                 else
                                                 {
-                                                    genericModel.SetModelHasSerialNumber(false);
-                                                    genericModel.SetCategoryName(categoryComboBox.Text);
+                                                    product_model.SetModelHasSerialNumber(false);
+                                                    product_model.SetCategoryName(categoryComboBox.Text);
                                                   
-                                                        genericModel.SetProductName(typeComboBox.Text);
-                                                        if (!genericModel.IssuNewProduct())
+                                                        product_model.SetProductName(typeComboBox.Text);
+                                                        if (!product_model.IssuNewProduct())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                         {
-                                                            genericModel.SetBrandName(brandComboBox.Text);
-                                                            if (!genericModel.IssuproductBrand())
+                                                            product_model.SetBrandName(brandComboBox.Text);
+                                                            if (!product_model.IssuproductBrand())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                             {
-                                                            if (!genericModel.IssuNewModel())
+                                                            if (!product_model.IssuNewModel())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                                 this.Close();
@@ -884,15 +884,15 @@ namespace _01electronics_inventory
                                             }
                                             else
                                             {
-                                                genericModel.SetCategoryName(categoryComboBox.Text);
+                                                product_model.SetCategoryName(categoryComboBox.Text);
                                                
-                                                    genericModel.SetProductName(typeComboBox.Text);
-                                                    if (!genericModel.IssuNewProduct())
+                                                    product_model.SetProductName(typeComboBox.Text);
+                                                    if (!product_model.IssuNewProduct())
                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                     else
                                                     {
 
-                                                    if (!genericModel.IssuproductBrand())
+                                                    if (!product_model.IssuproductBrand())
                                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                     else
                                                         this.Close();
@@ -906,16 +906,16 @@ namespace _01electronics_inventory
                                     else
                                     {
                                         System.Windows.Forms.MessageBox.Show("Category Already Exists.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                                        // genericModel.SetCategoryName(categoryComboBox.Text);
-                                        // if (!genericModel.IssuNewCategory())
+                                        // product_model.SetCategoryName(categoryComboBox.Text);
+                                        // if (!product_model.IssuNewCategory())
                                         //     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                         //System.Windows.Forms.MessageBox.Show("Type must be specified", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     }
                                 }
                                 else
                                 {
-                                    genericModel.SetProductName(typeComboBox.Text);
-                                    genericModel.SetProductId(typeList[typeComboBox.SelectedIndex].product_id);
+                                    product_model.SetProductName(typeComboBox.Text);
+                                    product_model.SetProductId(typeList[typeComboBox.SelectedIndex].type_id);
                                     if (brandComboBox.SelectedIndex == -1 && additionalInfo.SelectedIndex==-1)
                                     {
                                         if (brandComboBox.Text != string.Empty)
@@ -926,26 +926,26 @@ namespace _01electronics_inventory
                                             /////////////////////////////////////////////////////////////////
                                             if (modelTextBlock.Text != string.Empty)
                                             {
-                                                genericModel.SetModelName(modelTextBlock.Text);
+                                                product_model.SetModelName(modelTextBlock.Text);
                                                 if (itemUnitComboBox.SelectedIndex != -1)
                                                 {
-                                                    genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                    product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                     if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                     {
-                                                        genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                        product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                         if (hasSerialNumberCheckBox.IsChecked == true)
                                                         {
-                                                            genericModel.SetModelHasSerialNumber(true);
+                                                            product_model.SetModelHasSerialNumber(true);
 
-                                                            if (!genericModel.IssuNewModel())
+                                                            if (!product_model.IssuNewModel())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                                 this.Close();
                                                         }
                                                         else
                                                         {
-                                                            genericModel.SetModelHasSerialNumber(false);
-                                                            if (!genericModel.IssuNewModel())
+                                                            product_model.SetModelHasSerialNumber(false);
+                                                            if (!product_model.IssuNewModel())
                                                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                             else
                                                                 this.Close();
@@ -968,8 +968,8 @@ namespace _01electronics_inventory
                                             }
                                             else
                                             {
-                                                genericModel.SetBrandName(brandComboBox.Text);
-                                                if (!genericModel.IssuNewBrand())
+                                                product_model.SetBrandName(brandComboBox.Text);
+                                                if (!product_model.IssuNewBrand())
                                                     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                 else
                                                     this.Close();
@@ -986,31 +986,31 @@ namespace _01electronics_inventory
                                     }
                                     else
                                     {
-                                        genericModel.SetBrandName(brandComboBox.Text);
+                                        product_model.SetBrandName(brandComboBox.Text);
                                         if(brandComboBox.SelectedIndex!=-1)
-                                        genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                                        product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
 
                                         if (modelTextBlock.Text != string.Empty)
                                         {
-                                            genericModel.SetModelName(modelTextBlock.Text);
+                                            product_model.SetModelName(modelTextBlock.Text);
                                             if (itemUnitComboBox.SelectedIndex != -1)
                                             {
-                                                genericModel.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                                                product_model.SetModelitemUnit(measureUnitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
                                                 if (pricingCriteriaComboBox.SelectedIndex != -1)
                                                 {
-                                                    genericModel.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
+                                                    product_model.SetModelpricingCriteria(pricingCriteria[pricingCriteriaComboBox.SelectedIndex].pricing_criteria_id);
                                                     if (hasSerialNumberCheckBox.IsChecked == true)
                                                     {
-                                                        genericModel.SetModelHasSerialNumber(true);
-                                                        if (!genericModel.IssuNewModel())
+                                                        product_model.SetModelHasSerialNumber(true);
+                                                        if (!product_model.IssuNewModel())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                             this.Close();
                                                     }
                                                     else
                                                     {
-                                                        genericModel.SetModelHasSerialNumber(false);
-                                                        if (!genericModel.IssuNewModel())
+                                                        product_model.SetModelHasSerialNumber(false);
+                                                        if (!product_model.IssuNewModel())
                                                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                         else
                                                             this.Close();
@@ -1033,7 +1033,7 @@ namespace _01electronics_inventory
                                         }
                                         else
                                         {
-                                            if (!genericModel.IssuproductBrand())
+                                            if (!product_model.IssuproductBrand())
                                                 System.Windows.Forms.MessageBox.Show("Already Exists", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                             else
                                                 this.Close();
@@ -1114,7 +1114,7 @@ namespace _01electronics_inventory
             {
                 brandComboBox.IsEnabled = true;
                 brandComboBox.Items.Clear();
-                FillProductBrandComboBox(categoryList[categoryComboBox.SelectedIndex].category_id, typeList[typeComboBox.SelectedIndex].product_id);
+                FillProductBrandComboBox(categoryList[categoryComboBox.SelectedIndex].category_id, typeList[typeComboBox.SelectedIndex].type_id);
 
             }
             else if (typeComboBox.SelectedIndex == -1 && typeComboBox.Text != string.Empty)

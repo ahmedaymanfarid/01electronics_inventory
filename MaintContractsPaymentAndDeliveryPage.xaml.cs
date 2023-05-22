@@ -174,7 +174,7 @@ namespace _01electronics_inventory
         {
             totalPrice = 0;
 
-            for (int i = 1; i <= COMPANY_WORK_MACROS.MAX_OUTGOING_QUOTATION_PRODUCTS; i++)
+            for (int i = 1; i <= COMPANY_WORK_MACROS.MAX_QUOTATION_PRODUCTS; i++)
                 totalPrice += maintContracts.GetMaintContractProductPriceValue(i) * maintContracts.GetMaintContractProductQuantity(i);
 
             totalPriceTextBox.Text = totalPrice.ToString();
@@ -185,7 +185,7 @@ namespace _01electronics_inventory
         {
             totalPrice = 0;
 
-            for (int i = 1; i <= COMPANY_WORK_MACROS.MAX_OUTGOING_QUOTATION_PRODUCTS; i++)
+            for (int i = 1; i <= COMPANY_WORK_MACROS.MAX_QUOTATION_PRODUCTS; i++)
                 totalPrice += maintContracts.GetProductPriceValue(i) * maintContracts.GetMaintOfferProductQuantity(i);
 
             totalPriceTextBox.Text = totalPrice.ToString();
@@ -294,7 +294,7 @@ namespace _01electronics_inventory
         }
         private void OnClickUploadFiles(object sender, MouseButtonEventArgs e)
         {
-            if (viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+            if (viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
             {
                 maintContractsUploadFilesPage.maintContractsBasicInfoPage = maintContractsBasicInfoPage;
                 maintContractsUploadFilesPage.maintContractsProjectsPage = maintContractsProjectsPage;

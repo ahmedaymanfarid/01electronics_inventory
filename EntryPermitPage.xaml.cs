@@ -34,7 +34,7 @@ namespace _01electronics_inventory
 
         MaterialEntryPermit entryPermit = new MaterialEntryPermit();
 
-        List<BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_MIN_STRUCT> materialEntryPermits = new List<BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_MIN_STRUCT>();
+        List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT> materialEntryPermits = new List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT>();
 
         public EntryPermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser)
         {
@@ -61,7 +61,7 @@ namespace _01electronics_inventory
                 for (int j = i + 1; j < materialEntryPermits.Count; j++) {
 
 
-                    if (materialEntryPermits[i].entry_Permit_Serial == materialEntryPermits[j].entry_Permit_Serial) {
+                    if (materialEntryPermits[i].entry_permit_serial == materialEntryPermits[j].entry_permit_serial) {
 
                         materialEntryPermits.Remove(materialEntryPermits[j]);
                         j--;
@@ -78,7 +78,7 @@ namespace _01electronics_inventory
                 Grid card = new Grid() { Margin=new Thickness(0,0,0,10)};
                 card.MouseEnter += CardMouseEnter;
 
-                card.Tag = materialEntryPermits[i].entry_Permit_Serial;
+                card.Tag = materialEntryPermits[i].entry_permit_serial;
 
                 card.RowDefinitions.Add(new RowDefinition());
                 card.RowDefinitions.Add(new RowDefinition());
@@ -90,7 +90,7 @@ namespace _01electronics_inventory
 
 
                 Label header = new Label();
-                header.Content = $"{materialEntryPermits[i].entry_Permit_Id}";
+                header.Content = $"{materialEntryPermits[i].entry_permit_id}";
 
                 header.Style= (Style)FindResource("stackPanelItemHeader");
 
@@ -114,20 +114,20 @@ namespace _01electronics_inventory
                 Grid.SetColumn(transactionDate, 0);
 
 
-                Label nickName = new Label();
-                nickName.Content = $"{materialEntryPermits[i].nickName}";
+                Label warehouseNiceName = new Label();
+                warehouseNiceName.Content = $"{materialEntryPermits[i].warehouseNiceName}";
 
-                nickName.Style = (Style)FindResource("stackPanelItemBody");
-                nickName.HorizontalAlignment = HorizontalAlignment.Left;
+                warehouseNiceName.Style = (Style)FindResource("stackPanelItemBody");
+                warehouseNiceName.HorizontalAlignment = HorizontalAlignment.Left;
 
-                card.Children.Add(nickName);
+                card.Children.Add(warehouseNiceName);
 
-                Grid.SetRow(nickName, 2);
+                Grid.SetRow(warehouseNiceName, 2);
 
-                Grid.SetColumn(nickName, 0);
+                Grid.SetColumn(warehouseNiceName, 0);
 
 
-                if (materialEntryPermits[i].rfpInfo.rfpSerial != 0) {
+                if (materialEntryPermits[i].rfp.rfpSerial != 0) {
 
                     card.RowDefinitions.Add(new RowDefinition());
                     card.RowDefinitions.Add(new RowDefinition());
@@ -135,7 +135,7 @@ namespace _01electronics_inventory
 
 
                     Label rfpSerial = new Label();
-                    rfpSerial.Content = $"{materialEntryPermits[i].rfpInfo.rfpSerial}";
+                    rfpSerial.Content = $"{materialEntryPermits[i].rfp.rfpSerial}";
 
                     rfpSerial.Style = (Style)FindResource("stackPanelItemBody");
 
@@ -148,7 +148,7 @@ namespace _01electronics_inventory
 
 
                     Label rfpRequesterTeam = new Label();
-                    rfpRequesterTeam.Content = $"{materialEntryPermits[i].rfp_requsterTeam_Name}";
+                    rfpRequesterTeam.Content = $"{materialEntryPermits[i].rfp.rfp_requestor_team_name}";
 
                     rfpRequesterTeam.Style = (Style)FindResource("stackPanelItemBody");
 
@@ -160,7 +160,7 @@ namespace _01electronics_inventory
 
 
                     Label rfpId = new Label();
-                    rfpId.Content = $"{materialEntryPermits[i].rfpInfo.rfpID}";
+                    rfpId.Content = $"{materialEntryPermits[i].rfp.rfpID}";
 
                     rfpId.Style = (Style)FindResource("stackPanelItemBody");
 
@@ -243,10 +243,10 @@ namespace _01electronics_inventory
             Grid card = expander.Parent as Grid;
 
 
-            BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_MIN_STRUCT materialEntryPermit = materialEntryPermits.FirstOrDefault(a => a.entry_Permit_Serial == Convert.ToInt32(card.Tag));
+            INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT materialEntryPermit = materialEntryPermits.FirstOrDefault(a => a.entry_permit_serial == Convert.ToInt32(card.Tag));
 
 
-            entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_Permit_Serial);
+            entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_permit_serial);
             entryPermit.InitializeMaterialEntryPermit();
 
             AddEntryPermitWindow addEntryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, true, ref entryPermit,this);
@@ -254,9 +254,9 @@ namespace _01electronics_inventory
 
             addEntryPermitWindow.EntryPermitPage.TransactionDatePicker.Text = materialEntryPermit.transaction_date.ToString();
 
-            addEntryPermitWindow.EntryPermitPage.WareHouseCombo.SelectedItem = materialEntryPermit.nickName;
+            addEntryPermitWindow.EntryPermitPage.WareHouseCombo.SelectedItem = materialEntryPermit.warehouseNiceName;
 
-            addEntryPermitWindow.EntryPermitPage.entryPermitIdTextBox.Text = materialEntryPermit.entry_Permit_Id;
+            addEntryPermitWindow.EntryPermitPage.entryPermitIdTextBox.Text = materialEntryPermit.entry_permit_id;
 
 
 
@@ -290,7 +290,7 @@ namespace _01electronics_inventory
                 if (entryPermit.GetItems()[i].rfp_info.rfpSerial == 0)
                 {
 
-                    if (entryPermit.GetItems()[i].companyProduct.typeId == 0)
+                    if (!entryPermit.GetItems()[i].is_company_product)
                     {
 
 
@@ -346,7 +346,7 @@ namespace _01electronics_inventory
 
                         ComboBox genericCategoryComboBox = genericCategoryPanel.Children[1] as ComboBox;
 
-                        genericCategoryComboBox.SelectedItem = entryPermit.GetItems()[i].genericCategory.category_name;
+                        genericCategoryComboBox.SelectedItem = entryPermit.GetItems()[i].product_category.category_name;
 
 
 
@@ -355,7 +355,7 @@ namespace _01electronics_inventory
                         ComboBox genericProductComboBox = genericProductPanel.Children[1] as ComboBox;
 
 
-                        genericProductComboBox.SelectedItem = entryPermit.GetItems()[i].genericProduct.product_name;
+                        genericProductComboBox.SelectedItem = entryPermit.GetItems()[i].product_type.product_name;
 
 
 
@@ -364,7 +364,7 @@ namespace _01electronics_inventory
                         ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
 
 
-                        genericBrandComboBox.SelectedItem = entryPermit.GetItems()[i].genericBrand.brand_name;
+                        genericBrandComboBox.SelectedItem = entryPermit.GetItems()[i].product_brand.brand_name;
 
 
                         WrapPanel genericModelPanel = itemCard.Children[8] as WrapPanel;
@@ -372,7 +372,7 @@ namespace _01electronics_inventory
                         ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
 
 
-                        genericModelComboBox.SelectedItem = entryPermit.GetItems()[i].genericModel.model_name;
+                        genericModelComboBox.SelectedItem = entryPermit.GetItems()[i].product_model.model_name;
 
 
                         priceTextBox.Text = entryPermit.GetItems()[i].item_price.ToString();
@@ -460,7 +460,7 @@ namespace _01electronics_inventory
 
                     }
 
-                    else if (entryPermit.GetItems()[i].genericCategory.category_id == 0)
+                    else if (entryPermit.GetItems()[i].is_company_product)
                     {
 
                         Grid itemCard = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.Home.Children[m] as Grid;
@@ -512,14 +512,14 @@ namespace _01electronics_inventory
 
                         ComboBox companyCategoryComboBox = CompanyCategoryPanel.Children[1] as ComboBox;
 
-                        //companyCategoryComboBox.SelectedItem = entryPermit.GetItems()[i].company.typeName;
+                        //companyCategoryComboBox.SelectedItem = entryPermit.GetItems()[i].company.product_name;
 
 
                         WrapPanel CompanyProductPanel = itemCard.Children[10] as WrapPanel;
 
                         ComboBox companyProductComboBox = CompanyProductPanel.Children[1] as ComboBox;
 
-                        companyProductComboBox.SelectedItem = entryPermit.GetItems()[i].companyProduct.typeName;
+                        companyProductComboBox.SelectedItem = entryPermit.GetItems()[i].product_type.product_name;
 
 
 
@@ -527,7 +527,7 @@ namespace _01electronics_inventory
 
                         ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
-                        companyBrandComboBox.SelectedItem = entryPermit.GetItems()[i].companyBrand.brandName;
+                        companyBrandComboBox.SelectedItem = entryPermit.GetItems()[i].product_brand.brand_name;
 
 
 
@@ -535,7 +535,7 @@ namespace _01electronics_inventory
 
                         ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
 
-                        companyModelComboBox.SelectedItem = entryPermit.GetItems()[i].companyModel.modelName;
+                        companyModelComboBox.SelectedItem = entryPermit.GetItems()[i].product_model.model_name;
 
 
                         priceTextBox.Text = entryPermit.GetItems()[i].item_price.ToString();
@@ -655,7 +655,7 @@ namespace _01electronics_inventory
 
                     ComboBox requsterComboBox = rfpRequsterPanel.Children[1] as ComboBox;
 
-                    requsterComboBox.SelectedItem = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters().FirstOrDefault(a => a.team_id == entryPermit.GetItems()[i].rfp_info.rfpRequestorTeam).employee_team;
+                    requsterComboBox.SelectedItem = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters().FirstOrDefault(a => a.requestor_team.team_id == entryPermit.GetItems()[i].rfp_info.rfpRequestorTeam).requestor_team.team_name;
 
 
                     ComboBox rfpSerialComboBox = rfpRequsterPanel.Children[3] as ComboBox;
@@ -663,9 +663,9 @@ namespace _01electronics_inventory
 
                     addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfps().Clear();
 
-                    List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT> rfps = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfps();
+                    List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> rfps = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfps();
 
-                    commonQueries.GetTeamRFPs(ref rfps, addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters()[requsterComboBox.SelectedIndex].team_id);
+                    commonQueries.GetTeamRFPs(ref rfps, addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters()[requsterComboBox.SelectedIndex].requestor_team.team_id);
 
 
                     rfpSerialComboBox.Items.Clear();
@@ -675,7 +675,7 @@ namespace _01electronics_inventory
 
 
 
-                    List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> rfpItems = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfpItems();
+                    List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfpItems();
 
                     rfpItems.Clear();
 
@@ -690,16 +690,16 @@ namespace _01electronics_inventory
                     {
 
 
-                        if (rfpItems[i].rfpItem.generic_product_category.category_id == 0)
+                        if (rfpItems[i].product_category.category_id == 0)
                         {
 
-                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].rfpItem.company_category.category + "," + rfpItems[i].rfpItem.company_product.typeName + "," + rfpItems[i].rfpItem.company_brand.brandName + "," + rfpItems[i].rfpItem.company_model.modelName);
+                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
 
                         }
                         else
                         {
 
-                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].rfpItem.generic_product_category.category_name + "," + rfpItems[i].rfpItem.generic_product_type.product_name + "," + rfpItems[i].rfpItem.generic_product_brand.brand_name + "," + rfpItems[i].rfpItem.generic_product_model.model_name);
+                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
 
 
                         }
@@ -708,20 +708,20 @@ namespace _01electronics_inventory
                     }
 
 
-                    PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING item = rfpItems.FirstOrDefault(a => a.rfp_struct.rfpSerial == entryPermit.GetItems()[i].rfp_info.rfpSerial && a.rfp_struct.rfpVersion == entryPermit.GetItems()[i].rfp_info.rfpVersion && a.rfp_struct.rfpRequestorTeam == entryPermit.GetItems()[i].rfp_info.rfpRequestorTeam && a.rfpItem.item_number == entryPermit.GetItems()[i].rfp_item_number);
+                    PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT item = rfpItems.FirstOrDefault(a => a.rfpSerial == entryPermit.GetItems()[i].rfp_info.rfpSerial && a.rfpVersion == entryPermit.GetItems()[i].rfp_info.rfpVersion && a.rfpRequestorTeam == entryPermit.GetItems()[i].rfp_info.rfpRequestorTeam && a.rfp_item_number == entryPermit.GetItems()[i].rfp_item_number);
 
 
 
-                    if (rfpItems[i].rfpItem.generic_product_category.category_id == 0)
+                    if (rfpItems[i].product_category.category_id == 0)
                     {
 
-                        rfpItemDescriptionComboBox.SelectedItem = item.rfpItem.company_category.category + "," + item.rfpItem.company_product.typeName + "," + item.rfpItem.company_brand.brandName + "," + item.rfpItem.company_model.modelName;
+                        rfpItemDescriptionComboBox.SelectedItem = item.product_category.category_name + "," + item.product_type.product_name + "," + item.product_brand.brand_name + "," + item.product_model.model_name;
 
                     }
                     else
                     {
 
-                        rfpItemDescriptionComboBox.SelectedItem = item.rfpItem.generic_product_category.category_name + "," + item.rfpItem.generic_product_type.product_name + "," + item.rfpItem.generic_product_brand.brand_name + "," + item.rfpItem.generic_product_model.model_name;
+                        rfpItemDescriptionComboBox.SelectedItem = item.product_category.category_name + "," + item.product_type.product_name + "," + item.product_brand.brand_name + "," + item.product_model.model_name;
 
 
                     }
@@ -751,10 +751,10 @@ namespace _01electronics_inventory
             Expander expander=  stackPanel.Parent as Expander;
             Grid card= expander.Parent as Grid;
 
-            BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_MIN_STRUCT materialEntryPermit=materialEntryPermits.FirstOrDefault(a => a.entry_Permit_Serial == Convert.ToInt32(card.Tag));
+            INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT materialEntryPermit=materialEntryPermits.FirstOrDefault(a => a.entry_permit_serial == Convert.ToInt32(card.Tag));
 
 
-            entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_Permit_Serial);
+            entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_permit_serial);
             entryPermit.InitializeMaterialEntryPermit();
 
                         AddEntryPermitWindow addEntryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,false,ref entryPermit);
@@ -768,9 +768,9 @@ namespace _01electronics_inventory
 
             addEntryPermitWindow.EntryPermitPage.TransactionDatePicker.Text = materialEntryPermit.transaction_date.ToString();
 
-            addEntryPermitWindow.EntryPermitPage.WareHouseCombo.SelectedItem = materialEntryPermit.nickName;
+            addEntryPermitWindow.EntryPermitPage.WareHouseCombo.SelectedItem = materialEntryPermit.warehouseNiceName;
 
-            addEntryPermitWindow.EntryPermitPage.entryPermitIdTextBox.Text = materialEntryPermit.entry_Permit_Id;
+            addEntryPermitWindow.EntryPermitPage.entryPermitIdTextBox.Text = materialEntryPermit.entry_permit_id;
 
             addEntryPermitWindow.EntryPermitPage.entryPermitIdTextBox.IsReadOnly = true;
 
@@ -785,32 +785,32 @@ namespace _01electronics_inventory
 
 
 
-            List<BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM> items = new List<BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM>();
+            List<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT> items = new List<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT>();
 
 
             for (int i = 0; i < entryPermit.GetItems().Count; i++) {
 
 
-                if (entryPermit.GetItems()[i].companyProduct.typeName == "")
+                if (entryPermit.GetItems()[i].product_type.product_name == "")
                 {
 
-                    List<BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM> itemm = entryPermit.GetItems().Where(a => a.genericCategory.category_id == entryPermit.GetItems()[i].genericCategory.category_id && a.genericProduct.product_id == entryPermit.GetItems()[i].genericProduct.product_id && a.genericBrand.brand_id == entryPermit.GetItems()[i].genericBrand.brand_id && a.genericModel.model_id == entryPermit.GetItems()[i].genericModel.model_id).ToList();
+                    List<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT> itemm = entryPermit.GetItems().Where(a => a.product_category.category_id == entryPermit.GetItems()[i].product_category.category_id && a.product_type.type_id == entryPermit.GetItems()[i].product_type.type_id && a.product_brand.brand_id == entryPermit.GetItems()[i].product_brand.brand_id && a.product_model.model_id == entryPermit.GetItems()[i].product_model.model_id).ToList();
 
                     itemm.ForEach(a => items.Add(a));
 
 
-                    entryPermit.GetItems().RemoveAll(a => a.genericCategory.category_id == entryPermit.GetItems()[i].genericCategory.category_id && a.genericProduct.product_id == entryPermit.GetItems()[i].genericProduct.product_id && a.genericBrand.brand_id == entryPermit.GetItems()[i].genericBrand.brand_id && a.genericModel.model_id == entryPermit.GetItems()[i].genericModel.model_id);
+                    entryPermit.GetItems().RemoveAll(a => a.product_category.category_id == entryPermit.GetItems()[i].product_category.category_id && a.product_type.type_id == entryPermit.GetItems()[i].product_type.type_id && a.product_brand.brand_id == entryPermit.GetItems()[i].product_brand.brand_id && a.product_model.model_id == entryPermit.GetItems()[i].product_model.model_id);
                     i--;
                 }
 
                 else {
 
-                    List<BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM> itemm = entryPermit.GetItems().Where(a => a.companyProduct.typeId == entryPermit.GetItems()[i].companyProduct.typeId && a.companyBrand.brandId == entryPermit.GetItems()[i].companyBrand.brandId && a.companyModel.modelId == entryPermit.GetItems()[i].companyModel.modelId).ToList();
+                    List<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT> itemm = entryPermit.GetItems().Where(a => a.product_type.type_id == entryPermit.GetItems()[i].product_type.type_id && a.product_brand.brand_id == entryPermit.GetItems()[i].product_brand.brand_id && a.product_model.model_id == entryPermit.GetItems()[i].product_model.model_id).ToList();
 
                     itemm.ForEach(a => items.Add(a));
 
 
-                    entryPermit.GetItems().RemoveAll(a => a.companyProduct.typeId == entryPermit.GetItems()[i].companyProduct.typeId && a.companyBrand.brandId == entryPermit.GetItems()[i].companyBrand.brandId && a.companyModel.modelId == entryPermit.GetItems()[i].companyModel.modelId);
+                    entryPermit.GetItems().RemoveAll(a => a.product_type.type_id == entryPermit.GetItems()[i].product_type.type_id && a.product_brand.brand_id == entryPermit.GetItems()[i].product_brand.brand_id && a.product_model.model_id == entryPermit.GetItems()[i].product_model.model_id);
 
                     i--;
 
@@ -825,7 +825,7 @@ namespace _01electronics_inventory
                 if (items[i].rfp_info.rfpSerial == 0)
                 {
 
-                    if (items[i].companyProduct.typeName == "")
+                    if (items[i].product_type.product_name == "")
                     {
 
 
@@ -890,7 +890,7 @@ namespace _01electronics_inventory
                         ComboBox genericCategoryComboBox = genericCategoryPanel.Children[1] as ComboBox;
                         genericCategoryComboBox.IsEnabled = false;
 
-                        genericCategoryComboBox.SelectedItem = items[i].genericCategory.category_name;
+                        genericCategoryComboBox.SelectedItem = items[i].product_category.category_name;
 
 
 
@@ -900,7 +900,7 @@ namespace _01electronics_inventory
                         genericProductComboBox.IsEnabled = false;
 
 
-                        genericProductComboBox.SelectedItem = items[i].genericProduct.product_name;
+                        genericProductComboBox.SelectedItem = items[i].product_type.product_name;
 
 
 
@@ -910,7 +910,7 @@ namespace _01electronics_inventory
                         genericBrandComboBox.IsEnabled = false;
 
 
-                        genericBrandComboBox.SelectedItem = items[i].genericBrand.brand_name;
+                        genericBrandComboBox.SelectedItem = items[i].product_brand.brand_name;
 
 
                         WrapPanel genericModelPanel = itemCard.Children[8] as WrapPanel;
@@ -919,7 +919,7 @@ namespace _01electronics_inventory
                         genericModelComboBox.IsEnabled = false;
 
 
-                        genericModelComboBox.SelectedItem = items[i].genericModel.model_name;
+                        genericModelComboBox.SelectedItem = items[i].product_model.model_name;
 
 
                         priceTextBox.Text = items[i].item_price.ToString();
@@ -936,10 +936,10 @@ namespace _01electronics_inventory
                             if (i != 0)
                             {
 
-                                if (items[i - 1].genericCategory.category_id == items[i].genericCategory.category_id &&
-                                    items[i - 1].genericProduct.product_id == items[i].genericProduct.product_id &&
-                                    items[i - 1].genericBrand.brand_id == items[i].genericBrand.brand_id &&
-                                    items[i - 1].genericModel.model_id == items[i].genericModel.model_id)
+                                if (items[i - 1].product_category.category_id == items[i].product_category.category_id &&
+                                    items[i - 1].product_type.type_id == items[i].product_type.type_id &&
+                                    items[i - 1].product_brand.brand_id == items[i].product_brand.brand_id &&
+                                    items[i - 1].product_model.model_id == items[i].product_model.model_id)
 
                                 {
 
@@ -1071,7 +1071,7 @@ namespace _01electronics_inventory
 
                     }
 
-                    else if (items[i].genericCategory.category_name == "")
+                    else if (items[i].product_category.category_name == "")
                     {
 
    
@@ -1133,7 +1133,7 @@ namespace _01electronics_inventory
 
                             //ComboBox companyCategoryComboBox = CompanyCategoryPanel.Children[1] as ComboBox;
 
-                            ////companyCategoryComboBox.SelectedItem = entryPermit.GetItems()[i].company.typeName;
+                            ////companyCategoryComboBox.SelectedItem = entryPermit.GetItems()[i].company.product_name;
 
                             //companyCategoryComboBox.IsEnabled = false;
 
@@ -1142,7 +1142,7 @@ namespace _01electronics_inventory
 
                             //ComboBox companyProductComboBox = CompanyProductPanel.Children[1] as ComboBox;
 
-                            //companyProductComboBox.SelectedItem = items[i].companyProduct.typeName;
+                            //companyProductComboBox.SelectedItem = items[i].product_type.product_name;
 
                             //companyProductComboBox.IsEnabled = false;
 
@@ -1151,7 +1151,7 @@ namespace _01electronics_inventory
 
                             //ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
-                            //companyBrandComboBox.SelectedItem = items[i].companyBrand.brandName;
+                            //companyBrandComboBox.SelectedItem = items[i].product_brand.brand_name;
 
                             //companyBrandComboBox.IsEnabled = false;
 
@@ -1160,7 +1160,7 @@ namespace _01electronics_inventory
 
                             //ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
 
-                            //companyModelComboBox.SelectedItem = items[i].companyModel.modelName;
+                            //companyModelComboBox.SelectedItem = items[i].product_model.model_name;
                             //companyModelComboBox.IsEnabled = false;
 
 
@@ -1175,9 +1175,9 @@ namespace _01electronics_inventory
                             if (i != 0)
                             {
 
-                                if (items[i - 1].companyProduct.typeId == items[i].companyProduct.typeId &&
-                                    items[i - 1].companyBrand.brandId == items[i].companyBrand.brandId &&
-                                    items[i - 1].genericModel.model_id == items[i].genericModel.model_id)
+                                if (items[i - 1].product_type.type_id == items[i].product_type.type_id &&
+                                    items[i - 1].product_brand.brand_id == items[i].product_brand.brand_id &&
+                                    items[i - 1].product_model.model_id == items[i].product_model.model_id)
 
                                 {
 
@@ -1325,7 +1325,7 @@ namespace _01electronics_inventory
 
                                     ComboBox companyCategoryComboBox1 = CompanyCategoryPanel1.Children[1] as ComboBox;
 
-                                    companyCategoryComboBox1.SelectedItem = items[i].companyCategory.category;
+                                    companyCategoryComboBox1.SelectedItem = items[i].product_category.category_name;
 
                                     companyCategoryComboBox1.IsEnabled = false;
 
@@ -1334,7 +1334,7 @@ namespace _01electronics_inventory
 
                                     ComboBox companyProductComboBox1 = CompanyProductPanel1.Children[1] as ComboBox;
 
-                                    companyProductComboBox1.SelectedItem = items[i].companyProduct.typeName;
+                                    companyProductComboBox1.SelectedItem = items[i].product_type.product_name;
 
                                     companyProductComboBox1.IsEnabled = false;
 
@@ -1343,7 +1343,7 @@ namespace _01electronics_inventory
 
                                     ComboBox companyBrandComboBox1 = companyBrandPanel1.Children[1] as ComboBox;
 
-                                    companyBrandComboBox1.SelectedItem = items[i].companyBrand.brandName;
+                                    companyBrandComboBox1.SelectedItem = items[i].product_brand.brand_name;
 
                                     companyBrandComboBox1.IsEnabled = false;
 
@@ -1352,7 +1352,7 @@ namespace _01electronics_inventory
 
                                     ComboBox companyModelComboBox1 = companyModelPanel1.Children[1] as ComboBox;
 
-                                    companyModelComboBox1.SelectedItem = items[i].companyModel.modelName;
+                                    companyModelComboBox1.SelectedItem = items[i].product_model.model_name;
                                     companyModelComboBox1.IsEnabled = false;
 
 
@@ -1462,7 +1462,7 @@ namespace _01electronics_inventory
 
                                 ComboBox companyCategoryComboBox = CompanyCategoryPanel.Children[1] as ComboBox;
 
-                                companyCategoryComboBox.SelectedItem = items[i].companyCategory.category;
+                                companyCategoryComboBox.SelectedItem = items[i].product_category.category_name;
 
                                 companyCategoryComboBox.IsEnabled = false;
 
@@ -1471,7 +1471,7 @@ namespace _01electronics_inventory
 
                                 ComboBox companyProductComboBox = CompanyProductPanel.Children[1] as ComboBox;
 
-                                companyProductComboBox.SelectedItem = items[i].companyProduct.typeName;
+                                companyProductComboBox.SelectedItem = items[i].product_type.product_name;
 
                                 companyProductComboBox.IsEnabled = false;
 
@@ -1480,7 +1480,7 @@ namespace _01electronics_inventory
 
                                 ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
-                                companyBrandComboBox.SelectedItem = items[i].companyBrand.brandName;
+                                companyBrandComboBox.SelectedItem = items[i].product_brand.brand_name;
 
                                 companyBrandComboBox.IsEnabled = false;
 
@@ -1489,7 +1489,7 @@ namespace _01electronics_inventory
 
                                 ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
 
-                                companyModelComboBox.SelectedItem = items[i].companyModel.modelName;
+                                companyModelComboBox.SelectedItem = items[i].product_model.model_name;
                                 companyModelComboBox.IsEnabled = false;
 
 
@@ -1615,7 +1615,7 @@ namespace _01electronics_inventory
 
                             ComboBox companyCategoryComboBox1 = CompanyCategoryPanel1.Children[1] as ComboBox;
 
-                            companyCategoryComboBox1.SelectedItem = items[i].companyCategory.category;
+                            companyCategoryComboBox1.SelectedItem = items[i].product_category.category_name;
 
                             companyCategoryComboBox1.IsEnabled = false;
 
@@ -1624,7 +1624,7 @@ namespace _01electronics_inventory
 
                             ComboBox companyProductComboBox1 = CompanyProductPanel1.Children[1] as ComboBox;
 
-                            companyProductComboBox1.SelectedItem = items[i].companyProduct.typeName;
+                            companyProductComboBox1.SelectedItem = items[i].product_type.product_name;
 
                             companyProductComboBox1.IsEnabled = false;
 
@@ -1633,7 +1633,7 @@ namespace _01electronics_inventory
 
                             ComboBox companyBrandComboBox1 = companyBrandPanel1.Children[1] as ComboBox;
 
-                            companyBrandComboBox1.SelectedItem = items[i].companyBrand.brandName;
+                            companyBrandComboBox1.SelectedItem = items[i].product_brand.brand_name;
 
                             companyBrandComboBox1.IsEnabled = false;
 
@@ -1642,7 +1642,7 @@ namespace _01electronics_inventory
 
                             ComboBox companyModelComboBox1 = companyModelPanel1.Children[1] as ComboBox;
 
-                            companyModelComboBox1.SelectedItem = items[i].companyModel.modelName;
+                            companyModelComboBox1.SelectedItem = items[i].product_model.model_name;
                             companyModelComboBox1.IsEnabled = false;
 
 
@@ -1706,7 +1706,7 @@ namespace _01electronics_inventory
 
                     ComboBox requsterComboBox = rfpRequsterPanel.Children[1] as ComboBox;
 
-                    requsterComboBox.SelectedItem = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters().FirstOrDefault(a => a.team_id == items[i].rfp_info.rfpRequestorTeam).employee_team;
+                    requsterComboBox.SelectedItem = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters().FirstOrDefault(a => a.requestor_team.team_id == items[i].rfp_info.rfpRequestorTeam).requestor_team.team_name;
 
                     requsterComboBox.IsEnabled = false;
 
@@ -1716,9 +1716,9 @@ namespace _01electronics_inventory
 
                     addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfps().Clear();
 
-                    List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT>rfps=addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfps();
+                    List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>rfps=addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfps();
 
-                    commonQueries.GetTeamRFPs(ref rfps, addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters()[requsterComboBox.SelectedIndex].team_id);
+                    commonQueries.GetTeamRFPs(ref rfps, addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRequsters()[requsterComboBox.SelectedIndex].requestor_team.team_id);
 
 
                     rfpSerialComboBox.Items.Clear();
@@ -1728,7 +1728,7 @@ namespace _01electronics_inventory
 
 
 
-                    List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING>rfpItems=addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfpItems();
+                    List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>rfpItems=addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.GetRfpItems();
 
                     rfpItems.Clear();
 
@@ -1742,15 +1742,15 @@ namespace _01electronics_inventory
                     for (int j = 0; j < rfpItems.Count; j++) {
 
 
-                        if (rfpItems[i].rfpItem.generic_product_category.category_id == 0)
+                        if (rfpItems[i].product_category.category_id == 0)
                         {
 
-                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].rfpItem.company_category.category + "," + rfpItems[i].rfpItem.company_product.typeName + "," + rfpItems[i].rfpItem.company_brand.brandName + "," + rfpItems[i].rfpItem.company_model.modelName);
+                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
 
                         }
                         else {
 
-                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].rfpItem.generic_product_category.category_name + "," + rfpItems[i].rfpItem.generic_product_type.product_name + "," + rfpItems[i].rfpItem.generic_product_brand.brand_name + "," + rfpItems[i].rfpItem.generic_product_model.model_name);
+                            rfpItemDescriptionComboBox.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
 
 
                         }
@@ -1759,20 +1759,20 @@ namespace _01electronics_inventory
                     }
 
 
-                   PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING item=rfpItems.FirstOrDefault(a => a.rfp_struct.rfpSerial == items[i].rfp_info.rfpSerial && a.rfp_struct.rfpVersion == items[i].rfp_info.rfpVersion && a.rfp_struct.rfpRequestorTeam == items[i].rfp_info.rfpRequestorTeam && a.rfpItem.item_number == items[i].rfp_item_number);
+                   PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT item=rfpItems.FirstOrDefault(a => a.rfpSerial == items[i].rfp_info.rfpSerial && a.rfpVersion == items[i].rfp_info.rfpVersion && a.rfpRequestorTeam == items[i].rfp_info.rfpRequestorTeam && a.rfp_item_number == items[i].rfp_item_number);
 
 
 
-                    if (rfpItems[i].rfpItem.generic_product_category.category_id == 0)
+                    if (rfpItems[i].product_category.category_id == 0)
                     {
 
-                        rfpItemDescriptionComboBox.SelectedItem= item.rfpItem.company_category.category + "," + item.rfpItem.company_product.typeName + "," + item.rfpItem.company_brand.brandName + "," + item.rfpItem.company_model.modelName;
+                        rfpItemDescriptionComboBox.SelectedItem= item.product_category.category_name + "," + item.product_type.product_name + "," + item.product_brand.brand_name + "," + item.product_model.model_name;
 
                     }
                     else
                     {
 
-                        rfpItemDescriptionComboBox.SelectedItem = item.rfpItem.generic_product_category.category_name + "," + item.rfpItem.generic_product_type.product_name + "," + item.rfpItem.generic_product_brand.brand_name + "," + item.rfpItem.generic_product_model.model_name;
+                        rfpItemDescriptionComboBox.SelectedItem = item.product_category.category_name + "," + item.product_type.product_name + "," + item.product_brand.brand_name + "," + item.product_model.model_name;
 
 
                     }
@@ -1814,14 +1814,14 @@ namespace _01electronics_inventory
             Grid card= sender as Grid;
             Label serial= card.Children[0] as Label;
             Label transactionDate = card.Children[1] as Label;
-            Label nickName = card.Children[2] as Label;
+            Label warehouseNiceName = card.Children[2] as Label;
 
 
             BrushConverter brush = new BrushConverter();
             card.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
             serial.Foreground = Brushes.White;
             transactionDate.Foreground = Brushes.White;
-            nickName.Foreground = Brushes.White;
+            warehouseNiceName.Foreground = Brushes.White;
 
             previousGrid = card;
         }

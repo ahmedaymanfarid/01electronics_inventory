@@ -214,7 +214,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="AprroveRFPItemsWindow.xaml">
+    <Page Include="ApproveRFPItemsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -312,7 +312,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AprroveRFPItemsWindow.xaml.cs" />
+    <Compile Include="ApproveRFPItemsWindow.xaml.cs" />
     <Compile Include="BrandsPage.xaml.cs" />
     <Compile Include="CategoriesPage.xaml.cs" />
     <Compile Include="ChangePasswordPage.xaml.cs" />

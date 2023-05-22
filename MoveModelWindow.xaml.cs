@@ -19,9 +19,9 @@ namespace _01electronics_inventory
     {
         CommonQueries commonQueries;
         Model currentModell;
-        List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT> categories=new List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT>();
-        List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> products = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-        List<COMPANY_WORK_MACROS.BRAND_STRUCT> brands = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> categories=new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> products = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
         public MoveModelWindow(Model CurrentModel)
         {
             InitializeComponent();
@@ -33,7 +33,7 @@ namespace _01electronics_inventory
 
             commonQueries.GetProductCategories(ref categories);
 
-            categories.ForEach(a => CategoryCombo.Items.Add(a.category));
+            categories.ForEach(a => CategoryCombo.Items.Add(a.category_name));
 
             ProductsCombo.IsEnabled = false;
             BrandComboBox.IsEnabled = false;
@@ -43,8 +43,8 @@ namespace _01electronics_inventory
         {
             ProductsCombo.Items.Clear();
             products.Clear();
-            commonQueries.GetCompanyProducts(ref products, categories[CategoryCombo.SelectedIndex].categoryId);
-            products.ForEach(a => ProductsCombo.Items.Add(a.typeName));
+            commonQueries.GetCompanyProducts(ref products, categories[CategoryCombo.SelectedIndex].category_id);
+            products.ForEach(a => ProductsCombo.Items.Add(a.product_name));
             ProductsCombo.IsEnabled = true;
             ProductsCombo.SelectedItem = ProductsCombo.Items[0];
         }
@@ -55,8 +55,8 @@ namespace _01electronics_inventory
                 return;
             brands.Clear();
             BrandComboBox.Items.Clear();
-            commonQueries.GetProductBrands(products[ProductsCombo.SelectedIndex].typeId, ref brands);
-            brands.ForEach(a => BrandComboBox.Items.Add(a.brandName));
+            commonQueries.GetProductBrands(products[ProductsCombo.SelectedIndex].type_id, ref brands);
+            brands.ForEach(a => BrandComboBox.Items.Add(a.brand_name));
             BrandComboBox.IsEnabled = true;
             if (BrandComboBox.Items.Count == 0)
                 return;
@@ -74,16 +74,16 @@ namespace _01electronics_inventory
 
           
 
-            int productId = products[ProductsCombo.SelectedIndex].typeId;
-            int brandId = brands[BrandComboBox.SelectedIndex].brandId;
+            int productId = products[ProductsCombo.SelectedIndex].type_id;
+            int brand_id = brands[BrandComboBox.SelectedIndex].brand_id;
 
             Model newModel = new Model();
 
-            newModel.SetBrandID(brandId);
+            newModel.SetBrandID(brand_id);
             newModel.SetProductID(productId);
             newModel.SetModelName(currentModell.GetModelName());
 
-            newModel.SetCategoryID(categories[CategoryCombo.SelectedIndex].categoryId);
+            newModel.SetCategoryID(categories[CategoryCombo.SelectedIndex].category_id);
 
             newModel.SetModelsummaryPoints(currentModell.GetModelSummaryPoints());
 

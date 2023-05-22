@@ -38,13 +38,13 @@ namespace _01electronics_inventory
 
         public List<int> serialProducts = new List<int>();
 
-        private List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT> rfps;
-        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> rfpItems;
-        private List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrders;
+        private List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> rfps;
+        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems;
+        private List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders;
         private List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> rfpRequestors;
-        public List<PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT> selectedRFPItems;
+        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT> selectedRFPItems;
         private List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> rfpRequestorTeams;
-        private List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT> outgoingQuotationsList;
+        private List<SALES_STRUCTS.QUOTATION_MAX_STRUCT> outgoingQuotationsList;
 
         public AddReservationItemsPage addReservationItemsPage;
 
@@ -60,12 +60,12 @@ namespace _01electronics_inventory
             materialReservation = mMaterialReservation;
             viewAddCondition = mViewAddCondition;
 
-            rfps = new List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT>();
-            rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING>();
-            workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
+            rfps = new List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>();
+            rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+            workOrders = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
             rfpRequestors = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
             rfpRequestorTeams = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
-            outgoingQuotationsList = new List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT>();
+            outgoingQuotationsList = new List<SALES_STRUCTS.QUOTATION_MAX_STRUCT>();
 
             reservationDatePicker.SelectedDate = commonFunctions.GetTodaysDate();
             holdUntilDatePicker.SelectedDate = commonFunctions.GetTodaysDate();
@@ -93,14 +93,14 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < rfpRequestorTeams.Count; i++)
             {
-                if (i != 0 && rfpRequestorTeams[i].employee_team != rfpRequestorTeams[i - 1].employee_team)
+                if (i != 0 && rfpRequestorTeams[i].requestor_team.team_name != rfpRequestorTeams[i - 1].requestor_team.team_name)
                 {
-                    rfpTeamComboBox.Items.Add(rfpRequestorTeams[i].employee_team);
+                    rfpTeamComboBox.Items.Add(rfpRequestorTeams[i].requestor_team.team_name);
                     rfpRequestors.Add(rfpRequestorTeams[i]);
                 }
                 else if (i == 0)
                 {
-                    rfpTeamComboBox.Items.Add(rfpRequestorTeams[i].employee_team);
+                    rfpTeamComboBox.Items.Add(rfpRequestorTeams[i].requestor_team.team_name);
                     rfpRequestors.Add(rfpRequestorTeams[i]);
                 }
             }
@@ -272,7 +272,7 @@ namespace _01electronics_inventory
         {
             if (rfpTeamComboBox.SelectedIndex != -1)
             {
-                if (!InitializeRFPIDs(rfpRequestors[rfpTeamComboBox.SelectedIndex].team_id))
+                if (!InitializeRFPIDs(rfpRequestors[rfpTeamComboBox.SelectedIndex].requestor_team.team_id))
                     return;
 
                 rfpSerialComboBox.Text = "RFP ID";
@@ -297,13 +297,10 @@ namespace _01electronics_inventory
                     selectedQuotation = null;
 
                     selectedRFP = new RFP();
-                    selectedRFPItems = new List<PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT>();
+                    selectedRFPItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT>();
 
-                    selectedRFP.SetRFPRequestorTeamId(rfps[rfpSerialComboBox.SelectedIndex].rfpRequestorTeam);
-                    selectedRFP.SetRFPSerial(rfps[rfpSerialComboBox.SelectedIndex].rfpSerial);
-                    selectedRFP.SetRFPVersion(rfps[rfpSerialComboBox.SelectedIndex].rfpVersion);
-
-                    if (!selectedRFP.GetRFPMappedItems())
+                    
+                    if (!selectedRFP.InitializeRFP(rfps[rfpSerialComboBox.SelectedIndex].rfpRequestorTeam, rfps[rfpSerialComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialComboBox.SelectedIndex].rfpVersion))
                         return;
                     selectedRFP.GetRFPItemList(ref selectedRFPItems);
 
@@ -318,7 +315,7 @@ namespace _01electronics_inventory
                     
                     for (int i = 0; i < rfpItems.Count; i++)
                     {
-                        if (rfpItems[i].rfpItem.item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].rfpItem.item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                        if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK)
                         {
                             rfpItems.Remove(rfpItems[i]);
                             i--;
@@ -329,9 +326,9 @@ namespace _01electronics_inventory
                     addReservationItemsPage.ClearItemsPage();
                     for (int i = 0; i < rfpItems.Count; i++)
                     {
-                        if (rfpItems[i].rfpItem.company_model.modelName != "")
+                        if (rfpItems[i].is_company_product)
                         {
-                            if (rfpItems[i].rfpItem.company_model.has_serial_number == true)
+                            if (rfpItems[i].product_model.has_serial_number == true)
                             {
                                 serialProducts.Add(0);
                             }
@@ -342,7 +339,7 @@ namespace _01electronics_inventory
                         }
                         else
                         {
-                            if (rfpItems[i].rfpItem.generic_product_model.has_serial_number == true)
+                            if (rfpItems[i].product_model.has_serial_number == true)
                             {
                                 serialProducts.Add(0);
                             }

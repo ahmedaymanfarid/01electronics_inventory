@@ -29,19 +29,19 @@ namespace _01electronics_inventory
 
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> assignees;
         private List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> rfpRequestors;
-        private List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrders;
+        private List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders;
         List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> tmpList;
-        private List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_MIN_STRUCT> maintenanceContracts;
+        private List<SALES_STRUCTS.MAINTENANCE_CONTRACT_MIN_STRUCT> maintenanceContracts;
         private List<PROJECT_MACROS.PROJECT_STRUCT> projects;
         private List<int> requestorTeamId;
         private List<int> requestorId;
         private RFP rfp;
         private int viewAddCondition;
-        private List<BASIC_STRUCTS.WORK_FORM> workFormList;
+        private List<COMPANY_WORK_MACROS.WORK_FORM_STRUCT> workFormList;
         public RFPItemsPage rfpItemsPage;
         public RFPUploadFilesPage rfpUploadFilesPage;
         public List<int> workFormIdList;
-        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> rfpMappedItems;
+        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpMappedItems;
 
         public RFPBasicInfoPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRfp, ref int mViewAddCondition, ref RFPItemsPage mRfpItemsPage)
         {
@@ -60,13 +60,13 @@ namespace _01electronics_inventory
 
             assignees = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
             rfpRequestors = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
-            workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
-            maintenanceContracts = new List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_MIN_STRUCT>();
+            workOrders = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
+            maintenanceContracts = new List<SALES_STRUCTS.MAINTENANCE_CONTRACT_MIN_STRUCT>();
             projects = new List<PROJECT_MACROS.PROJECT_STRUCT>();
-            workFormList = new List<BASIC_STRUCTS.WORK_FORM>();
+            workFormList = new List<COMPANY_WORK_MACROS.WORK_FORM_STRUCT>();
             workFormIdList = new List<int>();
             tmpList = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
-            rfpMappedItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING>();
+            rfpMappedItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
 
             if (!commonQueries.GetRFPRequestors(ref rfpRequestors))
                 return;
@@ -272,12 +272,12 @@ namespace _01electronics_inventory
                     {
                         if (rfp.GetRFPRequestor().GetEmployeeId() == rfpRequestors[i].employee_id)
                         {
-                            if (requestorTeamCombo.Items.Contains(rfpRequestors[i].employee_team))
+                            if (requestorTeamCombo.Items.Contains(rfpRequestors[i].requestor_team.team_name))
                                 continue;
                             else
                             {
-                                requestorTeamCombo.Items.Add(rfpRequestors[i].employee_team);
-                                requestorTeamId.Add(rfpRequestors[i].team_id);
+                                requestorTeamCombo.Items.Add(rfpRequestors[i].requestor_team.team_name);
+                                requestorTeamId.Add(rfpRequestors[i].requestor_team.team_id);
                             }
                         }
                     }
@@ -300,12 +300,12 @@ namespace _01electronics_inventory
                     {
                         if (loggedInUser.GetEmployeeId() == rfpRequestors[i].employee_id)
                         {
-                            if (requestorTeamCombo.Items.Contains(rfpRequestors[i].employee_team))
+                            if (requestorTeamCombo.Items.Contains(rfpRequestors[i].requestor_team.team_name))
                                 continue;
                             else
                             {
-                                requestorTeamCombo.Items.Add(rfpRequestors[i].employee_team);
-                                requestorTeamId.Add(rfpRequestors[i].team_id);
+                                requestorTeamCombo.Items.Add(rfpRequestors[i].requestor_team.team_name);
+                                requestorTeamId.Add(rfpRequestors[i].requestor_team.team_id);
                             }
                         }
                     }
@@ -390,7 +390,7 @@ namespace _01electronics_inventory
 
         private bool InitializeContractIdCombo()
         {
-            List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_MIN_STRUCT> tmpList = new List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_MIN_STRUCT>();
+            List<SALES_STRUCTS.MAINTENANCE_CONTRACT_MIN_STRUCT> tmpList = new List<SALES_STRUCTS.MAINTENANCE_CONTRACT_MIN_STRUCT>();
             if (!commonQueries.GetMaintenanceContracts(ref tmpList))
                 return false;
 
@@ -452,27 +452,25 @@ namespace _01electronics_inventory
             { return false; }
             for (int i = 0; i < rfp.rfpItems.Count; i++)
             {
-                PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING foundItem = rfpMappedItems.Find(f => f.rfpItem.item_number == rfp.rfpItems[i].item_number);
-                if (foundItem.rfpItem.item_number != 0)
+                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT foundItem = rfpMappedItems.Find(f => f.rfp_item_number == rfp.rfpItems[i].rfp_item_number);
+                if (foundItem.rfp_item_number != 0)
                 {
-                    PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT();
-                    rfpItem.company_category = foundItem.rfpItem.company_category;
-                    rfpItem.company_product = foundItem.rfpItem.company_product;
-                    rfpItem.company_brand = foundItem.rfpItem.company_brand;
-                    rfpItem.company_model = foundItem.rfpItem.company_model;
-                    rfpItem.company_model_spec = foundItem.rfpItem.company_model_spec;
+                    PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
+                    
+                    rfpItem.product_category = foundItem.product_category;
+                    rfpItem.product_type = foundItem.product_type;
+                    rfpItem.product_brand = foundItem.product_brand;
+                    rfpItem.product_model = foundItem.product_model;
+                    rfpItem.product_specs = foundItem.product_specs;
+                    rfpItem.is_company_product = foundItem.is_company_product;
 
-                    rfpItem.generic_product_category = foundItem.rfpItem.generic_product_category;
-                    rfpItem.generic_product_type = foundItem.rfpItem.generic_product_type;
-                    rfpItem.generic_product_brand = foundItem.rfpItem.generic_product_brand;
-                    rfpItem.generic_product_model = foundItem.rfpItem.generic_product_model;
-
+                    
                     rfpItem.itemSelected = rfp.rfpItems[i].itemSelected;
                     rfpItem.item_description = rfp.rfpItems[i].item_description;
-                    rfpItem.item_measure_unit = rfp.rfpItems[i].item_measure_unit;
-                    rfpItem.item_measure_unit_id = rfp.rfpItems[i].item_measure_unit_id;
+                    rfpItem.measure_unit = rfp.rfpItems[i].measure_unit;
+                    rfpItem.measure_unit_id = rfp.rfpItems[i].measure_unit_id;
                     rfpItem.item_notes = rfp.rfpItems[i].item_notes;
-                    rfpItem.item_number = rfp.rfpItems[i].item_number;
+                    rfpItem.rfp_item_number = rfp.rfpItems[i].rfp_item_number;
                     rfpItem.item_quantity = rfp.rfpItems[i].item_quantity;
                     rfpItem.item_status = rfp.rfpItems[i].item_status;
                     rfpItem.item_vendors = new List<PROCUREMENT_STRUCTS.VENDOR_MIN_STRUCT>();
@@ -534,8 +532,8 @@ namespace _01electronics_inventory
                 if (requestorCombo.SelectedIndex != -1 && requestorId.Count != 0)
                 {
                     rfp.InitializeRequestorInfo(rfpRequestors[requestorId[requestorCombo.SelectedIndex]].employee_id);
-                    rfp.SetRFPRequestorTeamId(rfpRequestors[requestorId[requestorCombo.SelectedIndex]].team_id);
-                    rfp.SetRFPRequestorTeam(rfpRequestors[requestorId[requestorCombo.SelectedIndex]].employee_team);
+                    rfp.SetRFPRequestorTeamId(rfpRequestors[requestorId[requestorCombo.SelectedIndex]].requestor_team.team_id);
+                    rfp.SetRFPRequestorTeam(rfpRequestors[requestorId[requestorCombo.SelectedIndex]].requestor_team.team_name);
                 }
             }
         }
@@ -615,7 +613,7 @@ namespace _01electronics_inventory
                     rfp.SetRFPRequestorTeam(requestorTeamCombo.SelectedItem.ToString());
                     for (int i = 0; i < rfpRequestors.Count; i++)
                     {
-                        if (requestorTeamId[requestorTeamCombo.SelectedIndex] == rfpRequestors[i].team_id)
+                        if (requestorTeamId[requestorTeamCombo.SelectedIndex] == rfpRequestors[i].requestor_team.team_id)
                         {
                             if (loggedInUser.GetEmployeeName() == rfpRequestors[i].employee_name)
                             {

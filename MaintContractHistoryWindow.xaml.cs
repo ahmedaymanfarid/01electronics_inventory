@@ -27,7 +27,7 @@ namespace _01electronics_inventory
         private Employee loggedInUser;
 
         private int selectedContractSerial;
-        private List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_HISTORY_STRUCT> contractHistory;
+        private List<SALES_STRUCTS.MAINTENANCE_CONTRACT_HISTORY_STRUCT> contractHistory;
 
         public MaintContractHistoryWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, int ContractSerial)
         {
@@ -40,7 +40,7 @@ namespace _01electronics_inventory
 
             InitializeComponent();
 
-            contractHistory = new List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_HISTORY_STRUCT>();
+            contractHistory = new List<SALES_STRUCTS.MAINTENANCE_CONTRACT_HISTORY_STRUCT>();
 
             if (!commonQueries.GetMaintContractHistory(selectedContractSerial, ref contractHistory))
                 return;
@@ -124,15 +124,15 @@ namespace _01electronics_inventory
                 Grid.SetColumn(modelHeader, 3);
 
 
-                List<COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT> temp = contractHistory[i].products_summary;
+                List<PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT> temp = contractHistory[i].products_summary;
 
                 for (int j = 0; j < temp.Count(); j++)
                 {
-                    COMPANY_WORK_MACROS.PRODUCT_STRUCT tempType1 = temp[j].productType;
-                    COMPANY_WORK_MACROS.BRAND_STRUCT tempBrand1 = temp[j].productBrand;
-                    COMPANY_WORK_MACROS.MODEL_STRUCT tempModel1 = temp[j].productModel;
+                    PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT tempType1 = temp[j].productType;
+                    PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT tempBrand1 = temp[j].productBrand;
+                    PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT tempModel1 = temp[j].productModel;
 
-                    if (tempType1.typeId == 0)
+                    if (tempType1.type_id == 0)
                         continue;
 
                     productGrid.RowDefinitions.Add(new RowDefinition());
@@ -147,7 +147,7 @@ namespace _01electronics_inventory
                     Grid.SetColumn(productNumberHeader, 0);
 
                     Label type = new Label();
-                    type.Content = tempType1.typeName;
+                    type.Content = tempType1.product_name;
                     type.Style = (Style)FindResource("tableSubItemLabel");
 
                     productGrid.Children.Add(type);
@@ -155,7 +155,7 @@ namespace _01electronics_inventory
                     Grid.SetColumn(type, 1);
 
                     Label brand = new Label();
-                    brand.Content = tempBrand1.brandName;
+                    brand.Content = tempBrand1.brand_name;
                     brand.Style = (Style)FindResource("tableSubItemLabel");
 
                     productGrid.Children.Add(brand);
@@ -163,7 +163,7 @@ namespace _01electronics_inventory
                     Grid.SetColumn(brand, 2);
 
                     Label model = new Label();
-                    model.Content = tempModel1.modelName;
+                    model.Content = tempModel1.model_name;
                     model.Style = (Style)FindResource("tableSubItemLabel");
 
                     productGrid.Children.Add(model);

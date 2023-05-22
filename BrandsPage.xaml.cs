@@ -25,7 +25,7 @@ namespace _01electronics_inventory
         private Employee loggedInUser;
 
         private Brand selectedProduct;
-        List<COMPANY_WORK_MACROS.BRAND_STRUCT> brandsList;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brandsList;
 
         //SQL QUERY
         protected String sqlQuery;
@@ -51,7 +51,7 @@ namespace _01electronics_inventory
             selectedProduct = mSelectedProduct;
             mViewAddCondition = COMPANY_WORK_MACROS.PRODUCT_VIEW_CONDITION;
 
-            brandsList = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
+            brandsList = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
             brandsNames = new List<String>();
 
             //QueryGetProductName();
@@ -83,11 +83,11 @@ namespace _01electronics_inventory
             {
                 bool foundImage = true;
 
-                if (brandsList[i].brandId == 0)
+                if (brandsList[i].brand_id == 0)
                     continue;
                 Grid brandGrid = new Grid();
 
-                selectedProduct.SetBrandID(brandsList[i].brandId);
+                selectedProduct.SetBrandID(brandsList[i].brand_id);
 
 
                 Image brandLogo = new Image();
@@ -105,7 +105,7 @@ namespace _01electronics_inventory
                     foundImage = false;
           
                     TextBlock label = new TextBlock();
-                    label.Text = $"{brandsList[i].brandName.ToUpper()}";
+                    label.Text = $"{brandsList[i].brand_name.ToUpper()}";
                     BrushConverter converter = new BrushConverter();
                     label.Foreground = (Brush)converter.ConvertFrom("#105A97");
                     label.FontWeight = FontWeights.Bold;
@@ -115,8 +115,8 @@ namespace _01electronics_inventory
                     label.Height = 100;
                     label.Width = 250;
                     label.FontSize = 30;
-                    label.Tag = brandsList[i].brandId.ToString();
-                    label.Name= brandsList[i].brandName;
+                    label.Tag = brandsList[i].brand_id.ToString();
+                    label.Name= brandsList[i].brand_name;
                     label.MouseLeftButtonDown += OnMouseLeftBtnDownBrandTxtBlock;
 
 
@@ -151,7 +151,7 @@ namespace _01electronics_inventory
                     {
                         foundImage = false;
                         TextBlock label = new TextBlock();
-                        label.Text = $"{brandsList[i].brandName.ToUpper()}";
+                        label.Text = $"{brandsList[i].brand_name.ToUpper()}";
                         label.VerticalAlignment = VerticalAlignment.Stretch;
                         label.HorizontalAlignment = HorizontalAlignment.Stretch;
                         BrushConverter converter = new BrushConverter();
@@ -161,8 +161,8 @@ namespace _01electronics_inventory
                         label.Padding = new Thickness(10);
                         label.Background = Brushes.White;
                         label.FontSize = 30;
-                        label.Tag = brandsList[i].brandId.ToString();
-                        label.Name = brandsList[i].brandName;
+                        label.Tag = brandsList[i].brand_id.ToString();
+                        label.Name = brandsList[i].brand_name;
                         label.MouseLeftButtonDown += OnMouseLeftBtnDownBrandTxtBlock;
 
                         brandGrid.Children.Add(label);
@@ -177,9 +177,9 @@ namespace _01electronics_inventory
                 brandLogo.Width = 300;
                 brandLogo.MouseDown += ImageMouseDown;
                 brandLogo.Margin = new Thickness(80, 100, 12, 12);
-                brandLogo.Tag = brandsList[i].brandId.ToString();
+                brandLogo.Tag = brandsList[i].brand_id.ToString();
 
-              //List<char> chars=brandsList[i].brandName.ToList();
+              //List<char> chars=brandsList[i].brand_name.ToList();
 
               //  for (int j = 0; j < chars.Count; j++) {
 
@@ -192,7 +192,7 @@ namespace _01electronics_inventory
                
               //brandLogo.Name = new string(chars.ToArray());
 
-                brandLogo.Name = brandsList[i].brandName; 
+                brandLogo.Name = brandsList[i].brand_name; 
 
                 var e1 = new EventTrigger(UIElement.MouseEnterEvent);
                 e1.Actions.Add(new BeginStoryboard { Storyboard = (Storyboard)FindResource("expandStoryboard") });
@@ -207,7 +207,7 @@ namespace _01electronics_inventory
                 brandLogo.Triggers.Add(e2);
 
                 Expander expander = new Expander();
-                expander.Tag = brandsList[i].brandId.ToString();
+                expander.Tag = brandsList[i].brand_id.ToString();
                 expander.ExpandDirection = ExpandDirection.Down;
                 expander.VerticalAlignment = VerticalAlignment.Top;
                 expander.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
@@ -255,7 +255,7 @@ namespace _01electronics_inventory
 
             }
 
-            if (brandsList.Count() == 0 || brandsList[0].brandId == 0)
+            if (brandsList.Count() == 0 || brandsList[0].brand_id == 0)
             {
                 Image brandImage = new Image();
                 BitmapImage src = new BitmapImage();

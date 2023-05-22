@@ -29,13 +29,15 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> categoryList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> typeList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> brandList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL> modelList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS> genericProducts;
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> categoryList;
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> typeList;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brandList;
+        List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> modelList;
+        List<PRODUCTS_STRUCTS.GENERIC_PRODUCTS> genericProducts;
         List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT> unitList;
-        List<BASIC_STRUCTS.PRICING_CRITERIA> pricingCriteriaList;
+        List<PRODUCTS_STRUCTS.PRICING_CRITERIA> pricingCriteriaList;
+
+        PRODUCTS_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProducts;
 
         const int CATEGORY_COLUMN=0;
         const int TYPE_COLUMN=1;
@@ -44,14 +46,16 @@ namespace _01electronics_inventory
         const int ITEM_UNIT_COLUMN=4;
         const int PRICING_CRITERIA_COLUMN=5;
         const int HAS_SERIAL_NUMBER = 6;
+
         int position;
         int rowCount;
         int newRowsAdded;
-        GenericModel genericModel;
+
+        GenericModel product_model;
 
         int enterFunctionOnce;
         int enterFunctionOnce2;
-        BASIC_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProducts;
+        
 
         public GenericProductsPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser)
         {
@@ -60,26 +64,26 @@ namespace _01electronics_inventory
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
 
-            categoryList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY>();
-            typeList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS>();
-            brandList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
-            modelList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL>();
-            genericProducts = new List<BASIC_STRUCTS.GENERIC_PRODUCTS>();
+            categoryList = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            typeList = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            brandList = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            modelList = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+            genericProducts = new List<PRODUCTS_STRUCTS.GENERIC_PRODUCTS>();
             unitList = new List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT>();
-            pricingCriteriaList = new List<BASIC_STRUCTS.PRICING_CRITERIA>();
-            genericModel = new GenericModel();
+            pricingCriteriaList = new List<PRODUCTS_STRUCTS.PRICING_CRITERIA>();
+            product_model = new GenericModel();
             position = 0;
             rowCount = 1;
             newRowsAdded = 0;
             integrityChecks = new IntegrityChecks();
             enterFunctionOnce = 1;
             enterFunctionOnce2 = 1;
-            genericModel.SetAddedBy(loggedInUser.GetEmployeeId());
+            product_model.SetAddedBy(loggedInUser.GetEmployeeId());
 
             InitializeComponent();
 
             
-            sortGenericProducts = new BASIC_STRUCTS.SORT_GENERIC_PRODUCTS();
+            sortGenericProducts = new PRODUCTS_STRUCTS.SORT_GENERIC_PRODUCTS();
             InitializationFunction();
         }
 
@@ -170,7 +174,7 @@ namespace _01electronics_inventory
             if (!commonQueries.GetGenericProductCategories(ref categoryList))
                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
         }
-        private void FillCategoryStackPanel(List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> categoryList)
+        private void FillCategoryStackPanel(List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> categoryList)
         {
             viewCategoryStackPanel.Children.Clear();
             for (int i = 0; i < categoryList.Count; i++)
@@ -178,7 +182,7 @@ namespace _01electronics_inventory
                 CreateCategoryGrid(categoryList[i]);
             }
         }
-        private void CreateCategoryGrid(BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY category)
+        private void CreateCategoryGrid(PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT category_name)
         {
             Border border = new Border();
             border.Style = (Style)FindResource("borderCard1");
@@ -203,16 +207,16 @@ namespace _01electronics_inventory
             grid.ColumnDefinitions.Add(column2);
 
 
-            FillCtegoryGrid(grid, category);
+            FillCtegoryGrid(grid, category_name);
             border.Child = grid;
             viewCategoryStackPanel.Children.Add(border);
 
         }
-        private void FillCtegoryGrid(Grid grid, BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY category)
+        private void FillCtegoryGrid(Grid grid, PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT category_name)
         {
             Label categoryName = new Label();
             categoryName.Style = (Style)FindResource("GridItem");
-            categoryName.Content = category.category_name;
+            categoryName.Content = category_name.category_name;
             grid.Tag = 0;
             BitmapImage imgSource = new BitmapImage();
             imgSource.BeginInit();
@@ -220,7 +224,7 @@ namespace _01electronics_inventory
             imgSource.EndInit();
             System.Windows.Controls.Image arrowDown = new System.Windows.Controls.Image();
             arrowDown.Source = imgSource;
-            arrowDown.Tag = category.category_id.ToString()+'/'+"c";
+            arrowDown.Tag = category_name.category_id.ToString()+'/'+"c";
             arrowDown.MouseDown += OnButtonClickedImageArrowDownCategory;
 
 
@@ -300,7 +304,7 @@ namespace _01electronics_inventory
             if (commonQueries.GetGenericProducts(ref typeList, categoryID));
         }
 
-        private void ExpandCategoryListView(List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> productList , int categoryID, string categorySign)
+        private void ExpandCategoryListView(List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> productList , int categoryID, string categorySign)
         {
             int index = 0;
             for(int i=0;i<viewCategoryStackPanel.Children.Count;i++)
@@ -322,7 +326,7 @@ namespace _01electronics_inventory
                 index++;
             }
         }
-        private Border CreateTypeGrid(BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS type , int categoryID)
+        private Border CreateTypeGrid(PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT type , int categoryID)
         {
             Border border = new Border();
             border.Style = (Style)FindResource("borderCard2");
@@ -352,11 +356,11 @@ namespace _01electronics_inventory
             return border;
 
         }
-        private void FillTypeGrid(ref Grid grid, BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS type , int categoryID)
+        private void FillTypeGrid(ref Grid grid, PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT type , int categoryID)
         {
-            Label typeName = new Label();
-            typeName.Style = (Style)FindResource("GridItem");
-            typeName.Content = type.product_name;
+            Label product_name = new Label();
+            product_name.Style = (Style)FindResource("GridItem");
+            product_name.Content = type.product_name;
             grid.Tag = 0;
             BitmapImage imgSource = new BitmapImage();
             imgSource.BeginInit();
@@ -364,11 +368,11 @@ namespace _01electronics_inventory
             imgSource.EndInit();
             System.Windows.Controls.Image arrowDown = new System.Windows.Controls.Image();
             arrowDown.Source = imgSource;
-            arrowDown.Tag = type.product_id.ToString()+'/'+"t"+'/'+categoryID.ToString();
+            arrowDown.Tag = type.type_id.ToString()+'/'+"t"+'/'+categoryID.ToString();
             arrowDown.MouseDown += OnButtonClickedImageArrowDownType;
 
-            Grid.SetColumn(typeName, 0);
-            grid.Children.Add(typeName);
+            Grid.SetColumn(product_name, 0);
+            grid.Children.Add(product_name);
 
             Grid.SetColumn(arrowDown, 2);
             grid.Children.Add(arrowDown);
@@ -450,7 +454,7 @@ namespace _01electronics_inventory
             if (commonQueries.GetGenericProductBrands(productID,categoryID,ref brandList));
         }
 
-        private void ExpandTypeListView(List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> brandList, int categoryID,int productID)
+        private void ExpandTypeListView(List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brandList, int categoryID,int productID)
         {
             int index = 0;
             for (int i = 0; i < viewCategoryStackPanel.Children.Count; i++)
@@ -473,7 +477,7 @@ namespace _01electronics_inventory
             }
         }
 
-        private Border CreateBrandGrid(BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND brand, int categoryID , int productID)
+        private Border CreateBrandGrid(PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT brand, int categoryID , int productID)
         {
             Border border = new Border();
             border.Style = (Style)FindResource("borderCard3");
@@ -503,11 +507,11 @@ namespace _01electronics_inventory
             return border;
 
         }
-        private void FillBrandGrid(ref Grid grid, BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND brand, int categoryID , int productID)
+        private void FillBrandGrid(ref Grid grid, PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT brand, int categoryID , int productID)
         {
-            Label brandName = new Label();
-            brandName.Style = (Style)FindResource("GridItem");
-            brandName.Content = brand.brand_name;
+            Label brand_name = new Label();
+            brand_name.Style = (Style)FindResource("GridItem");
+            brand_name.Content = brand.brand_name;
             grid.Tag = 0;
             BitmapImage imgSource = new BitmapImage();
             imgSource.BeginInit();
@@ -518,8 +522,8 @@ namespace _01electronics_inventory
             arrowDown.Tag = brand.brand_id.ToString() + '/' + "b" + '/' + categoryID.ToString() + '/'+productID.ToString();
             arrowDown.MouseDown += OnButtonClickedImageArrowDownBrand;
 
-            Grid.SetColumn(brandName, 0);
-            grid.Children.Add(brandName);
+            Grid.SetColumn(brand_name, 0);
+            grid.Children.Add(brand_name);
 
             Grid.SetColumn(arrowDown, 2);
             grid.Children.Add(arrowDown);
@@ -598,7 +602,7 @@ namespace _01electronics_inventory
         {
             if (commonQueries.GetGenericBrandModels(productID, brandID,categoryID, ref modelList)) ;
         }
-        private Border CreateModelGrid(BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL model , int categoryID , int typeID , int brandID)
+        private Border CreateModelGrid(PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT model , int categoryID , int typeID , int brandID)
         {
             Border border = new Border();
             border.Style = (Style)FindResource("borderCard4");
@@ -628,11 +632,11 @@ namespace _01electronics_inventory
             return border;
 
         }
-        private void FillModelGrid(ref Grid grid, BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL model, int categoryID, int productID , int brandID)
+        private void FillModelGrid(ref Grid grid, PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT model, int categoryID, int productID , int brandID)
         {
-            Label modelName = new Label();
-            modelName.Style = (Style)FindResource("GridItem");
-            modelName.Content = model.model_name;
+            Label model_name = new Label();
+            model_name.Style = (Style)FindResource("GridItem");
+            model_name.Content = model.model_name;
 
             BitmapImage imgSource = new BitmapImage();
             imgSource.BeginInit();
@@ -643,14 +647,14 @@ namespace _01electronics_inventory
             arrowDown.Tag = model.model_id.ToString() + '/' + "m" + '/' + categoryID.ToString() + '/' + productID.ToString()+'/'+brandID.ToString();
             arrowDown.Visibility = Visibility.Collapsed;
 
-            Grid.SetColumn(modelName, 0);
-            grid.Children.Add(modelName);
+            Grid.SetColumn(model_name, 0);
+            grid.Children.Add(model_name);
 
             Grid.SetColumn(arrowDown, 2);
             grid.Children.Add(arrowDown);
 
         }
-        private void ExpandBrandListView(List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL> model , int categoryID, int productID, int brandID)
+        private void ExpandBrandListView(List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> model , int categoryID, int productID, int brandID)
         {
             
                 int index = 0;
@@ -719,26 +723,26 @@ namespace _01electronics_inventory
             if (!commonQueries.GetGenericProducts(ref genericProducts))
                 MessageBox.Show("Error");
            
-            if(sortGenericProducts.category==true)
+            if(sortGenericProducts.category_name==true)
             {
-                genericProducts = genericProducts.OrderBy(g1 => g1.category.category_name).ToList<BASIC_STRUCTS.GENERIC_PRODUCTS>();
+                genericProducts = genericProducts.OrderBy(g1 => g1.category_name.category_name).ToList<PRODUCTS_STRUCTS.GENERIC_PRODUCTS>();
             
             }
             else if(sortGenericProducts.type==true)
             {
-                genericProducts = genericProducts.OrderBy(g1 => g1.type.product_name).ToList<BASIC_STRUCTS.GENERIC_PRODUCTS>();
+                genericProducts = genericProducts.OrderBy(g1 => g1.type.product_name).ToList<PRODUCTS_STRUCTS.GENERIC_PRODUCTS>();
             }
             else if(sortGenericProducts.brand==true)
             {
-                genericProducts = genericProducts.OrderBy(g1 => g1.brand.brand_name).ToList<BASIC_STRUCTS.GENERIC_PRODUCTS>();
+                genericProducts = genericProducts.OrderBy(g1 => g1.brand.brand_name).ToList<PRODUCTS_STRUCTS.GENERIC_PRODUCTS>();
             }
             else if(sortGenericProducts.model==true)
             {
-                genericProducts = genericProducts.OrderBy(g1 => g1.model.model_name).ToList<BASIC_STRUCTS.GENERIC_PRODUCTS>();
+                genericProducts = genericProducts.OrderBy(g1 => g1.model.model_name).ToList<PRODUCTS_STRUCTS.GENERIC_PRODUCTS>();
             }
             else if(sortGenericProducts.pricing_criteria==true)
             {
-                genericProducts = genericProducts.OrderBy(g1 => g1.model.pricing_criteria.pricing_criteria_name).ToList<BASIC_STRUCTS.GENERIC_PRODUCTS>(); 
+                genericProducts = genericProducts.OrderBy(g1 => g1.model.pricing_criteria.pricing_criteria_name).ToList<PRODUCTS_STRUCTS.GENERIC_PRODUCTS>(); 
             }
 
             /////////// ELEMENTS +2 FOR THE ADDITIONAL PARTS (HEAD) AND (TAIL) ///////
@@ -780,8 +784,8 @@ namespace _01electronics_inventory
             {
                 if(rowCount%2==0)
                 {
-                    GridEvenRows(0, rowCount, genericProducts[i].category.category_name, genericProducts[i].category.category_id,grid);
-                    GridEvenRows(1, rowCount, genericProducts[i].type.product_name, genericProducts[i].type.product_id,grid);
+                    GridEvenRows(0, rowCount, genericProducts[i].category_name.category_name, genericProducts[i].category_name.category_id,grid);
+                    GridEvenRows(1, rowCount, genericProducts[i].type.product_name, genericProducts[i].type.type_id,grid);
                     GridEvenRows(2, rowCount, genericProducts[i].brand.brand_name, genericProducts[i].brand.brand_id, grid);
                     GridEvenRows(3, rowCount, genericProducts[i].model.model_name, genericProducts[i].model.model_id,grid);
                     GridEvenRows(4, rowCount, genericProducts[i].model.item_unit.measure_unit, genericProducts[i].model.item_unit.unit_id, grid);
@@ -817,8 +821,8 @@ namespace _01electronics_inventory
                 }
                 else
                 {
-                    GridOddRows(0, rowCount, genericProducts[i].category.category_name, genericProducts[i].category.category_id, grid);
-                    GridOddRows(1, rowCount, genericProducts[i].type.product_name, genericProducts[i].type.product_id, grid);
+                    GridOddRows(0, rowCount, genericProducts[i].category_name.category_name, genericProducts[i].category_name.category_id, grid);
+                    GridOddRows(1, rowCount, genericProducts[i].type.product_name, genericProducts[i].type.type_id, grid);
                     GridOddRows(2, rowCount, genericProducts[i].brand.brand_name, genericProducts[i].brand.brand_id, grid);
                     GridOddRows(3, rowCount, genericProducts[i].model.model_name, genericProducts[i].model.model_id, grid);
                     GridOddRows(4, rowCount, genericProducts[i].model.item_unit.measure_unit, genericProducts[i].model.item_unit.unit_id, grid);
@@ -908,20 +912,20 @@ namespace _01electronics_inventory
 
             Border categoryBorder = masterGrid.Children[position - 6] as Border;
             Grid categoryGrid = categoryBorder.Child as Grid;
-            int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+            int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
             Border typeBorder = masterGrid.Children[position - 5] as Border;
             Grid typeGrid = typeBorder.Child as Grid;
-            int typeId = Int32.Parse(typeGrid.Tag.ToString());
+            int type_id = Int32.Parse(typeGrid.Tag.ToString());
 
             Border brandBorder = masterGrid.Children[position - 4] as Border;
             Grid brandGrid = brandBorder.Child as Grid;
-            int brandId = Int32.Parse(brandGrid.Tag.ToString());
+            int brand_id = Int32.Parse(brandGrid.Tag.ToString());
 
             Border modelBorder = masterGrid.Children[position - 3] as Border;
             Grid modelGrid = modelBorder.Child as Grid;
             TextBlock modelTextBlock = modelGrid.Children[0] as TextBlock;
-            int modelId = Int32.Parse(modelGrid.Tag.ToString());
+            int model_id = Int32.Parse(modelGrid.Tag.ToString());
 
             Border itemBorder = masterGrid.Children[position - 2] as Border;
             Grid itemGrid = itemBorder.Child as Grid;
@@ -932,15 +936,15 @@ namespace _01electronics_inventory
             int priceId = Int32.Parse(priceGrid.Tag.ToString());
 
           
-            genericModel.SetCategoryId(categoryId);
-            genericModel.SetProductId(typeId);
-            genericModel.SetBrandId(brandId);
-            genericModel.SetModelId(modelId);
+            product_model.SetCategoryId(category_id);
+            product_model.SetProductId(type_id);
+            product_model.SetBrandId(brand_id);
+            product_model.SetModelId(model_id);
 
             if (checkBox.IsChecked == true)
             {
              
-                    if (!genericModel.UpdateModel(modelTextBlock.Text, itemId, true, priceId))
+                    if (!product_model.UpdateModel(modelTextBlock.Text, itemId, true, priceId))
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                     {
@@ -954,7 +958,7 @@ namespace _01electronics_inventory
             else
             {
               
-                    if (!genericModel.UpdateModel(modelTextBlock.Text, itemId, false, priceId))
+                    if (!product_model.UpdateModel(modelTextBlock.Text, itemId, false, priceId))
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                     {
@@ -1015,27 +1019,27 @@ namespace _01electronics_inventory
                     {
                         if (hasSerialCheckBox.IsChecked == true)
                         {
-                            genericModel.SetModelHasSerialNumber(true);
+                            product_model.SetModelHasSerialNumber(true);
                             hasSerialTextBlock.Text = "YES";
                         }
                         else
                         {
-                            genericModel.SetModelHasSerialNumber(false);
+                            product_model.SetModelHasSerialNumber(false);
                             hasSerialTextBlock.Text = "NO";
                         }
 
-                        genericModel.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
-                        genericModel.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
-                        genericModel.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
-                        genericModel.SetModelName(modelLabel.Text);
-                        genericModel.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
-                        genericModel.SetModelpricingCriteria(pricingCriteriaList[priceComboBox.SelectedIndex].pricing_criteria_id);
+                        product_model.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
+                        product_model.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
+                        product_model.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
+                        product_model.SetModelName(modelLabel.Text);
+                        product_model.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
+                        product_model.SetModelpricingCriteria(pricingCriteriaList[priceComboBox.SelectedIndex].pricing_criteria_id);
                      
-                            if (!genericModel.IssuNewModel())
+                            if (!product_model.IssuNewModel())
                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                modelGrid.Tag = genericModel.GetModelId();
+                                modelGrid.Tag = product_model.GetModelId();
                                 modelLabel.Visibility = Visibility.Visible;
                                 modelLabel.Foreground = System.Windows.Media.Brushes.Green;
                                 label.Visibility = Visibility.Visible;
@@ -1073,19 +1077,19 @@ namespace _01electronics_inventory
 
                                     Border ModelBorder = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) - 1] as Border;
                                     Grid ModelGrid = ModelBorder.Child as Grid;
-                                    TextBlock modelName = ModelGrid.Children[0] as TextBlock;
+                                    TextBlock model_name = ModelGrid.Children[0] as TextBlock;
 
                                     Border pricingCriteriaBorderItemUnit = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) + 1] as Border;
                                     Grid pricingCriteriaGridItemUnit = pricingCriteriaBorderItemUnit.Child as Grid;
 
-                                    genericModel.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
-                                    genericModel.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
-                                    genericModel.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
-                                    genericModel.SetModelId(Int32.Parse(ModelGrid.Tag.ToString()));
-                                    genericModel.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
-                                    genericModel.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridItemUnit.Tag.ToString()));
+                                    product_model.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
+                                    product_model.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
+                                    product_model.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
+                                    product_model.SetModelId(Int32.Parse(ModelGrid.Tag.ToString()));
+                                    product_model.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
+                                    product_model.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridItemUnit.Tag.ToString()));
                               
-                                    if (genericModel.UpdateModel(modelName.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+                                    if (product_model.UpdateModel(model_name.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
                                     {
                                         UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), null, comboBox, label, masterGrid);
                                     }
@@ -1115,14 +1119,14 @@ namespace _01electronics_inventory
                                     Border borderItemUnit = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) - 1] as Border;
                                     Grid gridItemUnit = borderItemUnit.Child as Grid;
 
-                                    genericModel.SetCategoryId(Int32.Parse(categoryGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetProductId(Int32.Parse(typeGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetBrandId(Int32.Parse(brandGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetModelId(Int32.Parse(ModelGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetModelitemUnit(Int32.Parse(gridItemUnit.Tag.ToString()));
-                                    genericModel.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
+                                    product_model.SetCategoryId(Int32.Parse(categoryGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetProductId(Int32.Parse(typeGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetBrandId(Int32.Parse(brandGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetModelId(Int32.Parse(ModelGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetModelitemUnit(Int32.Parse(gridItemUnit.Tag.ToString()));
+                                    product_model.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
                               
-                                    if (genericModel.UpdateModel(modelName1.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+                                    if (product_model.UpdateModel(modelName1.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
                                     {
                                         UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), null, comboBox, label, masterGrid);
                                     }
@@ -1177,28 +1181,28 @@ namespace _01electronics_inventory
 
                         if (hasSerialCheckBox.IsChecked == true)
                         {
-                            genericModel.SetModelHasSerialNumber(true);
+                            product_model.SetModelHasSerialNumber(true);
                             hasSerialTextBlock.Text = "YES";
                         }
                         else
                         {
-                            genericModel.SetModelHasSerialNumber(false);
+                            product_model.SetModelHasSerialNumber(false);
                             hasSerialTextBlock.Text = "NO";
                         }
 
-                        genericModel.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
-                        genericModel.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
-                        genericModel.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
-                        genericModel.SetModelName(modelLabel.Text);
-                        genericModel.SetModelitemUnit(unitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
-                        genericModel.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
+                        product_model.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
+                        product_model.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
+                        product_model.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
+                        product_model.SetModelName(modelLabel.Text);
+                        product_model.SetModelitemUnit(unitList[itemUnitComboBox.SelectedIndex].measure_unit_id);
+                        product_model.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
                       
-                            if (!genericModel.IssuNewModel())
+                            if (!product_model.IssuNewModel())
                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                modelGrid.Tag = genericModel.GetModelId();
-                                gridItemUnit.Tag = genericModel.GetModelUnitId();
+                                modelGrid.Tag = product_model.GetModelId();
+                                gridItemUnit.Tag = product_model.GetModelUnitId();
                                 modelLabel.Visibility = Visibility.Visible;
                                 modelLabel.Foreground = System.Windows.Media.Brushes.Green;
                                 label.Visibility = Visibility.Visible;
@@ -1235,19 +1239,19 @@ namespace _01electronics_inventory
 
                                     Border ModelBorder = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) - 1] as Border;
                                     Grid ModelGrid = ModelBorder.Child as Grid;
-                                    TextBlock modelName = ModelGrid.Children[0] as TextBlock;
+                                    TextBlock model_name = ModelGrid.Children[0] as TextBlock;
 
                                     Border pricingCriteriaBorderItemUnit = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) + 1] as Border;
                                     Grid pricingCriteriaGridItemUnit = pricingCriteriaBorderItemUnit.Child as Grid;
 
-                                    genericModel.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
-                                    genericModel.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
-                                    genericModel.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
-                                    genericModel.SetModelId(Int32.Parse(ModelGrid.Tag.ToString()));
-                                    genericModel.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
-                                    genericModel.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridItemUnit.Tag.ToString()));
+                                    product_model.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
+                                    product_model.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
+                                    product_model.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
+                                    product_model.SetModelId(Int32.Parse(ModelGrid.Tag.ToString()));
+                                    product_model.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
+                                    product_model.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridItemUnit.Tag.ToString()));
                             
-                                    if (genericModel.UpdateModel(modelName.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+                                    if (product_model.UpdateModel(model_name.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
                                     {
                                         UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), null, comboBox, label, masterGrid);
                                     }
@@ -1277,14 +1281,14 @@ namespace _01electronics_inventory
                                     Border borderItemUnit = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) - 1] as Border;
                                     Grid gridItemUnit = borderItemUnit.Child as Grid;
 
-                                    genericModel.SetCategoryId(Int32.Parse(categoryGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetProductId(Int32.Parse(typeGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetBrandId(Int32.Parse(brandGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetModelId(Int32.Parse(ModelGridPricingCriteria.Tag.ToString()));
-                                    genericModel.SetModelitemUnit(Int32.Parse(gridItemUnit.Tag.ToString()));
-                                    genericModel.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
+                                    product_model.SetCategoryId(Int32.Parse(categoryGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetProductId(Int32.Parse(typeGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetBrandId(Int32.Parse(brandGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetModelId(Int32.Parse(ModelGridPricingCriteria.Tag.ToString()));
+                                    product_model.SetModelitemUnit(Int32.Parse(gridItemUnit.Tag.ToString()));
+                                    product_model.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
                             
-                                    if (genericModel.UpdateModel(modelName1.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+                                    if (product_model.UpdateModel(modelName1.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
                                     {
                                         UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), null, comboBox, label, masterGrid);
                                     }
@@ -1326,15 +1330,15 @@ namespace _01electronics_inventory
                 {
                     Border categoryBorder = masterGrid.Children[position - 3] as Border;
                     Grid categoryGrid = categoryBorder.Child as Grid;
-                    int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+                    int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
                     Border typeBorder = masterGrid.Children[position - 2] as Border;
                     Grid typeGrid = typeBorder.Child as Grid;
-                    int typeId = Int32.Parse(typeGrid.Tag.ToString());
+                    int type_id = Int32.Parse(typeGrid.Tag.ToString());
 
                     Border brandBorder = masterGrid.Children[position - 1] as Border;
                     Grid brandGrid = brandBorder.Child as Grid;
-                    int brandId = Int32.Parse(brandGrid.Tag.ToString());
+                    int brand_id = Int32.Parse(brandGrid.Tag.ToString());
 
                     Border itemBorder = masterGrid.Children[position + 1] as Border;
                     Grid itemGrid = itemBorder.Child as Grid;
@@ -1348,16 +1352,16 @@ namespace _01electronics_inventory
                     Grid hasSerialGrid = hasSerialBorder.Child as Grid;
                     CheckBox hasSerialCheckBox = hasSerialGrid.Children[1] as CheckBox;
 
-                    genericModel.SetCategoryId(categoryId);
-                    genericModel.SetProductId(typeId);
-                    genericModel.SetBrandId(brandId);
-                    genericModel.SetModelId(id);
+                    product_model.SetCategoryId(category_id);
+                    product_model.SetProductId(type_id);
+                    product_model.SetBrandId(brand_id);
+                    product_model.SetModelId(id);
                     if (hasSerialCheckBox.IsChecked==true)
                     {
                         string errorMsg1 = string.Empty;
                         string outPutString1 = string.Empty;
                      
-                            if (!genericModel.UpdateModel(textBox.Text, itemId, true, priceId))
+                            if (!product_model.UpdateModel(textBox.Text, itemId, true, priceId))
                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
@@ -1374,7 +1378,7 @@ namespace _01electronics_inventory
                         string errorMsg1 = string.Empty;
                         string outPutString1 = string.Empty;
                        
-                            if (!genericModel.UpdateModel(textBox.Text, itemId, false, priceId))
+                            if (!product_model.UpdateModel(textBox.Text, itemId, false, priceId))
                             System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
@@ -1408,9 +1412,9 @@ namespace _01electronics_inventory
                 {
                     if (comboBox.Text != string.Empty)
                     {
-                        genericModel.SetCategoryId(id);
+                        product_model.SetCategoryId(id);
 
-                        if (!genericModel.UpdateCategoryName(comboBox.Text))
+                        if (!product_model.UpdateCategoryName(comboBox.Text))
                             System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         else
                         {
@@ -1425,12 +1429,12 @@ namespace _01electronics_inventory
                     {
                         Border catregoryBorder = masterGrid.Children[position - 1] as Border;
                         Grid categoryGrid = catregoryBorder.Child as Grid;
-                        int category = Int32.Parse(categoryGrid.Tag.ToString());
+                        int category_name = Int32.Parse(categoryGrid.Tag.ToString());
 
-                        genericModel.SetCategoryId(category);
-                        genericModel.SetProductId(id);
+                        product_model.SetCategoryId(category_name);
+                        product_model.SetProductId(id);
 
-                        if (!genericModel.UpdateProductName(comboBox.Text))
+                        if (!product_model.UpdateProductName(comboBox.Text))
                             System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         else
                         {
@@ -1446,18 +1450,18 @@ namespace _01electronics_inventory
                     {
                         Border catregoryBorder = masterGrid.Children[position - 2] as Border;
                         Grid categoryGrid = catregoryBorder.Child as Grid;
-                        int category = Int32.Parse(categoryGrid.Tag.ToString());
+                        int category_name = Int32.Parse(categoryGrid.Tag.ToString());
 
                         Border typeBorder = masterGrid.Children[position - 1] as Border;
                         Grid typeGrid = typeBorder.Child as Grid;
-                        int typeId = Int32.Parse(typeGrid.Tag.ToString());
+                        int type_id = Int32.Parse(typeGrid.Tag.ToString());
                         if (comboBox.SelectedIndex == -1 && comboBox.Text != string.Empty)
                         {
-                            genericModel.SetCategoryId(category);
-                            genericModel.SetProductId(typeId);
-                            genericModel.SetBrandName(comboBox.Text);
+                            product_model.SetCategoryId(category_name);
+                            product_model.SetProductId(type_id);
+                            product_model.SetBrandName(comboBox.Text);
 
-                            if (!genericModel.IssuNewBrand())
+                            if (!product_model.IssuNewBrand())
                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
@@ -1480,83 +1484,83 @@ namespace _01electronics_inventory
                     if (columnNumber == CATEGORY_COLUMN)
                     {
 
-                        int categoryId = categoryList[comboBox.SelectedIndex].category_id;
+                        int category_id = categoryList[comboBox.SelectedIndex].category_id;
 
                         Border typeBorder = masterGrid.Children[position + 1] as Border;
                         Grid typeGrid = typeBorder.Child as Grid;
                         TextBlock typeTextBlock = typeGrid.Children[0] as TextBlock;
-                        genericModel.SetProductId(Int32.Parse(typeGrid.Tag.ToString()));
-                        genericModel.SetProductName(typeTextBlock.Text);
+                        product_model.SetProductId(Int32.Parse(typeGrid.Tag.ToString()));
+                        product_model.SetProductName(typeTextBlock.Text);
 
                         Border brandBorder = masterGrid.Children[position + 2] as Border;
                         Grid brandGrid = brandBorder.Child as Grid;
                         TextBlock brandTextBlock = brandGrid.Children[0] as TextBlock;
-                        genericModel.SetBrandId(Int32.Parse(brandGrid.Tag.ToString()));
-                        genericModel.SetBrandName(brandTextBlock.Text);
+                        product_model.SetBrandId(Int32.Parse(brandGrid.Tag.ToString()));
+                        product_model.SetBrandName(brandTextBlock.Text);
 
 
                         Border modelBorder = masterGrid.Children[position + 3] as Border;
                         Grid modelGrid = modelBorder.Child as Grid;
                         TextBlock modelTextBlock = modelGrid.Children[0] as TextBlock;
-                        genericModel.SetModelId(Int32.Parse(modelGrid.Tag.ToString()));
-                        genericModel.SetModelName(modelTextBlock.Text);
+                        product_model.SetModelId(Int32.Parse(modelGrid.Tag.ToString()));
+                        product_model.SetModelName(modelTextBlock.Text);
 
                         Border itemBorder = masterGrid.Children[position + 4] as Border;
                         Grid itemGrid = itemBorder.Child as Grid;
                         TextBlock itemTextBlock = itemGrid.Children[0] as TextBlock;
-                        genericModel.SetModelitemUnit(Int32.Parse(itemGrid.Tag.ToString()));
+                        product_model.SetModelitemUnit(Int32.Parse(itemGrid.Tag.ToString()));
 
                         Border priceBorder = masterGrid.Children[position + 5] as Border;
                         Grid priceGrid = priceBorder.Child as Grid;
                         TextBlock priceTextblock = priceGrid.Children[0] as TextBlock;
-                        genericModel.SetModelpricingCriteria(Int32.Parse(priceGrid.Tag.ToString()));
+                        product_model.SetModelpricingCriteria(Int32.Parse(priceGrid.Tag.ToString()));
 
                         Border serialBorder = masterGrid.Children[position + 6] as Border;
                         Grid serialGrid = serialBorder.Child as Grid;
                         CheckBox serialCheckBox = serialGrid.Children[1] as CheckBox;
 
-                        MoveType(id, Int32.Parse(typeGrid.Tag.ToString()), typeTextBlock.Text, categoryId);
+                        MoveType(id, Int32.Parse(typeGrid.Tag.ToString()), typeTextBlock.Text, category_id);
 
                     }
                     else if (columnNumber == TYPE_COLUMN)
                     {
-                        int typeId = typeList[comboBox.SelectedIndex].product_id;
+                        int type_id = typeList[comboBox.SelectedIndex].type_id;
 
                         Border categoryBorder = masterGrid.Children[position - 1] as Border;
                         Grid categoryGrid = categoryBorder.Child as Grid;
                         TextBlock categoryTextBlock = categoryGrid.Children[0] as TextBlock;
-                        int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+                        int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
                         Border brandBorder = masterGrid.Children[position + 1] as Border;
                         Grid brandGrid = brandBorder.Child as Grid;
                         TextBlock brandTextBlock = brandGrid.Children[0] as TextBlock;
-                        genericModel.SetBrandId(Int32.Parse(brandGrid.Tag.ToString()));
-                        genericModel.SetBrandName(brandTextBlock.Text);
+                        product_model.SetBrandId(Int32.Parse(brandGrid.Tag.ToString()));
+                        product_model.SetBrandName(brandTextBlock.Text);
 
 
                         Border modelBorder = masterGrid.Children[position + 2] as Border;
                         Grid modelGrid = modelBorder.Child as Grid;
                         TextBlock modelTextBlock = modelGrid.Children[0] as TextBlock;
-                        genericModel.SetModelId(Int32.Parse(modelGrid.Tag.ToString()));
-                        genericModel.SetModelName(modelTextBlock.Text);
+                        product_model.SetModelId(Int32.Parse(modelGrid.Tag.ToString()));
+                        product_model.SetModelName(modelTextBlock.Text);
 
                         Border itemBorder = masterGrid.Children[position + 3] as Border;
                         Grid itemGrid = itemBorder.Child as Grid;
                         TextBlock itemTextBlock = itemGrid.Children[0] as TextBlock;
-                        genericModel.SetModelitemUnit(Int32.Parse(itemGrid.Tag.ToString()));
+                        product_model.SetModelitemUnit(Int32.Parse(itemGrid.Tag.ToString()));
 
                         Border priceBorder = masterGrid.Children[position + 4] as Border;
                         Grid priceGrid = priceBorder.Child as Grid;
                         TextBlock priceTextblock = priceGrid.Children[0] as TextBlock;
-                        genericModel.SetModelpricingCriteria(Int32.Parse(priceGrid.Tag.ToString()));
+                        product_model.SetModelpricingCriteria(Int32.Parse(priceGrid.Tag.ToString()));
 
                         Border serialBorder = masterGrid.Children[position + 5] as Border;
                         Grid serialGrid = serialBorder.Child as Grid;
                         CheckBox serialCheckBox = serialGrid.Children[1] as CheckBox;
 
-                        int newType = typeList[comboBox.SelectedIndex].product_id;
+                        int newType = typeList[comboBox.SelectedIndex].type_id;
 
-                        MoveBrand(categoryId, id, newType);
+                        MoveBrand(category_id, id, newType);
 
                     }
                     else if (columnNumber == BRAND_COLUMN)
@@ -1590,11 +1594,11 @@ namespace _01electronics_inventory
 
                 Border categoryBorder = masterGrid.Children[position - 1] as Border;
                 Grid categoryGrid = categoryBorder.Child as Grid;
-                int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
-                genericModel.SetCategoryId(categoryId);
-                genericModel.SetProductName(textBox.Text);
+                int category_id = Int32.Parse(categoryGrid.Tag.ToString());
+                product_model.SetCategoryId(category_id);
+                product_model.SetProductName(textBox.Text);
 
-                if (!genericModel.IssuNewProduct())
+                if (!product_model.IssuNewProduct())
                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 else
                 {
@@ -1615,15 +1619,15 @@ namespace _01electronics_inventory
             {
                 Border categoryBorder = masterGrid.Children[position - 3] as Border;
                 Grid categoryGrid = categoryBorder.Child as Grid;
-                int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+                int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
                 Border typeBorder = masterGrid.Children[position - 2] as Border;
                 Grid typeGrid = typeBorder.Child as Grid;
-                int typeId = Int32.Parse(typeGrid.Tag.ToString());
+                int type_id = Int32.Parse(typeGrid.Tag.ToString());
 
                 Border brandBorder = masterGrid.Children[position - 1] as Border;
                 Grid brandGrid = brandBorder.Child as Grid;
-                int brandId = Int32.Parse(brandGrid.Tag.ToString());
+                int brand_id = Int32.Parse(brandGrid.Tag.ToString());
 
                 Border itemUnitBorder = masterGrid.Children[position + 1] as Border;
                 Grid itemUnitGrid = itemUnitBorder.Child as Grid;
@@ -1644,20 +1648,20 @@ namespace _01electronics_inventory
                     int itemUnitId = unitList[itemUnitComboBox.SelectedIndex].measure_unit_id;
                     int priceId = pricingCriteriaList[priceComboBox.SelectedIndex].pricing_criteria_id;
                     if (hasSerialCheckBox.IsChecked == true)
-                        genericModel.SetModelHasSerialNumber(true);
+                        product_model.SetModelHasSerialNumber(true);
                     else
-                        genericModel.SetModelHasSerialNumber(false);
+                        product_model.SetModelHasSerialNumber(false);
 
 
 
-                    genericModel.SetCategoryId(categoryId);
-                    genericModel.SetProductId(typeId);
-                    genericModel.SetBrandId(brandId);
-                    genericModel.SetModelName(textBox.Text);
-                    genericModel.SetModelitemUnit(itemUnitId);
-                    genericModel.SetModelpricingCriteria(priceId);
+                    product_model.SetCategoryId(category_id);
+                    product_model.SetProductId(type_id);
+                    product_model.SetBrandId(brand_id);
+                    product_model.SetModelName(textBox.Text);
+                    product_model.SetModelitemUnit(itemUnitId);
+                    product_model.SetModelpricingCriteria(priceId);
 
-                    if (!genericModel.IssuNewModel())
+                    if (!product_model.IssuNewModel())
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                     {
@@ -1672,28 +1676,28 @@ namespace _01electronics_inventory
                 {
 
 
-                    genericModel.SetCategoryId(categoryId);
-                    genericModel.SetProductId(typeId);
-                    genericModel.SetBrandId(brandId);
-                    genericModel.SetModelName(textBox.Text);
+                    product_model.SetCategoryId(category_id);
+                    product_model.SetProductId(type_id);
+                    product_model.SetBrandId(brand_id);
+                    product_model.SetModelName(textBox.Text);
 
                 }
                 else if (textBox.Text != string.Empty && itemUnitComboBox.SelectedIndex != -1 || priceComboBox.SelectedIndex != -1)
                 {
-                    genericModel.SetCategoryId(categoryId);
-                    genericModel.SetProductId(typeId);
-                    genericModel.SetBrandId(brandId);
-                    genericModel.SetModelName(textBox.Text);
+                    product_model.SetCategoryId(category_id);
+                    product_model.SetProductId(type_id);
+                    product_model.SetBrandId(brand_id);
+                    product_model.SetModelName(textBox.Text);
 
                     if (itemUnitComboBox.SelectedIndex != -1)
                     {
                         int itemUnitId = unitList[itemUnitComboBox.SelectedIndex].measure_unit_id;
-                        genericModel.SetModelitemUnit(itemUnitId);
+                        product_model.SetModelitemUnit(itemUnitId);
                     }
                     else
                     {
                         int priceId = pricingCriteriaList[priceComboBox.SelectedIndex].pricing_criteria_id;
-                        genericModel.SetModelpricingCriteria(priceId);
+                        product_model.SetModelpricingCriteria(priceId);
                     }
                 }
                 else
@@ -1921,7 +1925,7 @@ namespace _01electronics_inventory
             grid.Children.Add(gridHeader);
         }
 
-        private void MoveType(int categoryOld , int typeOld ,string typeName, int categoryNew)
+        private void MoveType(int categoryOld , int typeOld ,string product_name, int categoryNew)
         {
             ////////////////// GET RELATED BRANDS AND MODELS /////////////////
             brandList.Clear();
@@ -1931,19 +1935,19 @@ namespace _01electronics_inventory
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
-                genericModel.SetCategoryId(categoryNew);
-                genericModel.SetProductName(typeName);
+                product_model.SetCategoryId(categoryNew);
+                product_model.SetProductName(product_name);
             
-                    if (!genericModel.IssuNewProduct())
+                    if (!product_model.IssuNewProduct())
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                     {
                         for (int i = 0; i < brandList.Count; i++)
                         {
-                            genericModel.SetBrandName(brandList[i].brand_name);
-                            genericModel.SetBrandId(brandList[i].brand_id);
+                            product_model.SetBrandName(brandList[i].brand_name);
+                            product_model.SetBrandId(brandList[i].brand_id);
                            
-                                if (!genericModel.IssuproductBrand())
+                                if (!product_model.IssuproductBrand())
                                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 else
                                 {
@@ -1951,61 +1955,61 @@ namespace _01electronics_inventory
                                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                     else
                                     {
-                                        genericModel.SetBrandId(brandList[i].brand_id);
+                                        product_model.SetBrandId(brandList[i].brand_id);
                                         for (int j = 0; j < modelList.Count; j++)
                                         {
 
 
                                             ///////////////////////// NEW ENTRY FOR THE NEW CATEGORY ////////////////////////
-                                            genericModel.SetCategoryId(categoryNew);
-                                            genericModel.SetProductName(typeName);
-                                            genericModel.SetBrandName(brandList[i].brand_name);
-                                            genericModel.SetModelName(modelList[j].model_name);
-                                            genericModel.SetModelitemUnit(modelList[j].item_unit.unit_id);
-                                            genericModel.SetModelpricingCriteria(modelList[j].pricing_criteria.pricing_criteria_id);
-                                            genericModel.SetModelHasSerialNumber(modelList[j].has_serial_number);
+                                            product_model.SetCategoryId(categoryNew);
+                                            product_model.SetProductName(product_name);
+                                            product_model.SetBrandName(brandList[i].brand_name);
+                                            product_model.SetModelName(modelList[j].model_name);
+                                            product_model.SetModelitemUnit(modelList[j].item_unit.unit_id);
+                                            product_model.SetModelpricingCriteria(modelList[j].pricing_criteria.pricing_criteria_id);
+                                            product_model.SetModelHasSerialNumber(modelList[j].has_serial_number);
 
 
-                                            if (!genericModel.IssuNewModel())
+                                            if (!product_model.IssuNewModel())
                                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                             else
                                             {
                                                 //////////////////////////// UPDATE REFERENCED TABLES ///////////////////////
                                                 ////////////// RESTORE OLD IDs AND SAVE NEWLY GENERATED IDs//////////////////////////
-                                                productNew = genericModel.GetProductId();
-                                                int brandNew = genericModel.GetBrandId();
-                                                int modelNew = genericModel.GetModelId();
+                                                productNew = product_model.GetProductId();
+                                                int brandNew = product_model.GetBrandId();
+                                                int modelNew = product_model.GetModelId();
 
-                                                genericModel.SetCategoryId(categoryOld);
-                                                genericModel.SetProductId(typeOld);
-                                                genericModel.SetBrandId(brandList[i].brand_id);
-                                                genericModel.SetModelId(modelList[j].model_id);
+                                                product_model.SetCategoryId(categoryOld);
+                                                product_model.SetProductId(typeOld);
+                                                product_model.SetBrandId(brandList[i].brand_id);
+                                                product_model.SetModelId(modelList[j].model_id);
 
-                                                if (!genericModel.UpdateReferencedTables(categoryNew, productNew, brandNew, modelNew))
+                                                if (!product_model.UpdateReferencedTables(categoryNew, productNew, brandNew, modelNew))
                                                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                 else
                                                 {
                                                     ///////////////////// DELETE OLD MODELS RELATED TO BRAND[i] ////////////////
-                                                    if (!genericModel.DeleteModel())
+                                                    if (!product_model.DeleteModel())
                                                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                 }
-                                                genericModel.SetCategoryId(categoryNew);
-                                                genericModel.SetProductId(productNew);
-                                                genericModel.SetBrandId(brandList[i].brand_id);
+                                                product_model.SetCategoryId(categoryNew);
+                                                product_model.SetProductId(productNew);
+                                                product_model.SetBrandId(brandList[i].brand_id);
                                             }
 
                                         }
 
                                         /////////////////////////// DELETE OLD BRAND[i] /////////////////////////////
-                                        genericModel.SetCategoryId(categoryOld);
-                                        genericModel.SetProductId(typeOld);
-                                        genericModel.SetBrandId(brandList[i].brand_id);
-                                        if (!genericModel.DeleteFromProductBrands())
+                                        product_model.SetCategoryId(categoryOld);
+                                        product_model.SetProductId(typeOld);
+                                        product_model.SetBrandId(brandList[i].brand_id);
+                                        if (!product_model.DeleteFromProductBrands())
                                             System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                         else
                                         {
-                                            genericModel.SetCategoryId(categoryNew);
-                                            genericModel.SetProductId(productNew);
+                                            product_model.SetCategoryId(categoryNew);
+                                            product_model.SetProductId(productNew);
                                         }
                                     }
                                 }
@@ -2013,14 +2017,14 @@ namespace _01electronics_inventory
                         }
                     }
              
-                genericModel.SetCategoryId(categoryOld);
-                genericModel.SetProductId(typeOld);
+                product_model.SetCategoryId(categoryOld);
+                product_model.SetProductId(typeOld);
                 /////////////////////////// DELETE OLD TYPE ////////////////////////////
-                if (!genericModel.DeleteFromProduct())
+                if (!product_model.DeleteFromProduct())
                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 else
                 { //////////////////////////// DELETE OLD CATEGORY IF EMPTY /////////////////////////
-                    if(!genericModel.DeleteFromCategory())
+                    if(!product_model.DeleteFromCategory())
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 }
 
@@ -2037,13 +2041,13 @@ namespace _01electronics_inventory
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
-                genericModel.SetCategoryId(categoryOld);
-                genericModel.SetProductId(typeNew);
+                product_model.SetCategoryId(categoryOld);
+                product_model.SetProductId(typeNew);
                   for (int i = 0; i < brandList.Count; i++)
                     {
-                        genericModel.SetBrandName(brandList[i].brand_name);
-                        genericModel.SetBrandId(brandList[i].brand_id);
-                        if (!genericModel.IssuproductBrand())
+                        product_model.SetBrandName(brandList[i].brand_name);
+                        product_model.SetBrandId(brandList[i].brand_id);
+                        if (!product_model.IssuproductBrand())
                             System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         else
                         {
@@ -2051,7 +2055,7 @@ namespace _01electronics_inventory
                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                genericModel.SetBrandId(brandList[i].brand_id);
+                                product_model.SetBrandId(brandList[i].brand_id);
                                 for (int j = 0; j < modelList.Count; j++)
                                 {
 
@@ -2059,66 +2063,66 @@ namespace _01electronics_inventory
                                     ///////////////////////// NEW ENTRY FOR THE NEW CATEGORY ////////////////////////
                                   
                                    
-                                    genericModel.SetBrandName(brandList[i].brand_name);
-                                    genericModel.SetModelName(modelList[j].model_name);
-                                    genericModel.SetModelitemUnit(modelList[j].item_unit.unit_id);
-                                    genericModel.SetModelpricingCriteria(modelList[j].pricing_criteria.pricing_criteria_id);
-                                    genericModel.SetModelHasSerialNumber(modelList[j].has_serial_number);
+                                    product_model.SetBrandName(brandList[i].brand_name);
+                                    product_model.SetModelName(modelList[j].model_name);
+                                    product_model.SetModelitemUnit(modelList[j].item_unit.unit_id);
+                                    product_model.SetModelpricingCriteria(modelList[j].pricing_criteria.pricing_criteria_id);
+                                    product_model.SetModelHasSerialNumber(modelList[j].has_serial_number);
 
-                                    if (!genericModel.IssuNewModel())
+                                    if (!product_model.IssuNewModel())
                                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                     else
                                     {
                                         //////////////////////////// UPDATE REFERENCED TABLES ///////////////////////
                                         ////////////// RESTORE OLD IDs AND SAVE NEWLY GENERATED IDs//////////////////////////
-                                        productNew = genericModel.GetProductId();
-                                        int brandNew = genericModel.GetBrandId();
-                                        int modelNew = genericModel.GetModelId();
+                                        productNew = product_model.GetProductId();
+                                        int brandNew = product_model.GetBrandId();
+                                        int modelNew = product_model.GetModelId();
 
-                                        genericModel.SetCategoryId(categoryOld);
-                                        genericModel.SetProductId(typeOld);
-                                        genericModel.SetBrandId(brandList[i].brand_id);
-                                        genericModel.SetModelId(modelList[j].model_id);
+                                        product_model.SetCategoryId(categoryOld);
+                                        product_model.SetProductId(typeOld);
+                                        product_model.SetBrandId(brandList[i].brand_id);
+                                        product_model.SetModelId(modelList[j].model_id);
 
-                                        if (!genericModel.UpdateReferencedTables(categoryOld, productNew, brandNew, modelNew))
+                                        if (!product_model.UpdateReferencedTables(categoryOld, productNew, brandNew, modelNew))
                                             System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                         else
                                         {
                                             ///////////////////// DELETE OLD MODELS RELATED TO BRAND[i] ////////////////
-                                            if (!genericModel.DeleteModel())
+                                            if (!product_model.DeleteModel())
                                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                         }
-                                        genericModel.SetCategoryId(categoryOld);
-                                        genericModel.SetProductId(productNew);
-                                        genericModel.SetBrandId(brandList[i].brand_id);
+                                        product_model.SetCategoryId(categoryOld);
+                                        product_model.SetProductId(productNew);
+                                        product_model.SetBrandId(brandList[i].brand_id);
                                     }
 
 
                                 }
 
                                 /////////////////////////// DELETE OLD BRAND[i] /////////////////////////////
-                                genericModel.SetCategoryId(categoryOld);
-                                genericModel.SetProductId(typeOld);
-                                genericModel.SetBrandId(brandList[i].brand_id);
-                                if (!genericModel.DeleteFromProductBrands())
+                                product_model.SetCategoryId(categoryOld);
+                                product_model.SetProductId(typeOld);
+                                product_model.SetBrandId(brandList[i].brand_id);
+                                if (!product_model.DeleteFromProductBrands())
                                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 else
                                 {
-                                    genericModel.SetCategoryId(categoryOld);
-                                    genericModel.SetProductId(productNew);
+                                    product_model.SetCategoryId(categoryOld);
+                                    product_model.SetProductId(productNew);
                                 }
                             }
                         }
                     }
                 
-                genericModel.SetCategoryId(categoryOld);
-                genericModel.SetProductId(typeOld);
+                product_model.SetCategoryId(categoryOld);
+                product_model.SetProductId(typeOld);
                 /////////////////////////// DELETE OLD TYPE ////////////////////////////
-                if (!genericModel.DeleteFromProduct())
+                if (!product_model.DeleteFromProduct())
                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 else
                 { //////////////////////////// DELETE OLD CATEGORY IF EMPTY /////////////////////////
-                    if (!genericModel.DeleteFromCategory())
+                    if (!product_model.DeleteFromCategory())
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 }
 
@@ -2149,43 +2153,43 @@ namespace _01electronics_inventory
             Border categoryBorder = masterGrid.Children[position - 6] as Border;
             Grid categoryGrid = categoryBorder.Child as Grid;
             TextBlock categoryTextBlock = categoryGrid.Children[0] as TextBlock;
-            int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
-            genericModel.SetCategoryId(categoryId);
+            int category_id = Int32.Parse(categoryGrid.Tag.ToString());
+            product_model.SetCategoryId(category_id);
 
             Border typeBorder = masterGrid.Children[position - 5] as Border;
             Grid typeGrid = typeBorder.Child as Grid;
             TextBlock typeTextBlock = typeGrid.Children[0] as TextBlock;
-            int typeId = Int32.Parse(typeGrid.Tag.ToString());
-            genericModel.SetProductId(typeId);
+            int type_id = Int32.Parse(typeGrid.Tag.ToString());
+            product_model.SetProductId(type_id);
 
             Border brandBorder = masterGrid.Children[position - 4] as Border;
             Grid brandGrid = brandBorder.Child as Grid;
             TextBlock brandTextBlock = brandGrid.Children[0] as TextBlock;
-            genericModel.SetBrandId(Int32.Parse(brandGrid.Tag.ToString()));
-            genericModel.SetBrandName(brandTextBlock.Text);
+            product_model.SetBrandId(Int32.Parse(brandGrid.Tag.ToString()));
+            product_model.SetBrandName(brandTextBlock.Text);
 
 
             Border modelBorder = masterGrid.Children[position - 3] as Border;
             Grid modelGrid = modelBorder.Child as Grid;
             TextBlock modelTextBlock = modelGrid.Children[0] as TextBlock;
-            genericModel.SetModelId(Int32.Parse(modelGrid.Tag.ToString()));
-            genericModel.SetModelName(modelTextBlock.Text);
+            product_model.SetModelId(Int32.Parse(modelGrid.Tag.ToString()));
+            product_model.SetModelName(modelTextBlock.Text);
 
             Border itemBorder = masterGrid.Children[position - 2] as Border;
             Grid itemGrid = itemBorder.Child as Grid;
             TextBlock itemTextBlock = itemGrid.Children[0] as TextBlock;
-            genericModel.SetModelitemUnit(Int32.Parse(itemGrid.Tag.ToString()));
+            product_model.SetModelitemUnit(Int32.Parse(itemGrid.Tag.ToString()));
 
             Border priceBorder = masterGrid.Children[position - 1] as Border;
             Grid priceGrid = priceBorder.Child as Grid;
             TextBlock priceTextblock = priceGrid.Children[0] as TextBlock;
-            genericModel.SetModelpricingCriteria(Int32.Parse(priceGrid.Tag.ToString()));
+            product_model.SetModelpricingCriteria(Int32.Parse(priceGrid.Tag.ToString()));
 
             if (hasSerialNumberCheckBox.IsChecked==true)
             {
 
                 
-                    if (!genericModel.UpdateModel(modelTextBlock.Text, Int32.Parse(itemGrid.Tag.ToString()), true, Int32.Parse(priceGrid.Tag.ToString())))
+                    if (!product_model.UpdateModel(modelTextBlock.Text, Int32.Parse(itemGrid.Tag.ToString()), true, Int32.Parse(priceGrid.Tag.ToString())))
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                     {
@@ -2198,7 +2202,7 @@ namespace _01electronics_inventory
             {
                
               
-                    if (!genericModel.UpdateModel(modelTextBlock.Text, Int32.Parse(itemGrid.Tag.ToString()), false, Int32.Parse(priceGrid.Tag.ToString())))
+                    if (!product_model.UpdateModel(modelTextBlock.Text, Int32.Parse(itemGrid.Tag.ToString()), false, Int32.Parse(priceGrid.Tag.ToString())))
                         System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                     {
@@ -2364,8 +2368,8 @@ namespace _01electronics_inventory
                 typeList.Clear();
                 Border categoryBorder = outterGrid.Children[position - 1] as Border;
                 Grid categoryGrid = categoryBorder.Child as Grid;
-                int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
-                if(!commonQueries.GetGenericProducts(ref typeList , categoryId))
+                int category_id = Int32.Parse(categoryGrid.Tag.ToString());
+                if(!commonQueries.GetGenericProducts(ref typeList , category_id))
                     System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 for (int i = 0; i < typeList.Count;i++)
                 {
@@ -2433,7 +2437,7 @@ namespace _01electronics_inventory
                     if (columnNumber == CATEGORY_COLUMN)
                     {
 
-                        genericModel.SetCategoryName(comboBox.Text);
+                        product_model.SetCategoryName(comboBox.Text);
                         Border typeBorder = masterGrid.Children[NextPosition] as Border;
                         Grid typeGrid = typeBorder.Child as Grid;
                         ComboBox typeComboBox = typeGrid.Children[1] as ComboBox;
@@ -2442,7 +2446,7 @@ namespace _01electronics_inventory
                     }
                     else if (columnNumber == TYPE_COLUMN)
                     {
-                        genericModel.SetProductName(comboBox.Text);
+                        product_model.SetProductName(comboBox.Text);
 
                         int categoryPosition = Int32.Parse(comboBox.Tag.ToString()) - 1;
                         Border border = masterGrid.Children[categoryPosition] as Border;
@@ -2469,23 +2473,23 @@ namespace _01electronics_inventory
                     }
                     else if (columnNumber == BRAND_COLUMN)
                     {
-                        genericModel.SetBrandName(comboBox.Text);
-                        genericModel.SetAddedBy(loggedInUser.GetEmployeeId());
+                        product_model.SetBrandName(comboBox.Text);
+                        product_model.SetAddedBy(loggedInUser.GetEmployeeId());
                         int categoryPosition = Int32.Parse(comboBox.Tag.ToString()) - 2;
                         Border categoryBorder = masterGrid.Children[categoryPosition] as Border;
                         Grid categoryGrid = categoryBorder.Child as Grid;
                         ComboBox categoryComboBox = categoryGrid.Children[1] as ComboBox;
-                        int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+                        int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
                         int typePosition = Int32.Parse(comboBox.Tag.ToString()) - 1;
                         Border typeBorder = masterGrid.Children[typePosition] as Border;
                         Grid typeGrid = typeBorder.Child as Grid;
                         ComboBox typeComboBox = typeGrid.Children[1] as ComboBox;
-                        int typeId = Int32.Parse(typeGrid.Tag.ToString());
+                        int type_id = Int32.Parse(typeGrid.Tag.ToString());
 
-                        genericModel.SetCategoryId(categoryId);
-                        genericModel.SetProductId(typeId);
-                        // if (!genericModel.IssuNewBrand())
+                        product_model.SetCategoryId(category_id);
+                        product_model.SetProductId(type_id);
+                        // if (!product_model.IssuNewBrand())
                         //     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         // else
                         // {
@@ -2530,7 +2534,7 @@ namespace _01electronics_inventory
                     Grid grid = border.Child as Grid;
                     ComboBox categoryComboBox = grid.Children[1] as ComboBox;
                     brandList.Clear();
-                    if (!commonQueries.GetGenericProductBrands(typeList[comboBox.SelectedIndex].product_id, categoryList[categoryComboBox.SelectedIndex].category_id, ref brandList))
+                    if (!commonQueries.GetGenericProductBrands(typeList[comboBox.SelectedIndex].type_id, categoryList[categoryComboBox.SelectedIndex].category_id, ref brandList))
                         MessageBox.Show("error");
                     else
                     {
@@ -2550,8 +2554,8 @@ namespace _01electronics_inventory
                 else if (columnNumber == BRAND_COLUMN)
                 {
 
-                    genericModel.SetBrandName(comboBox.Text);
-                    genericModel.SetAddedBy(loggedInUser.GetEmployeeId());
+                    product_model.SetBrandName(comboBox.Text);
+                    product_model.SetAddedBy(loggedInUser.GetEmployeeId());
                     Border modelBorder = masterGrid.Children[NextPosition] as Border;
                     Grid modelGrid = modelBorder.Child as Grid;
                     TextBox modelComboBox = modelGrid.Children[1] as TextBox;
@@ -2606,19 +2610,19 @@ namespace _01electronics_inventory
                     //Border categoryBorder = masterGrid.Children[categoryPosition] as Border;
                     //Grid categoryGrid = categoryBorder.Child as Grid;
                     //ComboBox categoryComboBox = categoryGrid.Children[1] as ComboBox;
-                    //nt categoryId = categoryList[categoryComboBox.SelectedIndex].category_id;
+                    //nt category_id = categoryList[categoryComboBox.SelectedIndex].category_id;
                     //
                     //
                     //int typePosition = Int32.Parse(comboBox.Tag.ToString()) - 1;
                     //Border typeBorder = masterGrid.Children[typePosition] as Border;
                     //Grid typeGrid = typeBorder.Child as Grid;
                     //ComboBox typeComboBox = typeGrid.Children[1] as ComboBox;
-                    //int typeId = Int32.Parse(typeGrid.Tag.ToString());
+                    //int type_id = Int32.Parse(typeGrid.Tag.ToString());
                     //
-                    //genericModel.SetCategoryId(categoryId);
-                    //genericModel.SetProductId(typeId);
-                    //genericModel.SetBrandId(brandList[comboBox.SelectedIndex].brand_id);
-                    //if (!genericModel.IssuproductBrand())
+                    //product_model.SetCategoryId(category_id);
+                    //product_model.SetProductId(type_id);
+                    //product_model.SetBrandId(brandList[comboBox.SelectedIndex].brand_id);
+                    //if (!product_model.IssuproductBrand())
                     //     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     // else
                     // {
@@ -2648,9 +2652,9 @@ namespace _01electronics_inventory
                switch (Int32.Parse(label.Tag.ToString()))
                 {
                     case CATEGORY_COLUMN:
-                        genericModel.SetCategoryId(Int32.Parse(parent.Tag.ToString()));
+                        product_model.SetCategoryId(Int32.Parse(parent.Tag.ToString()));
                       
-                            if (genericModel.UpdateCategoryName(textBox.Text))
+                            if (product_model.UpdateCategoryName(textBox.Text))
                             {
                                 UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), textBox, null, label, masterGrid);
                             }
@@ -2667,10 +2671,10 @@ namespace _01electronics_inventory
                     case TYPE_COLUMN:
                         Border categoryBorder = masterGrid.Children[Int32.Parse(textBox.Tag.ToString())-1] as Border;
                         Grid categoryGrid = categoryBorder.Child as Grid;
-                        genericModel.SetCategoryId(Int32.Parse(categoryGrid.Tag.ToString()));
-                        genericModel.SetProductId(Int32.Parse(parent.Tag.ToString()));
+                        product_model.SetCategoryId(Int32.Parse(categoryGrid.Tag.ToString()));
+                        product_model.SetProductId(Int32.Parse(parent.Tag.ToString()));
                        
-                            if (genericModel.UpdateProductName(textBox.Text))
+                            if (product_model.UpdateProductName(textBox.Text))
                             {
                                 UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), textBox, null, label, masterGrid);
                             }
@@ -2707,14 +2711,14 @@ namespace _01electronics_inventory
                         Border pricingCriteriaBorderBrand = masterGrid.Children[Int32.Parse(textBox.Tag.ToString()) + 2] as Border;
                         Grid pricingCriteriaGridBrand = pricingCriteriaBorderBrand.Child as Grid;
 
-                        genericModel.SetCategoryId(Int32.Parse(categoryGridBrand.Tag.ToString()));
-                        genericModel.SetProductId(Int32.Parse(typeGridBrand.Tag.ToString()));
-                        genericModel.SetBrandId(Int32.Parse(brandGridBrand.Tag.ToString()));
-                        genericModel.SetModelId(Int32.Parse(parent.Tag.ToString()));
-                        genericModel.SetModelitemUnit(Int32.Parse(itemUnitGridBrand.Tag.ToString()));
-                        genericModel.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridBrand.Tag.ToString()));
+                        product_model.SetCategoryId(Int32.Parse(categoryGridBrand.Tag.ToString()));
+                        product_model.SetProductId(Int32.Parse(typeGridBrand.Tag.ToString()));
+                        product_model.SetBrandId(Int32.Parse(brandGridBrand.Tag.ToString()));
+                        product_model.SetModelId(Int32.Parse(parent.Tag.ToString()));
+                        product_model.SetModelitemUnit(Int32.Parse(itemUnitGridBrand.Tag.ToString()));
+                        product_model.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridBrand.Tag.ToString()));
                        
-                            if (genericModel.UpdateModel(textBox.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+                            if (product_model.UpdateModel(textBox.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
                             {
                                 UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), textBox, null, label, masterGrid);
                             }
@@ -2758,18 +2762,18 @@ namespace _01electronics_inventory
        //
        //                 Border ModelBorder = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) - 1] as Border;
        //                 Grid ModelGrid = ModelBorder.Child as Grid;
-       //                 TextBlock modelName = ModelGrid.Children[0] as TextBlock;
+       //                 TextBlock model_name = ModelGrid.Children[0] as TextBlock;
        //
        //                 Border pricingCriteriaBorderItemUnit = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) + 1] as Border;
        //                 Grid pricingCriteriaGridItemUnit = pricingCriteriaBorderItemUnit.Child as Grid;
        //
-       //                 genericModel.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
-       //                 genericModel.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
-       //                 genericModel.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
-       //                 genericModel.SetModelId(Int32.Parse(ModelGrid.Tag.ToString()));
-       //                 genericModel.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
-       //                 genericModel.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridItemUnit.Tag.ToString()));
-       //                 if (genericModel.UpdateModel(modelName.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+       //                 product_model.SetCategoryId(Int32.Parse(categoryGridItemUnit.Tag.ToString()));
+       //                 product_model.SetProductId(Int32.Parse(typeGridItemUnit.Tag.ToString()));
+       //                 product_model.SetBrandId(Int32.Parse(brandGridItemUnit.Tag.ToString()));
+       //                 product_model.SetModelId(Int32.Parse(ModelGrid.Tag.ToString()));
+       //                 product_model.SetModelitemUnit(unitList[comboBox.SelectedIndex].measure_unit_id);
+       //                 product_model.SetModelpricingCriteria(Int32.Parse(pricingCriteriaGridItemUnit.Tag.ToString()));
+       //                 if (product_model.UpdateModel(model_name.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
        //                 {
        //                     UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), null, comboBox, label, masterGrid);
        //                 }
@@ -2798,13 +2802,13 @@ namespace _01electronics_inventory
        //                 Border borderItemUnit = masterGrid.Children[Int32.Parse(comboBox.Tag.ToString()) - 1] as Border;
        //                 Grid gridItemUnit = borderItemUnit.Child as Grid;
        //
-       //                 genericModel.SetCategoryId(Int32.Parse(categoryGridPricingCriteria.Tag.ToString()));
-       //                 genericModel.SetProductId(Int32.Parse(typeGridPricingCriteria.Tag.ToString()));
-       //                 genericModel.SetBrandId(Int32.Parse(brandGridPricingCriteria.Tag.ToString()));
-       //                 genericModel.SetModelId(Int32.Parse(ModelGridPricingCriteria.Tag.ToString()));
-       //                 genericModel.SetModelitemUnit(Int32.Parse(gridItemUnit.Tag.ToString()));
-       //                 genericModel.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
-       //                 if (genericModel.UpdateModel(modelName1.Text, genericModel.GetModelUnitId(), true, genericModel.GetModelPricingCriteria()))
+       //                 product_model.SetCategoryId(Int32.Parse(categoryGridPricingCriteria.Tag.ToString()));
+       //                 product_model.SetProductId(Int32.Parse(typeGridPricingCriteria.Tag.ToString()));
+       //                 product_model.SetBrandId(Int32.Parse(brandGridPricingCriteria.Tag.ToString()));
+       //                 product_model.SetModelId(Int32.Parse(ModelGridPricingCriteria.Tag.ToString()));
+       //                 product_model.SetModelitemUnit(Int32.Parse(gridItemUnit.Tag.ToString()));
+       //                 product_model.SetModelpricingCriteria(pricingCriteriaList[comboBox.SelectedIndex].pricing_criteria_id);
+       //                 if (product_model.UpdateModel(modelName1.Text, product_model.GetModelUnitId(), true, product_model.GetModelPricingCriteria()))
        //                 {
        //                     UpdateColumn(Int32.Parse(label.Tag.ToString()), Int32.Parse(parent.Tag.ToString()), null, comboBox, label, masterGrid);
        //                 }
@@ -2880,7 +2884,7 @@ namespace _01electronics_inventory
                     {
                         Border categoryborder = grid.Children[i-1] as Border;
                         Grid categoryborderChild = categoryborder.Child as Grid;
-                        if(Int32.Parse(categoryborderChild.Tag.ToString())== genericModel.GetCategoryId())
+                        if(Int32.Parse(categoryborderChild.Tag.ToString())== product_model.GetCategoryId())
                         {
                             Border typeBorder = grid.Children[i] as Border;
                             Grid typeBorderChild = typeBorder.Child as Grid;
@@ -2905,9 +2909,9 @@ namespace _01electronics_inventory
                     //
                     //    Border typeborder = grid.Children[i - 1] as Border;
                     //    Grid typeborderChild = typeborder.Child as Grid;
-                    //    if (Int32.Parse(categoryborderChild.Tag.ToString()) == genericModel.GetCategoryId())
+                    //    if (Int32.Parse(categoryborderChild.Tag.ToString()) == product_model.GetCategoryId())
                     //    {
-                    //        if (Int32.Parse(typeborderChild.Tag.ToString()) == genericModel.GetBrandId())
+                    //        if (Int32.Parse(typeborderChild.Tag.ToString()) == product_model.GetBrandId())
                     //        {
                     //            Border brandBorder = grid.Children[i] as Border;
                     //            Grid brandBorderChild = brandBorder.Child as Grid;
@@ -2937,11 +2941,11 @@ namespace _01electronics_inventory
                         Border brandborder = grid.Children[i - 1] as Border;
                         Grid brandborderChild = brandborder.Child as Grid;
 
-                        if (Int32.Parse(categoryborderChild.Tag.ToString()) == genericModel.GetCategoryId())
+                        if (Int32.Parse(categoryborderChild.Tag.ToString()) == product_model.GetCategoryId())
                         {
-                            if (Int32.Parse(typeborderChild.Tag.ToString()) == genericModel.GetProductId())
+                            if (Int32.Parse(typeborderChild.Tag.ToString()) == product_model.GetProductId())
                             {
-                                if (Int32.Parse(brandborderChild.Tag.ToString()) == genericModel.GetBrandId())
+                                if (Int32.Parse(brandborderChild.Tag.ToString()) == product_model.GetBrandId())
                                 {
                                     Border ModelBorder = grid.Children[i] as Border;
                                     Grid ModelBorderChild = ModelBorder.Child as Grid;
@@ -2973,13 +2977,13 @@ namespace _01electronics_inventory
                         Border modelborder = grid.Children[i - 1] as Border;
                         Grid modelborderChild = modelborder.Child as Grid;
 
-                        if (Int32.Parse(categoryborderChild.Tag.ToString()) == genericModel.GetCategoryId())
+                        if (Int32.Parse(categoryborderChild.Tag.ToString()) == product_model.GetCategoryId())
                         {
-                            if (Int32.Parse(typeborderChild.Tag.ToString()) == genericModel.GetProductId())
+                            if (Int32.Parse(typeborderChild.Tag.ToString()) == product_model.GetProductId())
                             {
-                                if (Int32.Parse(brandborderChild.Tag.ToString()) == genericModel.GetBrandId())
+                                if (Int32.Parse(brandborderChild.Tag.ToString()) == product_model.GetBrandId())
                                 {
-                                    if (Int32.Parse(modelborderChild.Tag.ToString()) == genericModel.GetModelId())
+                                    if (Int32.Parse(modelborderChild.Tag.ToString()) == product_model.GetModelId())
                                     {
                                         Border itemUnitBorder = grid.Children[i] as Border;
                                         Grid itemUnitBorderChild = itemUnitBorder.Child as Grid;
@@ -3015,15 +3019,15 @@ namespace _01electronics_inventory
                         Border itemborder = grid.Children[i - 1] as Border;
                         Grid itemborderChild = itemborder.Child as Grid;
 
-                        if (Int32.Parse(categoryborderChild.Tag.ToString()) == genericModel.GetCategoryId())
+                        if (Int32.Parse(categoryborderChild.Tag.ToString()) == product_model.GetCategoryId())
                         {
-                            if (Int32.Parse(typeborderChild.Tag.ToString()) == genericModel.GetProductId())
+                            if (Int32.Parse(typeborderChild.Tag.ToString()) == product_model.GetProductId())
                             {
-                                if (Int32.Parse(brandborderChild.Tag.ToString()) == genericModel.GetBrandId())
+                                if (Int32.Parse(brandborderChild.Tag.ToString()) == product_model.GetBrandId())
                                 {
-                                    if (Int32.Parse(modelborderChild.Tag.ToString()) == genericModel.GetModelId())
+                                    if (Int32.Parse(modelborderChild.Tag.ToString()) == product_model.GetModelId())
                                     {
-                                        if (Int32.Parse(itemborderChild.Tag.ToString()) == genericModel.GetModelUnitId())
+                                        if (Int32.Parse(itemborderChild.Tag.ToString()) == product_model.GetModelUnitId())
                                         {
                                             Border pricingCreteriaBorder = grid.Children[i] as Border;
                                             Grid pricingCreteriaBorderChild = pricingCreteriaBorder.Child as Grid;
@@ -3291,52 +3295,52 @@ namespace _01electronics_inventory
             Border categoryBorder = masterGrid.Children[imagePosition - 7] as Border;
             Grid categoryGrid = categoryBorder.Child as Grid;
             TextBlock categoryTextBlock = categoryGrid.Children[0] as TextBlock;
-            int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+            int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
             Border typeBorder = masterGrid.Children[imagePosition - 6] as Border;
             Grid typeGrid = typeBorder.Child as Grid;
             TextBlock typeTextBlock = typeGrid.Children[0] as TextBlock;
-            int typeId = Int32.Parse(typeGrid.Tag.ToString());
+            int type_id = Int32.Parse(typeGrid.Tag.ToString());
 
             Border brandBorder = masterGrid.Children[imagePosition - 5] as Border;
             Grid brandGrid = brandBorder.Child as Grid;
             TextBlock brandTextBlock = brandGrid.Children[0] as TextBlock;
-            int brandId = Int32.Parse(brandGrid.Tag.ToString());
+            int brand_id = Int32.Parse(brandGrid.Tag.ToString());
 
             Border modelBorder = masterGrid.Children[imagePosition - 4] as Border;
             Grid modelGrid = modelBorder.Child as Grid;
-            int modelId = Int32.Parse(modelGrid.Tag.ToString());
+            int model_id = Int32.Parse(modelGrid.Tag.ToString());
 
-            genericModel.SetCategoryId(categoryId);
-            genericModel.SetProductId(typeId);
-            genericModel.SetBrandId(brandId);
-            genericModel.SetModelId(modelId);
-            if (modelId != 0)
+            product_model.SetCategoryId(category_id);
+            product_model.SetProductId(type_id);
+            product_model.SetBrandId(brand_id);
+            product_model.SetModelId(model_id);
+            if (model_id != 0)
             {
-                if (!genericModel.DeleteModel())
+                if (!product_model.DeleteModel())
                     System.Windows.Forms.MessageBox.Show("Couldn't Delete The Model.  Please report this to your system adminstrator ", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 else 
                     InitializeTableView();
             }
             else
             {
-                if(brandId != 0)
+                if(brand_id != 0)
                 {
-                    if (!genericModel.DeleteFromProductBrands())
+                    if (!product_model.DeleteFromProductBrands())
                         System.Windows.Forms.MessageBox.Show("Couldn't Delete The Brand.  Please report this to your system adminstrator", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                         InitializeTableView();
                 }
-                else if(typeId !=0)
+                else if(type_id !=0)
                 {
-                    if(!genericModel.DeleteFromProduct())
+                    if(!product_model.DeleteFromProduct())
                         System.Windows.Forms.MessageBox.Show("Couldn't Delete The Type. Please report this to your system adminstrator.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                         InitializeTableView();
                 }
-                else if(categoryId !=0)
+                else if(category_id !=0)
                 {
-                    if(!genericModel.DeleteFromCategory())
+                    if(!product_model.DeleteFromCategory())
                         System.Windows.Forms.MessageBox.Show("Couldn't Delete The Type. Please report this to your system adminstrator.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     else
                         InitializeTableView();
@@ -3400,32 +3404,32 @@ namespace _01electronics_inventory
 
                                         if (modelTextBox.Text != string.Empty && itemComboBox.SelectedIndex != -1 && pricingComboBox.SelectedIndex != -1)
                                         {
-                                            genericModel.SetModelName(modelTextBox.Text);
-                                            genericModel.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
-                                            genericModel.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
-                                            genericModel.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
-                                            genericModel.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
+                                            product_model.SetModelName(modelTextBox.Text);
+                                            product_model.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
+                                            product_model.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
+                                            product_model.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
+                                            product_model.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
                                             if (hasSerialNumberCheckBox.IsChecked == true)
-                                                genericModel.SetModelHasSerialNumber(true);
+                                                product_model.SetModelHasSerialNumber(true);
                                             else
-                                                genericModel.SetModelHasSerialNumber(false);
+                                                product_model.SetModelHasSerialNumber(false);
                                             string errorMsg1 = string.Empty;
                                             string outPutString1 = string.Empty;
                                            
-                                                if (!genericModel.IssuNewCategory())
+                                                if (!product_model.IssuNewCategory())
                                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                       else
                                                       {
                                                     
-                                                                 if (!genericModel.IssuNewProduct())
+                                                                 if (!product_model.IssuNewProduct())
                                                                      System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                  else
                                                                  {
-                                                                     if (!genericModel.IssuNewBrand())
+                                                                     if (!product_model.IssuNewBrand())
                                                                          System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                      else
                                                                      {
-                                                                         if (!genericModel.IssuNewModel())
+                                                                         if (!product_model.IssuNewModel())
                                                                              System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                                                          else
                                                                          {
@@ -3433,29 +3437,29 @@ namespace _01electronics_inventory
                                                            
                                                            
                                                            
-                                                                             categoryTextBlock.Text = genericModel.GetCategoryName();
+                                                                             categoryTextBlock.Text = product_model.GetCategoryName();
                                                                              categoryTextBlock.Visibility = Visibility.Visible;
                                                                              categoryComboBox.Visibility = Visibility.Collapsed;
                                                                              categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                                                            
                                                            
-                                                                             typeTextBlock.Text = genericModel.GetProductName();
+                                                                             typeTextBlock.Text = product_model.GetProductName();
                                                                              typeTextBlock.Visibility = Visibility.Visible;
                                                                              typeComboBox.Visibility = Visibility.Collapsed;
                                                                              typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                                                            
                                                            
-                                                                             brandTextBlock.Text = genericModel.GetBrandName();
+                                                                             brandTextBlock.Text = product_model.GetBrandName();
                                                                              brandTextBlock.Visibility = Visibility.Visible;
                                                                              brandComboBox.Visibility = Visibility.Collapsed;
                                                                              brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                                                            
-                                                                             modelTextBlock.Text = genericModel.GetModelName();
+                                                                             modelTextBlock.Text = product_model.GetModelName();
                                                                              modelTextBlock.Visibility = Visibility.Visible;
                                                                              modelTextBox.Visibility = Visibility.Collapsed;
                                                                              modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                                                            
-                                                                             itemTextBlock.Text = genericModel.GetModelUnitName();
+                                                                             itemTextBlock.Text = product_model.GetModelUnitName();
                                                                              itemTextBlock.Visibility = Visibility.Visible;
                                                                              itemComboBox.Visibility = Visibility.Collapsed;
                                                                              itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3490,37 +3494,37 @@ namespace _01electronics_inventory
                             }
                             else
                             {
-                               if(!genericModel.IssuNewCategory())
+                               if(!product_model.IssuNewCategory())
                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                else
                                {
-                                   if (!genericModel.IssuNewProduct())
+                                   if (!product_model.IssuNewProduct())
                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                    else
                                    {
                                 if (brandComboBox.SelectedIndex != -1)
                                 {
-                                    genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
-                                    if (!genericModel.IssuproductBrand())
+                                    product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                                    if (!product_model.IssuproductBrand())
                                         System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                     else
                                     {
                                         if (modelTextBox.Text != string.Empty && itemComboBox.SelectedIndex != -1 && pricingComboBox.SelectedIndex != -1)
                                         {
-                                            genericModel.SetModelName(modelTextBox.Text);
-                                            genericModel.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
-                                            genericModel.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
-                                            genericModel.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
-                                            genericModel.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
+                                            product_model.SetModelName(modelTextBox.Text);
+                                            product_model.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
+                                            product_model.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
+                                            product_model.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
+                                            product_model.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
                                             if (hasSerialNumberCheckBox.IsChecked == true)
-                                                genericModel.SetModelHasSerialNumber(true);
+                                                product_model.SetModelHasSerialNumber(true);
                                             else
-                                                genericModel.SetModelHasSerialNumber(false);
+                                                product_model.SetModelHasSerialNumber(false);
                                             string errorMsg1 = string.Empty;
                                             string outPutString1 = string.Empty;
 
 
-                                            if (!genericModel.IssuNewModel())
+                                            if (!product_model.IssuNewModel())
                                                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                             else
                                             {
@@ -3528,29 +3532,29 @@ namespace _01electronics_inventory
 
 
 
-                                                categoryTextBlock.Text = genericModel.GetCategoryName();
+                                                categoryTextBlock.Text = product_model.GetCategoryName();
                                                 categoryTextBlock.Visibility = Visibility.Visible;
                                                 categoryComboBox.Visibility = Visibility.Collapsed;
                                                 categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                                typeTextBlock.Text = genericModel.GetProductName();
+                                                typeTextBlock.Text = product_model.GetProductName();
                                                 typeTextBlock.Visibility = Visibility.Visible;
                                                 typeComboBox.Visibility = Visibility.Collapsed;
                                                 typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                                brandTextBlock.Text = genericModel.GetBrandName();
+                                                brandTextBlock.Text = product_model.GetBrandName();
                                                 brandTextBlock.Visibility = Visibility.Visible;
                                                 brandComboBox.Visibility = Visibility.Collapsed;
                                                 brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                                modelTextBlock.Text = genericModel.GetModelName();
+                                                modelTextBlock.Text = product_model.GetModelName();
                                                 modelTextBlock.Visibility = Visibility.Visible;
                                                 modelTextBox.Visibility = Visibility.Collapsed;
                                                 modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                                itemTextBlock.Text = genericModel.GetModelUnitName();
+                                                itemTextBlock.Text = product_model.GetModelUnitName();
                                                 itemTextBlock.Visibility = Visibility.Visible;
                                                 itemComboBox.Visibility = Visibility.Collapsed;
                                                 itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3586,29 +3590,29 @@ namespace _01electronics_inventory
                                 }
                                 else
                                 {
-                                    categoryTextBlock.Text = genericModel.GetCategoryName();
+                                    categoryTextBlock.Text = product_model.GetCategoryName();
                                     categoryTextBlock.Visibility = Visibility.Visible;
                                     categoryComboBox.Visibility = Visibility.Collapsed;
                                     categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                    typeTextBlock.Text = genericModel.GetProductName();
+                                    typeTextBlock.Text = product_model.GetProductName();
                                     typeTextBlock.Visibility = Visibility.Visible;
                                     typeComboBox.Visibility = Visibility.Collapsed;
                                     typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                    // brandTextBlock.Text = genericModel.GetBrandName();
+                                    // brandTextBlock.Text = product_model.GetBrandName();
                                     brandTextBlock.Visibility = Visibility.Visible;
                                     brandComboBox.Visibility = Visibility.Collapsed;
                                     brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                    //  modelTextBlock.Text = genericModel.GetModelName();
+                                    //  modelTextBlock.Text = product_model.GetModelName();
                                     modelTextBlock.Visibility = Visibility.Visible;
                                     modelTextBox.Visibility = Visibility.Collapsed;
                                     modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                    //  itemTextBlock.Text = genericModel.GetModelUnitName();
+                                    //  itemTextBlock.Text = product_model.GetModelUnitName();
                                     itemTextBlock.Visibility = Visibility.Visible;
                                     itemComboBox.Visibility = Visibility.Collapsed;
                                     itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3639,33 +3643,33 @@ namespace _01electronics_inventory
                     }
                     else
                     {
-                          if (!genericModel.IssuNewCategory())
+                          if (!product_model.IssuNewCategory())
                               System.Windows.Forms.MessageBox.Show("Category Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                           else
                           {
-                              categoryTextBlock.Text = genericModel.GetCategoryName();
+                              categoryTextBlock.Text = product_model.GetCategoryName();
                               categoryTextBlock.Visibility = Visibility.Visible;
                               categoryComboBox.Visibility = Visibility.Collapsed;
                               categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                           
                           
-                             // typeTextBlock.Text = genericModel.GetProductName();
+                             // typeTextBlock.Text = product_model.GetProductName();
                               typeTextBlock.Visibility = Visibility.Visible;
                               typeComboBox.Visibility = Visibility.Collapsed;
                               typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                           
                           
-                             // brandTextBlock.Text = genericModel.GetBrandName();
+                             // brandTextBlock.Text = product_model.GetBrandName();
                               brandTextBlock.Visibility = Visibility.Visible;
                               brandComboBox.Visibility = Visibility.Collapsed;
                               brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                           
-                            //  modelTextBlock.Text = genericModel.GetModelName();
+                            //  modelTextBlock.Text = product_model.GetModelName();
                               modelTextBlock.Visibility = Visibility.Visible;
                               modelTextBox.Visibility = Visibility.Collapsed;
                               modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                           
-                            //  itemTextBlock.Text = genericModel.GetModelUnitName();
+                            //  itemTextBlock.Text = product_model.GetModelUnitName();
                               itemTextBlock.Visibility = Visibility.Visible;
                               itemComboBox.Visibility = Visibility.Collapsed;
                               itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3689,8 +3693,8 @@ namespace _01electronics_inventory
             }
             else if(categoryComboBox.SelectedIndex !=-1)
             {
-                genericModel.SetCategoryName(categoryComboBox.SelectedItem.ToString());
-                genericModel.SetCategoryId(categoryList[categoryComboBox.SelectedIndex].category_id);
+                product_model.SetCategoryName(categoryComboBox.SelectedItem.ToString());
+                product_model.SetCategoryId(categoryList[categoryComboBox.SelectedIndex].category_id);
                 if (typeComboBox.SelectedIndex == -1 && typeComboBox.Text != string.Empty)
                 {
 
@@ -3698,58 +3702,58 @@ namespace _01electronics_inventory
                     {
                         if (modelTextBox.Text != string.Empty && itemComboBox.SelectedIndex != -1 && pricingComboBox.SelectedIndex != -1 )
                         {
-                            genericModel.SetModelName(modelTextBox.Text);
-                            genericModel.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
-                            genericModel.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
-                            genericModel.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
-                            genericModel.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
+                            product_model.SetModelName(modelTextBox.Text);
+                            product_model.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
+                            product_model.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
+                            product_model.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
+                            product_model.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
                             if (hasSerialNumberCheckBox.IsChecked == true)
-                                genericModel.SetModelHasSerialNumber(true);
+                                product_model.SetModelHasSerialNumber(true);
                             else
-                                genericModel.SetModelHasSerialNumber(false);
+                                product_model.SetModelHasSerialNumber(false);
 
-                            if (!genericModel.IssuNewCategory())
+                            if (!product_model.IssuNewCategory())
                                 System.Windows.Forms.MessageBox.Show("Category Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                if (!genericModel.IssuNewProduct())
+                                if (!product_model.IssuNewProduct())
                                     System.Windows.Forms.MessageBox.Show("Product Type Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 else
                                 {
-                                    if (!genericModel.IssuNewBrand())
+                                    if (!product_model.IssuNewBrand())
                                         System.Windows.Forms.MessageBox.Show("Model Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                     else
                                     {
-                                        if (!genericModel.IssuNewModel())
+                                        if (!product_model.IssuNewModel())
                                             MessageBox.Show("Error");
                                         else
                                         {
 
 
 
-                                            categoryTextBlock.Text = genericModel.GetCategoryName();
+                                            categoryTextBlock.Text = product_model.GetCategoryName();
                                             categoryTextBlock.Visibility = Visibility.Visible;
                                             categoryComboBox.Visibility = Visibility.Collapsed;
                                             categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                            typeTextBlock.Text = genericModel.GetProductName();
+                                            typeTextBlock.Text = product_model.GetProductName();
                                             typeTextBlock.Visibility = Visibility.Visible;
                                             typeComboBox.Visibility = Visibility.Collapsed;
                                             typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                            brandTextBlock.Text = genericModel.GetBrandName();
+                                            brandTextBlock.Text = product_model.GetBrandName();
                                             brandTextBlock.Visibility = Visibility.Visible;
                                             brandComboBox.Visibility = Visibility.Collapsed;
                                             brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                            modelTextBlock.Text = genericModel.GetModelName();
+                                            modelTextBlock.Text = product_model.GetModelName();
                                             modelTextBlock.Visibility = Visibility.Visible;
                                             modelTextBox.Visibility = Visibility.Collapsed;
                                             modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                            itemTextBlock.Text = genericModel.GetModelUnitName();
+                                            itemTextBlock.Text = product_model.GetModelUnitName();
                                             itemTextBlock.Visibility = Visibility.Visible;
                                             itemComboBox.Visibility = Visibility.Collapsed;
                                             itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3779,33 +3783,33 @@ namespace _01electronics_inventory
                         }
                         else
                         {
-                            if(!genericModel.IssuNewBrand())
+                            if(!product_model.IssuNewBrand())
                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                categoryTextBlock.Text = genericModel.GetCategoryName();
+                                categoryTextBlock.Text = product_model.GetCategoryName();
                                 categoryTextBlock.Visibility = Visibility.Visible;
                                 categoryComboBox.Visibility = Visibility.Collapsed;
                                 categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                typeTextBlock.Text = genericModel.GetProductName();
+                                typeTextBlock.Text = product_model.GetProductName();
                                 typeTextBlock.Visibility = Visibility.Visible;
                                 typeComboBox.Visibility = Visibility.Collapsed;
                                 typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                brandTextBlock.Text = genericModel.GetBrandName();
+                                brandTextBlock.Text = product_model.GetBrandName();
                                 brandTextBlock.Visibility = Visibility.Visible;
                                 brandComboBox.Visibility = Visibility.Collapsed;
                                 brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                             //   modelTextBlock.Text = genericModel.GetModelName();
+                             //   modelTextBlock.Text = product_model.GetModelName();
                                 modelTextBlock.Visibility = Visibility.Visible;
                                 modelTextBox.Visibility = Visibility.Collapsed;
                                 modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                //itemTextBlock.Text = genericModel.GetModelUnitName();
+                                //itemTextBlock.Text = product_model.GetModelUnitName();
                                 itemTextBlock.Visibility = Visibility.Visible;
                                 itemComboBox.Visibility = Visibility.Collapsed;
                                 itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3846,64 +3850,64 @@ namespace _01electronics_inventory
                     }
                     else if (brandComboBox.SelectedIndex != -1)
                     {
-                        genericModel.SetProductName(typeComboBox.Text);
-                        genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
-                        genericModel.SetBrandName(brandList[brandComboBox.SelectedIndex].brand_name);
+                        product_model.SetProductName(typeComboBox.Text);
+                        product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                        product_model.SetBrandName(brandList[brandComboBox.SelectedIndex].brand_name);
 
                         if (modelTextBox.Text != string.Empty && itemComboBox.SelectedIndex != -1 && pricingComboBox.SelectedIndex != -1)
                         {
-                            genericModel.SetModelName(modelTextBox.Text);
-                            genericModel.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
-                            genericModel.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
-                            genericModel.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
-                            genericModel.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
+                            product_model.SetModelName(modelTextBox.Text);
+                            product_model.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
+                            product_model.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
+                            product_model.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
+                            product_model.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
                             if (hasSerialNumberCheckBox.IsChecked == true)
-                                genericModel.SetModelHasSerialNumber(true);
+                                product_model.SetModelHasSerialNumber(true);
                             else
-                                genericModel.SetModelHasSerialNumber(false);
+                                product_model.SetModelHasSerialNumber(false);
 
-                            if (!genericModel.IssuNewCategory())
+                            if (!product_model.IssuNewCategory())
                                 System.Windows.Forms.MessageBox.Show("Category Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                if (!genericModel.IssuNewProduct())
+                                if (!product_model.IssuNewProduct())
                                     System.Windows.Forms.MessageBox.Show("Product Type Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 else
                                 {
-                                    if (!genericModel.IssuNewBrand())
+                                    if (!product_model.IssuNewBrand())
                                         System.Windows.Forms.MessageBox.Show("Model Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                     else
                                     {
-                                        if (!genericModel.IssuNewModel())
+                                        if (!product_model.IssuNewModel())
                                             MessageBox.Show("Error");
                                         else
                                         {
 
 
 
-                                            categoryTextBlock.Text = genericModel.GetCategoryName();
+                                            categoryTextBlock.Text = product_model.GetCategoryName();
                                             categoryTextBlock.Visibility = Visibility.Visible;
                                             categoryComboBox.Visibility = Visibility.Collapsed;
                                             categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                            typeTextBlock.Text = genericModel.GetProductName();
+                                            typeTextBlock.Text = product_model.GetProductName();
                                             typeTextBlock.Visibility = Visibility.Visible;
                                             typeComboBox.Visibility = Visibility.Collapsed;
                                             typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                            brandTextBlock.Text = genericModel.GetBrandName();
+                                            brandTextBlock.Text = product_model.GetBrandName();
                                             brandTextBlock.Visibility = Visibility.Visible;
                                             brandComboBox.Visibility = Visibility.Collapsed;
                                             brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                            modelTextBlock.Text = genericModel.GetModelName();
+                                            modelTextBlock.Text = product_model.GetModelName();
                                             modelTextBlock.Visibility = Visibility.Visible;
                                             modelTextBox.Visibility = Visibility.Collapsed;
                                             modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                            itemTextBlock.Text = genericModel.GetModelUnitName();
+                                            itemTextBlock.Text = product_model.GetModelUnitName();
                                             itemTextBlock.Visibility = Visibility.Visible;
                                             itemComboBox.Visibility = Visibility.Collapsed;
                                             itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3933,37 +3937,37 @@ namespace _01electronics_inventory
                         }
                         else
                         {
-                            if (!genericModel.IssuNewProduct())
+                            if (!product_model.IssuNewProduct())
                                 System.Windows.Forms.MessageBox.Show("Product Type Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                if (!genericModel.IssuNewBrand())
+                                if (!product_model.IssuNewBrand())
                                     System.Windows.Forms.MessageBox.Show("Product Type Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 else
                                 {
-                                    categoryTextBlock.Text = genericModel.GetCategoryName();
+                                    categoryTextBlock.Text = product_model.GetCategoryName();
                                     categoryTextBlock.Visibility = Visibility.Visible;
                                     categoryComboBox.Visibility = Visibility.Collapsed;
                                     categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                    typeTextBlock.Text = genericModel.GetProductName();
+                                    typeTextBlock.Text = product_model.GetProductName();
                                     typeTextBlock.Visibility = Visibility.Visible;
                                     typeComboBox.Visibility = Visibility.Collapsed;
                                     typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                    brandTextBlock.Text = genericModel.GetBrandName();
+                                    brandTextBlock.Text = product_model.GetBrandName();
                                     brandTextBlock.Visibility = Visibility.Visible;
                                     brandComboBox.Visibility = Visibility.Collapsed;
                                     brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                    //modelTextBlock.Text = genericModel.GetModelName();
+                                    //modelTextBlock.Text = product_model.GetModelName();
                                     modelTextBlock.Visibility = Visibility.Visible;
                                     modelTextBox.Visibility = Visibility.Collapsed;
                                     modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                   // itemTextBlock.Text = genericModel.GetModelUnitName();
+                                   // itemTextBlock.Text = product_model.GetModelUnitName();
                                     itemTextBlock.Visibility = Visibility.Visible;
                                     itemComboBox.Visibility = Visibility.Collapsed;
                                     itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3995,33 +3999,33 @@ namespace _01electronics_inventory
                     }
                     else
                     {
-                        if(!genericModel.IssuNewProduct())
+                        if(!product_model.IssuNewProduct())
                             System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         else
                         {
-                            categoryTextBlock.Text = genericModel.GetCategoryName();
+                            categoryTextBlock.Text = product_model.GetCategoryName();
                             categoryTextBlock.Visibility = Visibility.Visible;
                             categoryComboBox.Visibility = Visibility.Collapsed;
                             categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                            typeTextBlock.Text = genericModel.GetProductName();
+                            typeTextBlock.Text = product_model.GetProductName();
                             typeTextBlock.Visibility = Visibility.Visible;
                             typeComboBox.Visibility = Visibility.Collapsed;
                             typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                          //  brandTextBlock.Text = genericModel.GetBrandName();
+                          //  brandTextBlock.Text = product_model.GetBrandName();
                             brandTextBlock.Visibility = Visibility.Visible;
                             brandComboBox.Visibility = Visibility.Collapsed;
                             brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                          //  modelTextBlock.Text = genericModel.GetModelName();
+                          //  modelTextBlock.Text = product_model.GetModelName();
                             modelTextBlock.Visibility = Visibility.Visible;
                             modelTextBox.Visibility = Visibility.Collapsed;
                             modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                           // itemTextBlock.Text = genericModel.GetModelUnitName();
+                           // itemTextBlock.Text = product_model.GetModelUnitName();
                             itemTextBlock.Visibility = Visibility.Visible;
                             itemComboBox.Visibility = Visibility.Collapsed;
                             itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -4049,8 +4053,8 @@ namespace _01electronics_inventory
                 }
                 else if(typeComboBox.SelectedIndex !=-1)
                 {
-                    genericModel.SetProductName(typeList[typeComboBox.SelectedIndex].product_name);
-                    genericModel.SetProductId(typeList[typeComboBox.SelectedIndex].product_id);
+                    product_model.SetProductName(typeList[typeComboBox.SelectedIndex].product_name);
+                    product_model.SetProductId(typeList[typeComboBox.SelectedIndex].type_id);
 
                     if (brandComboBox.SelectedIndex == -1 && brandComboBox.Text != string.Empty)
                     {
@@ -4058,49 +4062,49 @@ namespace _01electronics_inventory
 
                         if (modelTextBox.Text != string.Empty && itemComboBox.SelectedIndex != -1 && pricingComboBox.SelectedIndex != -1)
                         {
-                            genericModel.SetModelName(modelTextBox.Text);
-                            genericModel.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
-                            genericModel.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
-                            genericModel.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
-                            genericModel.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
-                            if (!genericModel.IssuNewBrand())
+                            product_model.SetModelName(modelTextBox.Text);
+                            product_model.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
+                            product_model.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
+                            product_model.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
+                            product_model.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
+                            if (!product_model.IssuNewBrand())
                                 System.Windows.Forms.MessageBox.Show("Model Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
                                 if (hasSerialNumberCheckBox.IsChecked == true)
-                                    genericModel.SetModelHasSerialNumber(true);
+                                    product_model.SetModelHasSerialNumber(true);
                                 else
-                                    genericModel.SetModelHasSerialNumber(false);
-                                if (!genericModel.IssuNewModel())
+                                    product_model.SetModelHasSerialNumber(false);
+                                if (!product_model.IssuNewModel())
                                     MessageBox.Show("Error");
                                 else
                                 {
 
 
 
-                                    categoryTextBlock.Text = genericModel.GetCategoryName();
+                                    categoryTextBlock.Text = product_model.GetCategoryName();
                                     categoryTextBlock.Visibility = Visibility.Visible;
                                     categoryComboBox.Visibility = Visibility.Collapsed;
                                     categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                    typeTextBlock.Text = genericModel.GetProductName();
+                                    typeTextBlock.Text = product_model.GetProductName();
                                     typeTextBlock.Visibility = Visibility.Visible;
                                     typeComboBox.Visibility = Visibility.Collapsed;
                                     typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                    brandTextBlock.Text = genericModel.GetBrandName();
+                                    brandTextBlock.Text = product_model.GetBrandName();
                                     brandTextBlock.Visibility = Visibility.Visible;
                                     brandComboBox.Visibility = Visibility.Collapsed;
                                     brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                    modelTextBlock.Text = genericModel.GetModelName();
+                                    modelTextBlock.Text = product_model.GetModelName();
                                     modelTextBlock.Visibility = Visibility.Visible;
                                     modelTextBox.Visibility = Visibility.Collapsed;
                                     modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                    itemTextBlock.Text = genericModel.GetModelUnitName();
+                                    itemTextBlock.Text = product_model.GetModelUnitName();
                                     itemTextBlock.Visibility = Visibility.Visible;
                                     itemComboBox.Visibility = Visibility.Collapsed;
                                     itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -4129,33 +4133,33 @@ namespace _01electronics_inventory
                         }
                         else
                         {
-                            if (!genericModel.IssuNewBrand())
+                            if (!product_model.IssuNewBrand())
                                 System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             else
                             {
-                                categoryTextBlock.Text = genericModel.GetCategoryName();
+                                categoryTextBlock.Text = product_model.GetCategoryName();
                                 categoryTextBlock.Visibility = Visibility.Visible;
                                 categoryComboBox.Visibility = Visibility.Collapsed;
                                 categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                typeTextBlock.Text = genericModel.GetProductName();
+                                typeTextBlock.Text = product_model.GetProductName();
                                 typeTextBlock.Visibility = Visibility.Visible;
                                 typeComboBox.Visibility = Visibility.Collapsed;
                                 typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                brandTextBlock.Text = genericModel.GetBrandName();
+                                brandTextBlock.Text = product_model.GetBrandName();
                                 brandTextBlock.Visibility = Visibility.Visible;
                                 brandComboBox.Visibility = Visibility.Collapsed;
                                 brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                //   modelTextBlock.Text = genericModel.GetModelName();
+                                //   modelTextBlock.Text = product_model.GetModelName();
                                 modelTextBlock.Visibility = Visibility.Visible;
                                 modelTextBox.Visibility = Visibility.Collapsed;
                                 modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                //itemTextBlock.Text = genericModel.GetModelUnitName();
+                                //itemTextBlock.Text = product_model.GetModelUnitName();
                                 itemTextBlock.Visibility = Visibility.Visible;
                                 itemComboBox.Visibility = Visibility.Collapsed;
                                 itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -4183,50 +4187,50 @@ namespace _01electronics_inventory
                     }
                     else if (brandComboBox.SelectedIndex != -1)
                     {
-                        genericModel.SetBrandName(brandComboBox.SelectedItem.ToString());
-                        genericModel.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                        product_model.SetBrandName(brandComboBox.SelectedItem.ToString());
+                        product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
 
                         if (modelTextBox.Text != string.Empty && itemComboBox.SelectedIndex != -1 && pricingComboBox.SelectedIndex != -1)
                         {
-                            genericModel.SetModelName(modelTextBox.Text);
-                            genericModel.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
-                            genericModel.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
-                            genericModel.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
-                            genericModel.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
+                            product_model.SetModelName(modelTextBox.Text);
+                            product_model.SetModelitemUnit(unitList[itemComboBox.SelectedIndex].measure_unit_id);
+                            product_model.SetModelitemUnitName(unitList[itemComboBox.SelectedIndex].measure_unit);
+                            product_model.SetModelpricingCriteria(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_id);
+                            product_model.SetModelpricingCriteriaName(pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name);
                             if (hasSerialNumberCheckBox.IsChecked == true)
-                                genericModel.SetModelHasSerialNumber(true);
+                                product_model.SetModelHasSerialNumber(true);
                             else
-                                genericModel.SetModelHasSerialNumber(false);
-                            if (!genericModel.IssuNewModel())
+                                product_model.SetModelHasSerialNumber(false);
+                            if (!product_model.IssuNewModel())
                                 MessageBox.Show("Error");
                             else
                             {
 
 
 
-                                categoryTextBlock.Text = genericModel.GetCategoryName();
+                                categoryTextBlock.Text = product_model.GetCategoryName();
                                 categoryTextBlock.Visibility = Visibility.Visible;
                                 categoryComboBox.Visibility = Visibility.Collapsed;
                                 categoryTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                typeTextBlock.Text = genericModel.GetProductName();
+                                typeTextBlock.Text = product_model.GetProductName();
                                 typeTextBlock.Visibility = Visibility.Visible;
                                 typeComboBox.Visibility = Visibility.Collapsed;
                                 typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                                brandTextBlock.Text = genericModel.GetBrandName();
+                                brandTextBlock.Text = product_model.GetBrandName();
                                 brandTextBlock.Visibility = Visibility.Visible;
                                 brandComboBox.Visibility = Visibility.Collapsed;
                                 brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                modelTextBlock.Text = genericModel.GetModelName();
+                                modelTextBlock.Text = product_model.GetModelName();
                                 modelTextBlock.Visibility = Visibility.Visible;
                                 modelTextBox.Visibility = Visibility.Collapsed;
                                 modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                itemTextBlock.Text = genericModel.GetModelUnitName();
+                                itemTextBlock.Text = product_model.GetModelUnitName();
                                 itemTextBlock.Visibility = Visibility.Visible;
                                 itemComboBox.Visibility = Visibility.Collapsed;
                                 itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -4316,7 +4320,7 @@ namespace _01electronics_inventory
                     Grid grid = border.Child as Grid;
                     ComboBox categoryComboBox = grid.Children[1] as ComboBox;
                     brandList.Clear();
-                    if (!commonQueries.GetGenericProductBrands(typeList[comboBox.SelectedIndex].product_id, categoryList[categoryComboBox.SelectedIndex].category_id, ref brandList))
+                    if (!commonQueries.GetGenericProductBrands(typeList[comboBox.SelectedIndex].type_id, categoryList[categoryComboBox.SelectedIndex].category_id, ref brandList))
                         MessageBox.Show("error");
                     else
                     {
@@ -4335,24 +4339,24 @@ namespace _01electronics_inventory
                 }
                 else if(columnNumber==BRAND_COLUMN)
                 {
-                    genericModel.SetBrandName(comboBox.Text);
-                    genericModel.SetAddedBy(loggedInUser.GetEmployeeId());
+                    product_model.SetBrandName(comboBox.Text);
+                    product_model.SetAddedBy(loggedInUser.GetEmployeeId());
                     int categoryPosition = Int32.Parse(comboBox.Tag.ToString()) - 2;
                     Border categoryBorder = masterGrid.Children[categoryPosition] as Border;
                     Grid categoryGrid = categoryBorder.Child as Grid;
                     ComboBox categoryComboBox = categoryGrid.Children[1] as ComboBox;
-                    int categoryId = Int32.Parse(categoryGrid.Tag.ToString());
+                    int category_id = Int32.Parse(categoryGrid.Tag.ToString());
 
                     int typePosition = Int32.Parse(comboBox.Tag.ToString()) - 1;
                     Border typeBorder = masterGrid.Children[typePosition] as Border;
                     Grid typeGrid = typeBorder.Child as Grid;
                     ComboBox typeComboBox = typeGrid.Children[1] as ComboBox;
-                    int typeId = Int32.Parse(typeGrid.Tag.ToString());
+                    int type_id = Int32.Parse(typeGrid.Tag.ToString());
 
-                    genericModel.SetCategoryId(categoryId);
-                    genericModel.SetProductId(typeId);
-                    genericModel.SetBrandId(brandList[comboBox.SelectedIndex].brand_id);
-                      // if (!genericModel.IssuproductBrand())
+                    product_model.SetCategoryId(category_id);
+                    product_model.SetProductId(type_id);
+                    product_model.SetBrandId(brandList[comboBox.SelectedIndex].brand_id);
+                      // if (!product_model.IssuproductBrand())
                       //     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                       // else
                       // {
@@ -4372,7 +4376,7 @@ namespace _01electronics_inventory
             sortGenericProductWindow.Show();
         }
 
-        public void OnClose( ref BASIC_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProduct)
+        public void OnClose( ref PRODUCTS_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProduct)
         {
             sortGenericProducts = sortGenericProduct;
             InitializeTableView();

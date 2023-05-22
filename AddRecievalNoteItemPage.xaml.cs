@@ -34,7 +34,7 @@ namespace _01electronics_inventory
 
         MaterialRecievalNote recievalNote;
 
-        List<BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT> releasePermits;
+        List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT> releasePermits;
 
         public AddRecievalNoteItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, RecievalNoteWindow mWindow)
         {
@@ -43,7 +43,7 @@ namespace _01electronics_inventory
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
 
-            releasePermits = new List<BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT>();
+            releasePermits = new List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT>();
 
             InitializeComponent();
 
@@ -99,7 +99,7 @@ namespace _01electronics_inventory
 
                 recievalNote.SetAddedBy(loggedInUser.GetEmployeeId());
 
-                BASIC_STRUCTS.MATERIAL_RECIEVAL_NOTE_ITEM recievalNoteItem = new BASIC_STRUCTS.MATERIAL_RECIEVAL_NOTE_ITEM();
+                INVENTORY_STRUCTS.MATERIAL_RECIEVAL_NOTE_ITEM recievalNoteItem = new INVENTORY_STRUCTS.MATERIAL_RECIEVAL_NOTE_ITEM();
 
                 Grid item = ReleasePermitItemsGrid.Children[i] as Grid;
 
@@ -353,10 +353,10 @@ namespace _01electronics_inventory
 
                 ItemName.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
-                if (recievalNote.GetReleaseItems()[i].materialItemGenericModel.modelName != "")
-                    ItemName.Text = $"{recievalNote.GetReleaseItems()[i].materialItemGenericCategory.category_name + "-" + recievalNote.GetReleaseItems()[i].materialitemGenericproduct.typeName + "-" + recievalNote.GetReleaseItems()[i].materialItemGenericBrand.brandName + "-" + recievalNote.GetReleaseItems()[i].materialItemGenericModel.modelName}";
+                if (recievalNote.GetReleaseItems()[i].materialItemGenericModel.model_name != "")
+                    ItemName.Text = $"{recievalNote.GetReleaseItems()[i].materialItemGenericCategory.category_name + "-" + recievalNote.GetReleaseItems()[i].materialitemGenericproduct.product_name + "-" + recievalNote.GetReleaseItems()[i].materialItemGenericBrand.brand_name + "-" + recievalNote.GetReleaseItems()[i].materialItemGenericModel.model_name}";
                 else
-                    ItemName.Text = $"{recievalNote.GetReleaseItems()[i].materialItemcompanyCategory.category + "-" + recievalNote.GetReleaseItems()[i].materialitemCompanyproduct.typeName + "-" + recievalNote.GetReleaseItems()[i].materialItemCompanyBrand.brandName + "-" + recievalNote.GetReleaseItems()[i].materialItemCompanyModel.modelName}";
+                    ItemName.Text = $"{recievalNote.GetReleaseItems()[i].materialItemcompanyCategory.category_name + "-" + recievalNote.GetReleaseItems()[i].materialitemCompanyproduct.product_name + "-" + recievalNote.GetReleaseItems()[i].materialItemCompanyBrand.brand_name + "-" + recievalNote.GetReleaseItems()[i].materialItemCompanyModel.model_name}";
 
 
                 Grid.SetColumn(ItemName, 1);

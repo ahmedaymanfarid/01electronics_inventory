@@ -539,7 +539,7 @@ namespace _01electronics_inventory
 
             else
             {
-                if (viewAddCondition == COMPANY_WORK_MACROS.ORDER_ADD_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_RESOLVE_CONDITION)
+                if (viewAddCondition == COMPANY_WORK_MACROS.ORDER_ADD_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_RESOLVE_CONDITION)
                 {
                     if (workOrder.GetprojectSerial() != 0)
                     {
@@ -634,7 +634,7 @@ namespace _01electronics_inventory
                         System.Windows.Controls.Label serialStatusLabel = borderIcon.Child as System.Windows.Controls.Label;
 
                         firstRowSerialTextBox.IsEnabled = false;
-                        BASIC_STRUCTS.WORK_ORDER_MODEL_SERIAL_STRUCT currentModelSerial2 = workOrder.GetOrderModelsSerialsList().Find
+                        PRODUCTS_STRUCTS.ORDER_MODEL_SERIAL_STRUCT currentModelSerial2 = workOrder.GetOrderModelsSerialsList().Find
                             (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == 1);
                         if (currentModelSerial2.model_serial_id != 0)
                         {
@@ -726,7 +726,7 @@ namespace _01electronics_inventory
                         {
                             serialTextBox.IsEnabled = false;
 
-                            BASIC_STRUCTS.WORK_ORDER_MODEL_SERIAL_STRUCT currentModelSerial = workOrder.GetOrderModelsSerialsList().Find
+                            PRODUCTS_STRUCTS.ORDER_MODEL_SERIAL_STRUCT currentModelSerial = workOrder.GetOrderModelsSerialsList().Find
                                 (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == i + 1);
 
                             //serialTextBox.Text = currentModelSerial.model_serial;
@@ -779,7 +779,7 @@ namespace _01electronics_inventory
             {
                 Grid CurrentSerialGrid = currentGrid.Children[i] as Grid;
                 System.Windows.Controls.TextBox currentTextBox = CurrentSerialGrid.Children[1] as System.Windows.Controls.TextBox;
-                BASIC_STRUCTS.WORK_ORDER_MODEL_SERIAL_STRUCT currentSerialItem = new BASIC_STRUCTS.WORK_ORDER_MODEL_SERIAL_STRUCT();
+                PRODUCTS_STRUCTS.ORDER_MODEL_SERIAL_STRUCT currentSerialItem = new PRODUCTS_STRUCTS.ORDER_MODEL_SERIAL_STRUCT();
 
                 if (currentTextBox.Text == String.Empty || currentTextBox.Text == "NULL")
                 {

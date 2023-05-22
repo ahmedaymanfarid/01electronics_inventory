@@ -29,7 +29,7 @@ namespace _01electronics_inventory
         private Employee loggedInUser;
 
         protected MaterialReservation materialReservation;
-        protected List<BASIC_STRUCTS.MATERIAL_RESERVATION_MAX_STRUCT> reservationsList;
+        protected List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MAX_STRUCT> reservationsList;
         protected int viewAddCondition;
 
         public ReservationsPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser)
@@ -40,7 +40,7 @@ namespace _01electronics_inventory
             loggedInUser = mLoggedInUser;
 
             materialReservation = new MaterialReservation();
-            reservationsList = new List<BASIC_STRUCTS.MATERIAL_RESERVATION_MAX_STRUCT>();
+            reservationsList = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MAX_STRUCT>();
 
             InitializeComponent();
 
@@ -84,16 +84,16 @@ namespace _01electronics_inventory
                 TextBlock entryPermitItemHeader = new TextBlock();
                 entryPermitItemHeader.Style = (Style)FindResource("tableSubItemTextblock");
 
-                if (reservationsList[i].entry_permit_generic_product.category.category_name != String.Empty)                
-                    entryPermitItemHeader.Text = reservationsList[i].entry_permit_generic_product.category.category_name + " - " 
+                if (reservationsList[i].entry_permit_generic_product.category_name.category_name != String.Empty)                
+                    entryPermitItemHeader.Text = reservationsList[i].entry_permit_generic_product.category_name.category_name + " - " 
                                                + reservationsList[i].entry_permit_generic_product.type.product_name + " - "
                                                + reservationsList[i].entry_permit_generic_product.brand.brand_name + " - "
                                                + reservationsList[i].entry_permit_generic_product.model.model_name;
-                else if (reservationsList[i].entry_permit_company_product.category.category != String.Empty)
-                    entryPermitItemHeader.Text = reservationsList[i].entry_permit_company_product.category.category + " - "
-                                               + reservationsList[i].entry_permit_company_product.product.typeName + " - "
-                                               + reservationsList[i].entry_permit_company_product.brand.brandName + " - "
-                                               + reservationsList[i].entry_permit_company_product.model.modelName + " - "
+                else if (reservationsList[i].entry_permit_company_product.category_name.category_name != String.Empty)
+                    entryPermitItemHeader.Text = reservationsList[i].entry_permit_company_product.category_name.category_name + " - "
+                                               + reservationsList[i].entry_permit_company_product.product.product_name + " - "
+                                               + reservationsList[i].entry_permit_company_product.brand.brand_name + " - "
+                                               + reservationsList[i].entry_permit_company_product.model.model_name + " - "
                                                + reservationsList[i].entry_permit_company_product.spec.spec_name;
 
                 TextBlock itemDescriptionHeader = new TextBlock();
@@ -101,32 +101,32 @@ namespace _01electronics_inventory
                 
                 if(reservationsList[i].rfp_id != String.Empty)
                 {
-                    if(reservationsList[i].rfp_generic_product.category.category_name != String.Empty)
-                        itemDescriptionHeader.Text = reservationsList[i].rfp_generic_product.category.category_name + " - "
+                    if(reservationsList[i].rfp_generic_product.category_name.category_name != String.Empty)
+                        itemDescriptionHeader.Text = reservationsList[i].rfp_generic_product.category_name.category_name + " - "
                                                    + reservationsList[i].rfp_generic_product.type.product_name + " - "
                                                    + reservationsList[i].rfp_generic_product.brand.brand_name + " - "
                                                    + reservationsList[i].rfp_generic_product.model.model_name;
-                    else if (reservationsList[i].rfp_company_product.category.category != String.Empty)
-                        itemDescriptionHeader.Text = reservationsList[i].rfp_company_product.category.category + " - "
-                                                   + reservationsList[i].rfp_company_product.product.typeName + " - "
-                                                   + reservationsList[i].rfp_company_product.brand.brandName + " - "
-                                                   + reservationsList[i].rfp_company_product.model.modelName + " - "
+                    else if (reservationsList[i].rfp_company_product.category_name.category_name != String.Empty)
+                        itemDescriptionHeader.Text = reservationsList[i].rfp_company_product.category_name.category_name + " - "
+                                                   + reservationsList[i].rfp_company_product.product.product_name + " - "
+                                                   + reservationsList[i].rfp_company_product.brand.brand_name + " - "
+                                                   + reservationsList[i].rfp_company_product.model.model_name + " - "
                                                    + reservationsList[i].rfp_company_product.spec.spec_name;
                 }
                 else if (reservationsList[i].order_id != String.Empty)
                 {
-                    itemDescriptionHeader.Text = reservationsList[i].order_company_product.category.category + " - "
-                                               + reservationsList[i].order_company_product.product.typeName + " - "
-                                               + reservationsList[i].order_company_product.brand.brandName + " - "
-                                               + reservationsList[i].order_company_product.model.modelName + " - "
+                    itemDescriptionHeader.Text = reservationsList[i].order_company_product.category_name.category_name + " - "
+                                               + reservationsList[i].order_company_product.product.product_name + " - "
+                                               + reservationsList[i].order_company_product.brand.brand_name + " - "
+                                               + reservationsList[i].order_company_product.model.model_name + " - "
                                                + reservationsList[i].order_company_product.spec.spec_name;
                 }
                 else if (reservationsList[i].quotation_id != String.Empty)
                 {
-                    itemDescriptionHeader.Text = reservationsList[i].quotation_company_product.category.category + " - "
-                                               + reservationsList[i].quotation_company_product.product.typeName + " - "
-                                               + reservationsList[i].quotation_company_product.brand.brandName + " - "
-                                               + reservationsList[i].quotation_company_product.model.modelName + " - "
+                    itemDescriptionHeader.Text = reservationsList[i].quotation_company_product.category_name.category_name + " - "
+                                               + reservationsList[i].quotation_company_product.product.product_name + " - "
+                                               + reservationsList[i].quotation_company_product.brand.brand_name + " - "
+                                               + reservationsList[i].quotation_company_product.model.model_name + " - "
                                                + reservationsList[i].quotation_company_product.spec.spec_name;
                 }
 

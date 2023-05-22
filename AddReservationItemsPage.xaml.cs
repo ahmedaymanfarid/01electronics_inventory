@@ -37,22 +37,22 @@ namespace _01electronics_inventory
 
         protected List<string> serialsList;
 
-        protected List<KeyValuePair< BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>> selectedItemsGrids;
+        protected List<KeyValuePair< INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>> selectedItemsGrids;
 
         protected MaterialEntryPermit materialEntry;
-        protected List<MaterialEntryPermit> entryPermits;
+        protected List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT> entryPermits;
 
-        protected List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> genericBrands;
-        protected List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL> genericModels;
-        protected List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> genericProducts;
-        protected List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> genericCategories;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> genericModels;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> genericProducts;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> genericCategories;
 
-        protected List<COMPANY_WORK_MACROS.BRAND_STRUCT> companyBrands;
-        protected List<COMPANY_WORK_MACROS.MODEL_STRUCT> companyModels;
-        protected List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> companyProducts;
-        public List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrders;
-        protected List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT> companyCategories;
-        protected List<BASIC_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> listOfReservations;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> companyBrands;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> companyModels;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> companyProducts;
+        public List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> companyCategories;
+        protected List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> listOfReservations;
 
         public AddReservationBasicInfoPage addReservationBasicInfoPage;
 
@@ -67,27 +67,27 @@ namespace _01electronics_inventory
             viewAddCondition = mViewAddCondition;
 
             serialsList = new List<string>();
-            selectedItemsGrids = new List<KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>>();
+            selectedItemsGrids = new List<KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>>();
             materialEntry = new MaterialEntryPermit();
-            entryPermits = new List<MaterialEntryPermit>();
+            entryPermits = new List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT>();
 
-            genericBrands = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
-            genericModels = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL>();
-            genericProducts = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS>();
-            genericCategories = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY>();
+            genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            genericModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+            genericProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            genericCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
 
-            companyBrands = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-            companyModels = new List<COMPANY_WORK_MACROS.MODEL_STRUCT>();
-            companyProducts = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-            companyProducts = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
+            companyBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            companyModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+            companyProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            companyProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
 
-            workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
-            companyCategories = new List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT>();
-            listOfReservations = new List<BASIC_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
+            workOrders = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
+            companyCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            listOfReservations = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
 
             InitializeComponent();
 
-            if (!materialEntry.InitializeMaterialEntryPermits(ref entryPermits))
+            if (!commonQueries.GetEntryPermits(ref entryPermits))
                 return;
         }
 
@@ -155,32 +155,32 @@ namespace _01electronics_inventory
 
                 for (int i = 0; i < entryPermits.Count; i++)
                 {
-                    if (previousSerial == entryPermits[i].GetEntryPermitSerialid())
+                    if (previousSerial == entryPermits[i].entry_permit_serial)
                         continue;
 
-                    previousSerial = entryPermits[i].GetEntryPermitSerialid();
+                    previousSerial = entryPermits[i].entry_permit_serial;
 
-                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerialid());
+                    materialEntry.SetEntryPermitSerialid(entryPermits[i].entry_permit_serial);
                     if(!materialEntry.InitializeMaterialEntryPermit())
                         return;
 
                     for (int j = 0; j < materialEntry.GetItems().Count; j++)
                     {
                         if (categoryComboBox.SelectedIndex != -1)
-                            if (genericCategories[categoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].genericCategory.category_id)
+                            if (genericCategories[categoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].product_category.category_id)
                                 continue;
 
                         if (typeComboBox.SelectedIndex != -1)
-                            if (genericProducts[typeComboBox.SelectedIndex].product_id != materialEntry.GetItems()[j].genericProduct.product_id)
+                            if (genericProducts[typeComboBox.SelectedIndex].type_id != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
 
                         if (brandComboBox.SelectedIndex != -1)
-                            if (genericBrands[brandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].genericBrand.brand_id)
+                            if (genericBrands[brandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].product_brand.brand_id)
                                 continue;
 
                         if (modelComboBox.SelectedIndex != -1)
                             if (modelComboBox.SelectedIndex != -1)
-                                if (genericModels[modelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].genericModel.model_id)
+                                if (genericModels[modelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].product_model.model_id)
                                     continue;
 
                         if (materialEntry.GetItems()[j].is_released == true)
@@ -190,7 +190,7 @@ namespace _01electronics_inventory
 
                         Grid itemSubGrid = new Grid();
                         itemSubGrid.ShowGridLines = true;
-                        itemSubGrid.Tag = entryPermits[i].GetEntryPermitSerialid().ToString() + " " + materialEntry.GetItems()[j].entry_permit_item_serial + " " + itemsCounter;
+                        itemSubGrid.Tag = entryPermits[i].entry_permit_serial.ToString() + " " + materialEntry.GetItems()[j].entry_permit_item_serial + " " + itemsCounter;
                         itemsCounter++;
                         itemSubGrid.ColumnDefinitions.Add(new ColumnDefinition());
                         itemSubGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -211,7 +211,7 @@ namespace _01electronics_inventory
                         ItemName.VerticalAlignment = VerticalAlignment.Top;
                         ItemName.Style = (Style)FindResource("cardTextBlockStyle");
                         ItemName.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-                        ItemName.Text = $"{materialEntry.GetItems()[j].genericCategory.category_name + "-" + materialEntry.GetItems()[j].genericProduct.product_name + "-" + materialEntry.GetItems()[j].genericBrand.brand_name + "-" + materialEntry.GetItems()[j].genericModel.model_name}";
+                        ItemName.Text = $"{materialEntry.GetItems()[j].product_category.category_name + "-" + materialEntry.GetItems()[j].product_type.product_name + "-" + materialEntry.GetItems()[j].product_brand.brand_name + "-" + materialEntry.GetItems()[j].product_model.model_name}";
                         Grid.SetColumn(ItemName, 1);
                         itemSubGrid.Children.Add(ItemName);
 
@@ -226,7 +226,7 @@ namespace _01electronics_inventory
                             Grid.SetColumn(chooseItemSerialCheckBox, 2);
                             itemSubGrid.Children.Add(chooseItemSerialCheckBox);
 
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].GetEntryPermitSerialid() &&
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].entry_permit_serial &&
                                                                                             item.Key.entry_permit_item_serial == materialEntry.GetItems()[j].entry_permit_item_serial);
                             if (currentSerialWasChecked.Key.entry_permit_serial != 0)
                             {
@@ -269,7 +269,7 @@ namespace _01electronics_inventory
                             Grid.SetColumn(quantityGrid, 3);
                             itemSubGrid.Children.Add(quantityGrid);
 
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].GetEntryPermitSerialid() &&
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].entry_permit_serial &&
                                                                                             item.Key.entry_permit_item_serial == materialEntry.GetItems()[j].entry_permit_item_serial);
                             if (currentSerialWasChecked.Key.entry_permit_serial != 0)
                             {
@@ -296,31 +296,31 @@ namespace _01electronics_inventory
 
                 for (int i = 0; i < entryPermits.Count; i++)
                 {
-                    if (previousSerial == entryPermits[i].GetEntryPermitSerialid())
+                    if (previousSerial == entryPermits[i].entry_permit_serial)
                         continue;
 
-                    previousSerial = entryPermits[i].GetEntryPermitSerialid();
+                    previousSerial = entryPermits[i].entry_permit_serial;
 
-                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerialid());
+                    materialEntry.SetEntryPermitSerialid(entryPermits[i].entry_permit_serial);
                     if(!materialEntry.InitializeMaterialEntryPermit())
                         return;
 
                     for (int j = 0; j < materialEntry.GetItems().Count; j++)
                     {
                         if (categoryComboBox.SelectedIndex != -1)
-                            if (companyCategories[categoryComboBox.SelectedIndex].categoryId != materialEntry.GetItems()[j].companyCategory.categoryId)
+                            if (companyCategories[categoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].product_category.category_id)
                                 continue;
 
                         if (typeComboBox.SelectedIndex != -1)
-                            if (companyProducts[typeComboBox.SelectedIndex].typeId != materialEntry.GetItems()[j].companyProduct.typeId)
+                            if (companyProducts[typeComboBox.SelectedIndex].type_id != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
 
                         if (brandComboBox.SelectedIndex != -1)
-                            if (companyBrands[brandComboBox.SelectedIndex].brandId != materialEntry.GetItems()[j].companyBrand.brandId)
+                            if (companyBrands[brandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].product_brand.brand_id)
                                 continue;
 
                         if (modelComboBox.SelectedIndex != -1)
-                            if (companyModels[modelComboBox.SelectedIndex].modelId != materialEntry.GetItems()[j].companyModel.modelId)
+                            if (companyModels[modelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].product_model.model_id)
                                 continue;
 
                         if (materialEntry.GetItems()[j].is_released == true)
@@ -329,7 +329,7 @@ namespace _01electronics_inventory
                         itemsBody.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(60) });
                         Grid itemSubGrid = new Grid();
                         itemSubGrid.ShowGridLines = true;
-                        itemSubGrid.Tag = entryPermits[i].GetEntryPermitSerialid().ToString() + " " + materialEntry.GetItems()[j].entry_permit_item_serial + " " + itemsCounter;
+                        itemSubGrid.Tag = entryPermits[i].entry_permit_serial.ToString() + " " + materialEntry.GetItems()[j].entry_permit_item_serial + " " + itemsCounter;
                         itemsCounter++;
                         itemSubGrid.ColumnDefinitions.Add(new ColumnDefinition());
                         itemSubGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -349,7 +349,7 @@ namespace _01electronics_inventory
                         ItemName.HorizontalAlignment = HorizontalAlignment.Left;
                         ItemName.Style = (Style)FindResource("cardTextBlockStyle");
                         ItemName.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-                        ItemName.Text = $"{materialEntry.GetItems()[j].companyProduct.typeName + "-" + materialEntry.GetItems()[j].companyBrand.brandName + "-" + materialEntry.GetItems()[j].companyModel.modelName}";
+                        ItemName.Text = $"{materialEntry.GetItems()[j].product_type.product_name + "-" + materialEntry.GetItems()[j].product_brand.brand_name + "-" + materialEntry.GetItems()[j].product_model.model_name}";
                         Grid.SetColumn(ItemName, 1);
                         itemSubGrid.Children.Add(ItemName);
 
@@ -364,7 +364,7 @@ namespace _01electronics_inventory
                             Grid.SetColumn(chooseItemSerialCheckBox, 2);
                             itemSubGrid.Children.Add(chooseItemSerialCheckBox);
 
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].GetEntryPermitSerialid() &&
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].entry_permit_serial &&
                                                                                             item.Key.entry_permit_item_serial == materialEntry.GetItems()[j].entry_permit_item_serial);
                             if (currentSerialWasChecked.Key.entry_permit_serial != 0)
                             {
@@ -408,7 +408,7 @@ namespace _01electronics_inventory
                             Grid.SetColumn(quantityGrid, 3);
                             itemSubGrid.Children.Add(quantityGrid);
 
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].GetEntryPermitSerialid() &&
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == entryPermits[i].entry_permit_serial &&
                                                                                             item.Key.entry_permit_item_serial == materialEntry.GetItems()[j].entry_permit_item_serial);
                             if (currentSerialWasChecked.Key.entry_permit_serial != 0)
                             {
@@ -480,10 +480,10 @@ namespace _01electronics_inventory
 
                 sender.Tag = card;
 
-                BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT currentEntryPermitKeys = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT currentEntryPermitKeys = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                 currentEntryPermitKeys.entry_permit_serial = Convert.ToInt32(itemSubGrid.Tag.ToString().Split(' ')[0]);
                 currentEntryPermitKeys.entry_permit_item_serial = Convert.ToInt32(itemSubGrid.Tag.ToString().Split(' ')[1]);
-                selectedItemsGrids.Add(new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(currentEntryPermitKeys, card));
+                selectedItemsGrids.Add(new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(currentEntryPermitKeys, card));
 
                 WrapPanel rfpOrOrderOrQuotation = new WrapPanel();
 
@@ -527,29 +527,29 @@ namespace _01electronics_inventory
                 for(int i = 0; i < addReservationBasicInfoPage.rfpItems.Count(); i++)
                 {
                     String itemName = String.Empty;
-                    if ((addReservationBasicInfoPage.rfpItems[i].rfpItem.company_model.modelId != 0 ||
-                        addReservationBasicInfoPage.rfpItems[i].rfpItem.company_brand.brandId != 0 ||
-                        addReservationBasicInfoPage.rfpItems[i].rfpItem.company_product.typeId != 0 ||
-                        addReservationBasicInfoPage.rfpItems[i].rfpItem.company_category.categoryId != 0) &&
-                        (addReservationBasicInfoPage.rfpItems[i].rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED ||
-                         addReservationBasicInfoPage.rfpItems[i].rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_QUOTED))
+                    if ((addReservationBasicInfoPage.rfpItems[i].product_model.model_id != 0 ||
+                        addReservationBasicInfoPage.rfpItems[i].product_brand.brand_id != 0 ||
+                        addReservationBasicInfoPage.rfpItems[i].product_type.type_id != 0 ||
+                        addReservationBasicInfoPage.rfpItems[i].product_category.category_id != 0) &&
+                        (addReservationBasicInfoPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED ||
+                         addReservationBasicInfoPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_QUOTED))
                     {
-                        itemName = addReservationBasicInfoPage.rfpItems[i].rfpItem.company_category.category + " - " +
-                                   addReservationBasicInfoPage.rfpItems[i].rfpItem.company_product.typeName + " - " +
-                                   addReservationBasicInfoPage.rfpItems[i].rfpItem.company_brand.brandName + " - " +
-                                   addReservationBasicInfoPage.rfpItems[i].rfpItem.company_model.modelName;
+                        itemName = addReservationBasicInfoPage.rfpItems[i].product_category.category_name + " - " +
+                                   addReservationBasicInfoPage.rfpItems[i].product_type.product_name + " - " +
+                                   addReservationBasicInfoPage.rfpItems[i].product_brand.brand_name + " - " +
+                                   addReservationBasicInfoPage.rfpItems[i].product_model.model_name;
                     }
-                    else if ((addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_model.model_id != 0 ||
-                             addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_brand.brand_id != 0 ||
-                             addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_type.product_id != 0 ||
-                             addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_category.category_id != 0) &&
-                             (addReservationBasicInfoPage.rfpItems[i].rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED ||
-                             addReservationBasicInfoPage.rfpItems[i].rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_QUOTED))
+                    else if ((addReservationBasicInfoPage.rfpItems[i].product_model.model_id != 0 ||
+                             addReservationBasicInfoPage.rfpItems[i].product_brand.brand_id != 0 ||
+                             addReservationBasicInfoPage.rfpItems[i].product_type.type_id != 0 ||
+                             addReservationBasicInfoPage.rfpItems[i].product_category.category_id != 0) &&
+                             (addReservationBasicInfoPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED ||
+                             addReservationBasicInfoPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_QUOTED))
                     {
-                        itemName = addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_category.category_name + " - " +
-                                   addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_type.product_name + " - " +
-                                   addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_brand.brand_name + " - " +
-                                   addReservationBasicInfoPage.rfpItems[i].rfpItem.generic_product_model.model_name;
+                        itemName = addReservationBasicInfoPage.rfpItems[i].product_category.category_name + " - " +
+                                   addReservationBasicInfoPage.rfpItems[i].product_type.product_name + " - " +
+                                   addReservationBasicInfoPage.rfpItems[i].product_brand.brand_name + " - " +
+                                   addReservationBasicInfoPage.rfpItems[i].product_model.model_name;
                     }
                     if (itemName != String.Empty)
                         itemsCombobox.Items.Add(itemName);
@@ -560,17 +560,17 @@ namespace _01electronics_inventory
                 for (int i = 0; i < addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList().Count(); i++)
                 {
                     String itemName = String.Empty;
-                    if ((addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productModel.modelId != 0 ||
-                        addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productBrand.brandId != 0 ||
-                        addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productType.typeId != 0 ||
-                        addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productCategory.categoryId != 0) &&
+                    if ((addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productModel.model_id != 0 ||
+                        addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productBrand.brand_id != 0 ||
+                        addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productType.type_id != 0 ||
+                        addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].product_category.category_id != 0) &&
                         (addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].product_status.status_id == COMPANY_WORK_MACROS.OPEN_WORK_ORDER ||
                          addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].product_status.status_id == COMPANY_WORK_MACROS.PENDING_STOCK_RECEIVAL_WORK_ORDER_ITEM))
                     {
-                        itemName = addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productCategory.category + " - " +
-                                   addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productType.typeName + " - " +
-                                   addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productBrand.brandName + " - " +
-                                   addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productModel.modelName;
+                        itemName = addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].product_category.category_name + " - " +
+                                   addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productType.product_name + " - " +
+                                   addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productBrand.brand_name + " - " +
+                                   addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[i].productModel.model_name;
 
                         if (itemName != String.Empty)
                             itemsCombobox.Items.Add(itemName);
@@ -583,15 +583,15 @@ namespace _01electronics_inventory
                 for (int i = 0; i < addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList().Count(); i++)
                 {
                     String itemName = String.Empty;
-                    if ((addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productModel.modelId != 0 ||
-                        addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productBrand.brandId != 0 ||
-                        addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productType.typeId != 0 ||
-                        addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productCategory.categoryId != 0))
+                    if ((addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productModel.model_id != 0 ||
+                        addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productBrand.brand_id != 0 ||
+                        addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productType.type_id != 0 ||
+                        addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].product_category.category_id != 0))
                     {
-                        itemName = addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productCategory.category + " - " +
-                                   addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productType.typeName + " - " +
-                                   addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productBrand.brandName + " - " +
-                                   addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productModel.modelName;
+                        itemName = addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].product_category.category_name + " - " +
+                                   addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productType.product_name + " - " +
+                                   addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productBrand.brand_name + " - " +
+                                   addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[i].productModel.model_name;
 
                         if (itemName != String.Empty)
                             itemsCombobox.Items.Add(itemName);
@@ -605,7 +605,7 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < selectedItemsGrids.Count; i++)
             {
-                BASIC_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT currentItem = new BASIC_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
+                INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT currentItem = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
                 currentItem.entry_permit_serial = selectedItemsGrids[i].Key.entry_permit_serial;
                 currentItem.entry_permit_item_serial = selectedItemsGrids[i].Key.entry_permit_item_serial;
                 currentItem.quantity = selectedItemsGrids[i].Key.quantity;
@@ -646,7 +646,7 @@ namespace _01electronics_inventory
 
             Grid quantityGrid = quantity.Parent as Grid;
             Grid itemSubGrid = quantityGrid.Parent as Grid;
-            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == Convert.ToInt32(itemSubGrid.Tag.ToString().Split(' ')[0]) &&
+            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentSerialWasChecked = selectedItemsGrids.Find(item => item.Key.entry_permit_serial == Convert.ToInt32(itemSubGrid.Tag.ToString().Split(' ')[0]) &&
                                                                             item.Key.entry_permit_item_serial == Convert.ToInt32(itemSubGrid.Tag.ToString().Split(' ')[1]));
 
             TextBox availableQuantity = quantityGrid.Children[1] as TextBox;
@@ -679,11 +679,11 @@ namespace _01electronics_inventory
 
             }
 
-            BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+            INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
             tempKey.Copy(currentSerialWasChecked.Key);
             tempKey.quantity = Convert.ToInt32(quantity.Text);
 
-            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentSerialWasChecked.Value);
+            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentSerialWasChecked.Value);
             selectedItemsGrids.Remove(currentSerialWasChecked);
             selectedItemsGrids.Add(tempItem);
 
@@ -754,7 +754,7 @@ namespace _01electronics_inventory
             if (!commonQueries.GetProductCategories(ref companyCategories))
                 return;
 
-            companyCategories.ForEach(a => categoryComboBox.Items.Add(a.category));
+            companyCategories.ForEach(a => categoryComboBox.Items.Add(a.category_name));
         }
         private void OnCheckGenericCheckBox(object sender, RoutedEventArgs e)
         {
@@ -852,7 +852,7 @@ namespace _01electronics_inventory
                 addReservationBasicInfoPage.serialProducts[itemComboBox.SelectedIndex]--;
             }
 
-            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> itemToBeRemoved = selectedItemsGrids.Find(item => item.Value == card);
+            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> itemToBeRemoved = selectedItemsGrids.Find(item => item.Value == card);
             selectedItemsGrids.Remove(itemToBeRemoved);
             selectedItemsWrapPanel.Children.Remove(card);
         }
@@ -884,11 +884,11 @@ namespace _01electronics_inventory
             {
                 companyProducts.Clear();
 
-                if(!commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[categoryComboBox.SelectedIndex].categoryId))
+                if(!commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[categoryComboBox.SelectedIndex].category_id))
                     return;
 
                 typeComboBox.IsEnabled = true;
-                companyProducts.ForEach(a => typeComboBox.Items.Add(a.typeName));
+                companyProducts.ForEach(a => typeComboBox.Items.Add(a.product_name));
                 typeComboBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
             }
             else if(categoryComboBox.SelectedIndex == -1 || categoryComboBox.SelectedItem == null)
@@ -907,7 +907,7 @@ namespace _01electronics_inventory
             {
                 genericBrands.Clear();
 
-                if(!commonQueries.GetGenericProductBrands(genericProducts[typeComboBox.SelectedIndex].product_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands))
+                if(!commonQueries.GetGenericProductBrands(genericProducts[typeComboBox.SelectedIndex].type_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands))
                     return;
 
                 brandComboBox.IsEnabled = true;
@@ -918,11 +918,11 @@ namespace _01electronics_inventory
             {
                 companyBrands.Clear();
              
-                if(!commonQueries.GetProductBrands(companyProducts[typeComboBox.SelectedIndex].typeId, ref companyBrands))
+                if(!commonQueries.GetProductBrands(companyProducts[typeComboBox.SelectedIndex].type_id, ref companyBrands))
                     return;
 
                 brandComboBox.IsEnabled = true;
-                companyBrands.ForEach(a => brandComboBox.Items.Add(a.brandName));
+                companyBrands.ForEach(a => brandComboBox.Items.Add(a.brand_name));
                 brandComboBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
             }
             else if (typeComboBox.SelectedIndex == -1 || typeComboBox.SelectedItem == null)
@@ -940,7 +940,7 @@ namespace _01electronics_inventory
             {
                 genericModels.Clear();
 
-                if (!commonQueries.GetGenericBrandModels(genericProducts[typeComboBox.SelectedIndex].product_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels))
+                if (!commonQueries.GetGenericBrandModels(genericProducts[typeComboBox.SelectedIndex].type_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels))
                     return;
 
                 modelComboBox.IsEnabled = true;
@@ -955,7 +955,7 @@ namespace _01electronics_inventory
                     return;
 
                 modelComboBox.IsEnabled = true;
-                companyModels.ForEach(a => modelComboBox.Items.Add(a.modelName));
+                companyModels.ForEach(a => modelComboBox.Items.Add(a.model_name));
                 modelComboBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
             }
             else if (brandComboBox.SelectedIndex == -1 || brandComboBox.SelectedItem == null)
@@ -998,8 +998,8 @@ namespace _01electronics_inventory
 
                     WrapPanel parentCard = orderItemsComboBox.Parent as WrapPanel;
                     Grid card = parentCard.Parent as Grid;
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
-                    BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                     Grid headerGrid = currentItem.Value.Children[0] as Grid;
                     TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                     tempKey.Copy(currentItem.Key);
@@ -1007,7 +1007,7 @@ namespace _01electronics_inventory
                     tempKey.serial_number = headerTextBlock.Text.ToString().Split(',')[1];
                     tempKey.item_number = addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productNumber;
 
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                     selectedItemsGrids.Remove(currentItem);
                     selectedItemsGrids.Add(tempItem);
 
@@ -1017,7 +1017,7 @@ namespace _01electronics_inventory
                     WrapPanel orderCard = orderItemsComboBox.Parent as WrapPanel;
 
                     Grid card = orderCard.Parent as Grid;
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
 
                     if (currentItem.Key.quantity != 0)
                     {
@@ -1031,13 +1031,13 @@ namespace _01electronics_inventory
                         return;
                     }
 
-                    BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                     Grid headerGrid = currentItem.Value.Children[0] as Grid;
                     TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                     tempKey.Copy(currentItem.Key);
                     tempKey.item_number = addReservationBasicInfoPage.selectedWorkOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productNumber;
 
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                     selectedItemsGrids.Remove(currentItem);
                     selectedItemsGrids.Add(tempItem);
                 }
@@ -1047,11 +1047,11 @@ namespace _01electronics_inventory
             { 
                 ComboBox rfpItemsComboBox = sender as ComboBox;
 
-                if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.company_model.modelName != "")
+                if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.model_name != "")
                 {
-                    if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.company_model.has_serial_number == true)
+                    if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == true)
                     {
-                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                         {
                             System.Windows.Forms.MessageBox.Show("Rfp Item Quantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1063,16 +1063,16 @@ namespace _01electronics_inventory
 
                             WrapPanel parentCard = rfpItemsComboBox.Parent as WrapPanel;
                             Grid card = parentCard.Parent as Grid;
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
-                            BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                            INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                             Grid headerGrid = currentItem.Value.Children[0] as Grid;
                             TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                             tempKey.Copy(currentItem.Key);
                             tempKey.quantity = Convert.ToInt32(1);
                             tempKey.serial_number = headerTextBlock.Text.ToString().Split(',')[1];
-                            tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_number;
+                            tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfp_item_number;
 
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                             selectedItemsGrids.Remove(currentItem);
                             selectedItemsGrids.Add(tempItem);
                         }
@@ -1083,14 +1083,14 @@ namespace _01electronics_inventory
 
                         Grid card = rfpCard.Parent as Grid;
 
-                        KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                        KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
 
                         if (currentItem.Key.quantity != 0)
                         {
                             addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex] += currentItem.Key.quantity;
                         }
 
-                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                         {
                             System.Windows.Forms.MessageBox.Show("Rfp Item Quantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1098,22 +1098,22 @@ namespace _01electronics_inventory
 
                         }
 
-                        BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                        INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                         Grid headerGrid = currentItem.Value.Children[0] as Grid;
                         TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                         tempKey.Copy(currentItem.Key);
-                        tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_number;
+                        tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfp_item_number;
 
-                        KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                        KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                         selectedItemsGrids.Remove(currentItem);
                         selectedItemsGrids.Add(tempItem);
                     }
                 }
                 else
                 {
-                    if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.generic_product_model.has_serial_number == true)
+                    if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == true)
                     {
-                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                         {
                             System.Windows.Forms.MessageBox.Show("Rfp Item Quantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             return;
@@ -1123,16 +1123,16 @@ namespace _01electronics_inventory
                             addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex]++;
                             WrapPanel parentCard = rfpItemsComboBox.Parent as WrapPanel;
                             Grid card = parentCard.Parent as Grid;
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
-                            BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                            INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                             Grid headerGrid = currentItem.Value.Children[0] as Grid;
                             TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                             tempKey.Copy(currentItem.Key);
                             tempKey.quantity = Convert.ToInt32(1);
                             tempKey.serial_number = headerTextBlock.Text.ToString().Split(',')[1];
-                            tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_number;
+                            tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfp_item_number;
 
-                            KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                            KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                             selectedItemsGrids.Remove(currentItem);
                             selectedItemsGrids.Add(tempItem);
                         }
@@ -1142,27 +1142,27 @@ namespace _01electronics_inventory
                         WrapPanel rfpCard = rfpItemsComboBox.Parent as WrapPanel;
 
                         Grid card = rfpCard.Parent as Grid;
-                        KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                        KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
 
                         if (currentItem.Key.quantity != 0)
                         {
                             addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex] += currentItem.Key.quantity;
                         }
 
-                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                        if (addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReservationBasicInfoPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                         {
                             System.Windows.Forms.MessageBox.Show("Rfp Item Quantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                             return;
                         }
 
-                        BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                        INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                         Grid headerGrid = currentItem.Value.Children[0] as Grid;
                         TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                         tempKey.Copy(currentItem.Key);
-                        tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_number;
+                        tempKey.item_number = addReservationBasicInfoPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfp_item_number;
 
-                        KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                        KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                         selectedItemsGrids.Remove(currentItem);
                         selectedItemsGrids.Add(tempItem);
                     }
@@ -1185,8 +1185,8 @@ namespace _01electronics_inventory
 
                     WrapPanel parentCard = orderItemsComboBox.Parent as WrapPanel;
                     Grid card = parentCard.Parent as Grid;
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
-                    BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                     Grid headerGrid = currentItem.Value.Children[0] as Grid;
                     TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                     tempKey.Copy(currentItem.Key);
@@ -1194,7 +1194,7 @@ namespace _01electronics_inventory
                     tempKey.serial_number = headerTextBlock.Text.ToString().Split(',')[1];
                     tempKey.item_number = addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[orderItemsComboBox.SelectedIndex].productNumber;
 
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                     selectedItemsGrids.Remove(currentItem);
                     selectedItemsGrids.Add(tempItem);
                 }
@@ -1203,7 +1203,7 @@ namespace _01electronics_inventory
                     WrapPanel orderCard = orderItemsComboBox.Parent as WrapPanel;
 
                     Grid card = orderCard.Parent as Grid;
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> currentItem = selectedItemsGrids.Find(tmp => tmp.Value == card);
 
                     if (currentItem.Key.quantity != 0)
                     {
@@ -1217,13 +1217,13 @@ namespace _01electronics_inventory
                         return;
                     }
 
-                    BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT tempKey = new BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT();
+                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT tempKey = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT();
                     Grid headerGrid = currentItem.Value.Children[0] as Grid;
                     TextBlock headerTextBlock = headerGrid.Children[0] as TextBlock;
                     tempKey.Copy(currentItem.Key);
                     tempKey.item_number = addReservationBasicInfoPage.selectedQuotation.GetOfferProductsList()[orderItemsComboBox.SelectedIndex].productNumber;
 
-                    KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid> tempItem = new KeyValuePair<BASIC_STRUCTS.ENTRY_PERMIT_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
+                    KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid> tempItem = new KeyValuePair<INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MIN_STRUCT, Grid>(tempKey, currentItem.Value);
                     selectedItemsGrids.Remove(currentItem);
                     selectedItemsGrids.Add(tempItem);
                 }

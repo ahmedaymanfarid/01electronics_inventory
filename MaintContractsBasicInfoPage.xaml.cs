@@ -29,9 +29,9 @@ namespace _01electronics_inventory
         private List<COMPANY_ORGANISATION_MACROS.BRANCH_STRUCT> branchInfo = new List<COMPANY_ORGANISATION_MACROS.BRANCH_STRUCT>();
         private List<COMPANY_ORGANISATION_MACROS.CONTACT_BASIC_STRUCT> contactInfo = new List<COMPANY_ORGANISATION_MACROS.CONTACT_BASIC_STRUCT>();
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> employeesList = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
-        private List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT> outgoingQuotationsList = new List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT>();
-        private List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT> offersAddedToComboList = new List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT>();
-        private List<COMPANY_WORK_MACROS.STATUS_STRUCT> contractStatuses = new List<COMPANY_WORK_MACROS.STATUS_STRUCT>();
+        private List<SALES_STRUCTS.QUOTATION_MAX_STRUCT> outgoingQuotationsList = new List<SALES_STRUCTS.QUOTATION_MAX_STRUCT>();
+        private List<SALES_STRUCTS.QUOTATION_MAX_STRUCT> offersAddedToComboList = new List<SALES_STRUCTS.QUOTATION_MAX_STRUCT>();
+        private List<BASIC_STRUCTS.STATUS_STRUCT> contractStatuses = new List<BASIC_STRUCTS.STATUS_STRUCT>();
 
         private int viewAddCondition;
         private int salesPersonID;
@@ -327,9 +327,9 @@ namespace _01electronics_inventory
             {
                 FillOfferSerialCombo();
             }
-            else if (viewAddCondition == COMPANY_WORK_MACROS.CONTRACT_EDIT_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_RESOLVE_CONDITION)
+            else if (viewAddCondition == COMPANY_WORK_MACROS.CONTRACT_EDIT_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_RESOLVE_CONDITION)
             {
-                COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT tmp = outgoingQuotationsList.Find(x => x.offer_serial == maintContract.GetMaintOfferSerial());
+                SALES_STRUCTS.QUOTATION_MAX_STRUCT tmp = outgoingQuotationsList.Find(x => x.offer_serial == maintContract.GetMaintOfferSerial());
 
                 OfferSerialCombo.Items.Add(maintContract.GetMaintOfferID());
                 offersAddedToComboList.Add(tmp);
@@ -359,7 +359,7 @@ namespace _01electronics_inventory
                 {
                     if (loggedInUser.GetEmployeePositionId() <= COMPANY_ORGANISATION_MACROS.TEAM_LEAD_POSTION)
                     {
-                        if (outgoingQuotationsList[i].sales_person_id == employeesList[salesPersonCombo.SelectedIndex].employee_id && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_OUTGOING_QUOTATION)
+                        if (outgoingQuotationsList[i].sales_person_id == employeesList[salesPersonCombo.SelectedIndex].employee_id && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_QUOTATION)
                         {
                             OfferSerialCombo.Items.Add(outgoingQuotationsList[i].offer_id);
                             offersAddedToComboList.Add(outgoingQuotationsList[i]);
@@ -367,7 +367,7 @@ namespace _01electronics_inventory
                     }
                     else
                     {
-                        if (outgoingQuotationsList[i].sales_person_id == employeesList[salesPersonCombo.SelectedIndex].employee_id && outgoingQuotationsList[i].offer_proposer_id == loggedInUser.GetEmployeeId() && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_OUTGOING_QUOTATION)
+                        if (outgoingQuotationsList[i].sales_person_id == employeesList[salesPersonCombo.SelectedIndex].employee_id && outgoingQuotationsList[i].offer_proposer_id == loggedInUser.GetEmployeeId() && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_QUOTATION)
                         {
                             OfferSerialCombo.Items.Add(outgoingQuotationsList[i].offer_id);
                             offersAddedToComboList.Add(outgoingQuotationsList[i]);
@@ -513,7 +513,7 @@ namespace _01electronics_inventory
 
             if (viewAddCondition == COMPANY_WORK_MACROS.CONTRACT_ADD_CONDITION)
                 maintContract.InitializeMaintContractProposerInfo(loggedInUser.GetEmployeeId());
-            else if (viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_RESOLVE_CONDITION)
+            else if (viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_RESOLVE_CONDITION)
                 maintContract.InitializeMaintContractProposerInfo(maintContract.GetMaintOfferProposerId());
 
 

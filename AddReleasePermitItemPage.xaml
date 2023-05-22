@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       Title="AddReleasePermitItemPage">
 
-    <Grid Background="#EDEDED">
+    <Grid>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -48,10 +48,8 @@
             <Border Grid.Column="1" Style="{StaticResource selectedSecondaryTabBorder}" >
                 <Label Content="Items Info" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
             </Border>
-
-
             <Border Grid.Column="2" Style="{StaticResource unselectedSecondaryTabBorder}" >
-                <Label Content="Release permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="LabelMouseLeftButtonDown" />
+                <Label Content="Release Permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="LabelMouseLeftButtonDown" />
             </Border>
 
         </Grid>

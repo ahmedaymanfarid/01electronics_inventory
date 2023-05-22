@@ -36,23 +36,23 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        private List<PROCUREMENT_STRUCTS.RFPS_STRUCT> rfps;
-        private List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT> rfpStatuses;
+        private List<PROCUREMENT_STRUCTS.RFP_MAX_STRUCT> rfps;
+        private List<BASIC_STRUCTS.STATUS_STRUCT> rfpStatuses;
         private List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> rfpRequestors;
         private List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> tmpRequestors;
         private List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> tmpRequestorsTeamsList;
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> assignees;
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_MIN_STRUCT> siteEngineers;
-        private List<COMPANY_WORK_MACROS.WORK_ORDER_MIN_STRUCT> workOrders;
-        private List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_MIN_STRUCT> maintContracts;
+        private List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT> workOrders;
+        private List<SALES_STRUCTS.MAINTENANCE_CONTRACT_MIN_STRUCT> maintContracts;
         private List<PROJECT_MACROS.PROJECT_STRUCT> companyProjects;
-        private List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT> rfpItemsStatus;
-        private List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT> rfp_status;
-        private List<BASIC_STRUCTS.WORK_FORM> workFormList;
-        private List<BASIC_STRUCTS.WORK_FORM> filteredWorkFormList;
+        private List<BASIC_STRUCTS.STATUS_STRUCT> rfpItemsStatus;
+        private List<BASIC_STRUCTS.STATUS_STRUCT> rfp_status;
+        private List<COMPANY_WORK_MACROS.WORK_FORM_STRUCT> workFormList;
+        private List<COMPANY_WORK_MACROS.WORK_FORM_STRUCT> filteredWorkFormList;
         private List<int> workFormId;
         private BASIC_STRUCTS.FOLDER_STRUCT rfpsFolder;
-        private List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> rfpMappedItems;
+        private List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpMappedItems;
 
         private Expander currentExpander;
         private Expander previousExpander;
@@ -117,24 +117,24 @@ namespace _01electronics_inventory
             
             windowsFileSystem = new WindowsFileSystem();
 
-            rfps = new List<PROCUREMENT_STRUCTS.RFPS_STRUCT>();
-            rfpStatuses = new List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT>();
+            rfps = new List<PROCUREMENT_STRUCTS.RFP_MAX_STRUCT>();
+            rfpStatuses = new List<BASIC_STRUCTS.STATUS_STRUCT>();
 
             rfpRequestors = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
             tmpRequestors = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
             tmpRequestorsTeamsList = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
             assignees = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
-            workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MIN_STRUCT>();
-            maintContracts = new List<COMPANY_WORK_MACROS.MAINTENANCE_CONTRACT_MIN_STRUCT>();
+            workOrders = new List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT>();
+            maintContracts = new List<SALES_STRUCTS.MAINTENANCE_CONTRACT_MIN_STRUCT>();
             companyProjects = new List<PROJECT_MACROS.PROJECT_STRUCT>();
-            workFormList = new List<BASIC_STRUCTS.WORK_FORM>();
-            filteredWorkFormList = new List<BASIC_STRUCTS.WORK_FORM>();
+            workFormList = new List<COMPANY_WORK_MACROS.WORK_FORM_STRUCT>();
+            filteredWorkFormList = new List<COMPANY_WORK_MACROS.WORK_FORM_STRUCT>();
             workFormId = new List<int>();
             rfpsFolder = new BASIC_STRUCTS.FOLDER_STRUCT();
 
-            rfpItemsStatus = new List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT>();
-            rfp_status = new List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT>();
-            rfpMappedItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING>();
+            rfpItemsStatus = new List<BASIC_STRUCTS.STATUS_STRUCT>();
+            rfp_status = new List<BASIC_STRUCTS.STATUS_STRUCT>();
+            rfpMappedItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
             siteEngineers = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_MIN_STRUCT>();
 
             //rfpFolders = new List<BASIC_STRUCTS.FOLDER_STRUCT>();
@@ -144,7 +144,7 @@ namespace _01electronics_inventory
             canEdit = false;
             canDelete = false;
             
-            GetRFPStatues();
+            GetRFPStatuses();
             GetRFPs();
             GetRFPsFolders();
             GetRFPsRequestors();
@@ -194,30 +194,37 @@ namespace _01electronics_inventory
         /// GETTER FUNCTIONS
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void GetRFPStatues()
+        private bool GetRFPStatuses()
         {
             if (!commonQueries.GetRFPStatuses(ref rfpStatuses))
-                return;
+                return false;
+
+            return true;
         }
-        private void GetRFPs()
+        private bool GetRFPs()
         {
-            if (!commonQueries.GetRFPs(ref rfps))
-                return;
+            if (!GetRFPs())
+                return false;
+
+            return true;
         }
         private void GetRFPsFolders()
         {
             rfpsFolder = windowsFileSystem.GetDirectoryFilesAndFolders(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\01 Electronics\\erp_system\\RFPS");
         }
-        private void GetRFPsRequestors()
+        private bool GetRFPsRequestors()
         {
-
             if (!commonQueries.GetRFPRequestors(ref tmpRequestorsTeamsList))
-                return;
+                return false;
+
+            return true;
         }
-        private void GetSiteEngineer()
+        private bool GetSiteEngineer()
         {
             if (!commonQueries.GetProjectAssignees(ref siteEngineers))
-                return;
+                return false;
+
+            return true;
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,6 +266,185 @@ namespace _01electronics_inventory
             systemWatcher.EnableRaisingEvents = true;
 
         }
+
+        private void InitializeYearCombo()
+        {
+            for (int year = BASIC_MACROS.CRM_START_YEAR; year <= DateTime.Now.Year; year++)
+                yearComboBox.Items.Add(year);
+        }
+
+        private void InitializeRequestorCombo()
+        {
+            requestorComboBox.Items.Clear();
+            tmpRequestors.Clear();
+
+            tmpRequestorsTeamsList = tmpRequestorsTeamsList
+                              .OrderBy(o => o.employee_name).ToList();
+
+            for (int i = 0; i < tmpRequestorsTeamsList.Count; i++)
+            {
+                if (i != 0 && tmpRequestorsTeamsList[i].employee_id != tmpRequestorsTeamsList[i - 1].employee_id)
+                {
+                    requestorComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_name);
+                    tmpRequestors.Add(tmpRequestorsTeamsList[i]);
+                }
+                else if (i == 0)
+                {
+                    requestorComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_name);
+                    tmpRequestors.Add(tmpRequestorsTeamsList[i]);
+                }
+            }
+
+            tmpRequestorsTeamsList = tmpRequestorsTeamsList
+                              .OrderBy(o => o.requestor_team.team_name).ToList();
+        }
+
+        private bool InitializeAssignedOfficerCombo()
+        {
+
+            if (!commonQueries.GetDepartmentEmployees(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID, ref assignees))
+                return false;
+
+            for (int j = 0; j < assignees.Count; j++)
+                assignedOfficerComboBox.Items.Add(assignees[j].employee_name);
+
+            return true;
+        }
+
+        private void InitializeTeamCombo()
+        {
+            teamComboBox.Items.Clear();
+            rfpRequestors.Clear();
+
+            for (int i = 0; i < tmpRequestorsTeamsList.Count; i++)
+            {
+                if (i != 0 && tmpRequestorsTeamsList[i].requestor_team.team_name != tmpRequestorsTeamsList[i - 1].requestor_team.team_name)
+                {
+                    teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
+                    rfpRequestors.Add(tmpRequestorsTeamsList[i]);
+                }
+                else if (i == 0)
+                {
+                    teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
+                    rfpRequestors.Add(tmpRequestorsTeamsList[i]);
+                }
+            }
+        }
+
+
+        private void InitializeWorkFormCombo()
+        {
+            if (!commonQueries.GetWorkForm(ref workFormList))
+                return;
+            workFormComboBox.Items.Add("Work Order");
+
+            COMPANY_WORK_MACROS.WORK_FORM_STRUCT currentWorkForm = new COMPANY_WORK_MACROS.WORK_FORM_STRUCT();
+            currentWorkForm.work_form_id = 1;
+            currentWorkForm.work_form_name = "Work Order";
+            filteredWorkFormList.Add(currentWorkForm);
+
+            workFormComboBox.Items.Add("Maintenace Contract");
+            currentWorkForm = new COMPANY_WORK_MACROS.WORK_FORM_STRUCT();
+            currentWorkForm.work_form_id = 2;
+            currentWorkForm.work_form_name = "Maintenace Contract";
+            filteredWorkFormList.Add(currentWorkForm);
+
+            workFormComboBox.Items.Add("Project");
+            currentWorkForm = new COMPANY_WORK_MACROS.WORK_FORM_STRUCT();
+            currentWorkForm.work_form_id = 3;
+            currentWorkForm.work_form_name = "Project";
+            filteredWorkFormList.Add(currentWorkForm);
+
+            workFormComboBox.Items.Add("Stock");
+            currentWorkForm = new COMPANY_WORK_MACROS.WORK_FORM_STRUCT();
+            currentWorkForm.work_form_id = 4;
+            currentWorkForm.work_form_name = "Stock";
+            filteredWorkFormList.Add(currentWorkForm);
+        }
+
+        private void InitializeWorkOrderCombo()
+        {
+            if (!commonQueries.GetWorkOrders(ref workOrders))
+                return;
+
+            orderComboBox.Items.Clear();
+            orderCheckBox.Content = "Orders";
+
+            for (int i = 0; i < workOrders.Count; i++)
+            {
+                orderComboBox.Items.Add(workOrders[i].order_id);
+            }
+        }
+        private void InitializeMaintContractCombo()
+        {
+            if (!commonQueries.GetMaintenanceContracts(ref maintContracts))
+                return;
+
+            orderComboBox.Items.Clear();
+            orderCheckBox.Content = "Contracts";
+
+            for (int i = 0; i < maintContracts.Count; i++)
+            {
+                orderComboBox.Items.Add(maintContracts[i].contract_id);
+            }
+        }
+        private void InitializeProjectsCombo()
+        {
+            if (!commonQueries.GetCompanyProjects(ref companyProjects))
+                return;
+
+            orderComboBox.Items.Clear();
+            orderCheckBox.Content = "Projects";
+
+            for (int i = 0; i < companyProjects.Count; i++)
+            {
+                orderComboBox.Items.Add(companyProjects[i].project_name);
+            }
+
+        }
+        private void InitializeStockComboBox()
+        {
+            orderComboBox.Items.Clear();
+            orderCheckBox.Content = "Stock";
+
+
+            for (int i = workFormList.Count - 2; i < workFormList.Count; i++)
+            {
+                orderComboBox.Items.Add(workFormList[i].work_form_name);
+                workFormId.Add(workFormList[i].work_form_id);
+            }
+            orderComboBox.Items.Add(workFormList[0].work_form_name);
+            workFormId.Add(workFormList[0].work_form_id);
+        }
+        private bool InitializeStatusCombo()
+        {
+            statusComboBox.Items.Clear();
+
+            if (!GetRFPStatuses())
+                return false;
+
+            for (int i = 0; i < rfp_status.Count; i++)
+                statusComboBox.Items.Add(rfp_status[i].status_name);
+
+            return true;
+        }
+
+        private bool InitializeItemsStatusCombo()
+        {
+            itemStatusComboBox.Items.Clear();
+
+            if (!GetRFPStatuses())
+                return false;
+
+            for (int i = 0; i < rfpItemsStatus.Count; i++)
+                itemStatusComboBox.Items.Add(rfpItemsStatus[i].status_name);
+
+            itemStatusComboBox.SelectedIndex = -1;
+
+            return true;
+        }
+
+
         private void InitializeRFPsGrid()
         {
             rfpsGrid.Children.Clear();
@@ -352,10 +538,10 @@ namespace _01electronics_inventory
                 if (yearCheckBox.IsChecked == true && yearComboBox.SelectedIndex != -1 && currentRFP.Year != selectedYear)
                     continue;
 
-                if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].id)
+                if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].status_id)
                     continue;
 
-                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].id) == -1)
+                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.status_name.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
                     continue;
 
                 if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfps[i].work_form != workFormComboBox.SelectedIndex)
@@ -376,7 +562,7 @@ namespace _01electronics_inventory
                 if (requestorCheckBox.IsChecked == true && requestorComboBox.SelectedIndex != -1 && rfps[i].requestor_id != tmpRequestors[requestorComboBox.SelectedIndex].employee_id)
                     continue;
 
-                if (teamCheckBox.IsChecked == true && teamComboBox.SelectedIndex != -1 && rfps[i].requestor_team_id != rfpRequestors[teamComboBox.SelectedIndex].team_id)
+                if (teamCheckBox.IsChecked == true && teamComboBox.SelectedIndex != -1 && rfps[i].requestor_team_id != rfpRequestors[teamComboBox.SelectedIndex].requestor_team.team_id)
                     continue;
 
                 if (assignedOfficerCheckBox.IsChecked == true && assignedOfficerComboBox.SelectedIndex != -1 && rfps[i].assigned_officer_id != assignees[assignedOfficerComboBox.SelectedIndex].employee_id)
@@ -552,7 +738,7 @@ namespace _01electronics_inventory
                     itemsGrid.Children.Add(quantity);
 
                     Label unit = new Label();
-                    unit.Content = rfps[i].rfps_items[j].item_measure_unit;
+                    unit.Content = rfps[i].rfps_items[j].measure_unit;
                     unit.Style = (Style)FindResource("tableSubItemLabel");
 
                     Grid.SetRow(unit, currentItemRow);
@@ -560,7 +746,7 @@ namespace _01electronics_inventory
                     itemsGrid.Children.Add(unit);
 
                     Label status = new Label();
-                    status.Content = rfps[i].rfps_items[j].item_status.item_status;
+                    status.Content = rfps[i].rfps_items[j].status_name.status_name;
                     status.Style = (Style)FindResource("tableSubItemLabel");
 
                     Grid.SetRow(status, currentItemRow);
@@ -648,10 +834,10 @@ namespace _01electronics_inventory
                 if (yearCheckBox.IsChecked == true && yearComboBox.SelectedIndex != -1 && currentRFP.Year != selectedYear)
                     continue;
 
-                if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].id)
+                if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].status_id)
                     continue;
 
-                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].id) == -1)
+                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.status_name.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
                     continue;
 
                 if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfps[i].work_form != filteredWorkFormList[workFormComboBox.SelectedIndex].work_form_id && rfps[i].work_form > 0 && rfps[i].work_form < 4)
@@ -672,7 +858,7 @@ namespace _01electronics_inventory
                 if (requestorCheckBox.IsChecked == true && requestorComboBox.SelectedIndex != -1 && rfps[i].requestor_id != tmpRequestors[requestorComboBox.SelectedIndex].employee_id)
                     continue;
 
-                if (teamCheckBox.IsChecked == true && teamComboBox.SelectedIndex != -1 && rfps[i].requestor_team_id != rfpRequestors[teamComboBox.SelectedIndex].team_id)
+                if (teamCheckBox.IsChecked == true && teamComboBox.SelectedIndex != -1 && rfps[i].requestor_team_id != rfpRequestors[teamComboBox.SelectedIndex].requestor_team.team_id)
                     continue;
 
                 if (assignedOfficerCheckBox.IsChecked == true && assignedOfficerComboBox.SelectedIndex != -1 && rfps[i].assigned_officer_id != assignees[assignedOfficerComboBox.SelectedIndex].employee_id)
@@ -738,7 +924,7 @@ namespace _01electronics_inventory
 
                 for (int j = 0; j < rfps[i].rfps_items.Count; j++)
                 {
-                    if (itemStatusCheckBox.IsChecked == true && rfps[i].rfps_items[j].item_status.status_id != rfpItemsStatus[itemStatusComboBox.SelectedIndex].id)
+                    if (itemStatusCheckBox.IsChecked == true && rfps[i].rfps_items[j].status_name.status_id != rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id)
                         continue;
 
                     if (counter == 0)
@@ -766,7 +952,7 @@ namespace _01electronics_inventory
 
                     Label rfpItemStatusLabel = new Label();
                     rfpItemStatusLabel.Style = (Style)FindResource("BorderIconItemTextLabel");
-                    rfpItemStatusLabel.Content = rfps[i].rfps_items[j].item_status.item_status;
+                    rfpItemStatusLabel.Content = rfps[i].rfps_items[j].status_name.status_id;
                     rfpItemStatusLabel.FontSize = 13;
 
                     Border itemBorderIcon = new Border();
@@ -776,28 +962,28 @@ namespace _01electronics_inventory
                     itemBorderIcon.CornerRadius = new CornerRadius(15);
                     itemBorderIcon.BorderThickness = new Thickness(1);
 
-                    if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
+                    if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD000"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD000"));
                     }
-                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_QUOTED)
+                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_QUOTED)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E03C00"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E03C00"));
                     }
-                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PO)
+                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PO)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C08"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C08"));
                     }
-                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA500"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA500"));
 
                     }
-                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_SITE)
+                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_AT_SITE)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#008000"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#008000"));
@@ -827,7 +1013,7 @@ namespace _01electronics_inventory
                 {
                     if (rfps[i].rfp_status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                     {
-                        if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
+                        if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                         {
                             canEdit = true;
                             canDelete = true;
@@ -851,7 +1037,7 @@ namespace _01electronics_inventory
                 {
                     if (rfps[i].rfp_status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED || rfps[i].rfp_status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                     {
-                        if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING || rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
+                        if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PENDING || rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
                         {
 
                             canDelete = true;
@@ -999,7 +1185,7 @@ namespace _01electronics_inventory
                 }
 
 
-                // if (loggedInUser.GetEmployeeId() != rfps[i].requestor_id && rfps[i].rfps_items.FindIndex(x1 => x1.item_status.status_id != 1) == -1 && rfps[i].rfps_items.FindIndex(x1 => x1.item_availablilty_status.status_id != 1) == -1)
+                // if (loggedInUser.GetEmployeeId() != rfps[i].requestor_id && rfps[i].rfps_items.FindIndex(x1 => x1.status_name.status_id != 1) == -1 && rfps[i].rfps_items.FindIndex(x1 => x1.item_availablilty_status.status_id != 1) == -1)
                 if (canEdit)
                 {
                     expanderStackPanel.Children.Add(editButton);
@@ -1026,192 +1212,7 @@ namespace _01electronics_inventory
             }
 
         }
-        private void InitializeYearCombo()
-        {
-            for (int year = BASIC_MACROS.CRM_START_YEAR; year <= DateTime.Now.Year; year++)
-                yearComboBox.Items.Add(year);
-        }
-
-        private void InitializeRequestorCombo()
-        {
-            requestorComboBox.Items.Clear();
-            tmpRequestors.Clear();
-
-            tmpRequestorsTeamsList = tmpRequestorsTeamsList
-                              .OrderBy(o => o.employee_name).ToList();
-
-            for (int i = 0; i < tmpRequestorsTeamsList.Count; i++)
-            {
-                if (i != 0 && tmpRequestorsTeamsList[i].employee_id != tmpRequestorsTeamsList[i - 1].employee_id)
-                {
-                    requestorComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_name);
-                    tmpRequestors.Add(tmpRequestorsTeamsList[i]);
-                }
-                else if (i == 0)
-                {
-                    requestorComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_name);
-                    tmpRequestors.Add(tmpRequestorsTeamsList[i]);
-                }
-            }
-
-            tmpRequestorsTeamsList = tmpRequestorsTeamsList
-                              .OrderBy(o => o.employee_team).ToList();
-        }
-
-        private bool InitializeAssignedOfficerCombo()
-        {
-
-            if (!commonQueries.GetDepartmentEmployees(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID, ref assignees))
-                return false;
-
-            // for (int i = assignees.Count - 1; i >= 0; i--)
-            // {
-            //     if (assignees[i].position.position_id == 8 || assignees[i].team.team_id == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID)
-            //         continue;
-            //     else
-            //         assignees.RemoveAt(i);
-            // }
-
-            for (int j = 0; j < assignees.Count; j++)
-                assignedOfficerComboBox.Items.Add(assignees[j].employee_name);
-
-            return true;
-        }
-
-        private void InitializeTeamCombo()
-        {
-            teamComboBox.Items.Clear();
-            rfpRequestors.Clear();
-
-            for (int i = 0; i < tmpRequestorsTeamsList.Count; i++)
-            {
-                if (i != 0 && tmpRequestorsTeamsList[i].employee_team != tmpRequestorsTeamsList[i - 1].employee_team)
-                {
-                    teamComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_team);
-                    rfpRequestors.Add(tmpRequestorsTeamsList[i]);
-                }
-                else if (i == 0)
-                {
-                    teamComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_team);
-                    rfpRequestors.Add(tmpRequestorsTeamsList[i]);
-                }
-            }
-        }
-
-
-        private void InitializeWorkFormCombo()
-        {
-            if (!commonQueries.GetWorkForm(ref workFormList))
-                return;
-            workFormComboBox.Items.Add("Work Order");
-
-            BASIC_STRUCTS.WORK_FORM currentWorkForm = new BASIC_STRUCTS.WORK_FORM();
-            currentWorkForm.work_form_id = 1;
-            currentWorkForm.work_form_name = "Work Order";
-            filteredWorkFormList.Add(currentWorkForm);
-
-            workFormComboBox.Items.Add("Maintenace Contract");
-            currentWorkForm = new BASIC_STRUCTS.WORK_FORM();
-            currentWorkForm.work_form_id = 2;
-            currentWorkForm.work_form_name = "Maintenace Contract";
-            filteredWorkFormList.Add(currentWorkForm);
-
-            workFormComboBox.Items.Add("Project");
-            currentWorkForm = new BASIC_STRUCTS.WORK_FORM();
-            currentWorkForm.work_form_id = 3;
-            currentWorkForm.work_form_name = "Project";
-            filteredWorkFormList.Add(currentWorkForm);
-
-            workFormComboBox.Items.Add("Stock");
-            currentWorkForm = new BASIC_STRUCTS.WORK_FORM();
-            currentWorkForm.work_form_id = 4;
-            currentWorkForm.work_form_name = "Stock";
-            filteredWorkFormList.Add(currentWorkForm);
-        }
-
-        private void InitializeWorkOrderCombo()
-        {
-            if (!commonQueries.GetWorkOrders(ref workOrders))
-                return;
-
-            orderComboBox.Items.Clear();
-            orderCheckBox.Content = "Orders";
-
-            for (int i = 0; i < workOrders.Count; i++)
-            {
-                orderComboBox.Items.Add(workOrders[i].order_id);
-            }
-        }
-        private void InitializeMaintContractCombo()
-        {
-            if (!commonQueries.GetMaintenanceContracts(ref maintContracts))
-                return;
-
-            orderComboBox.Items.Clear();
-            orderCheckBox.Content = "Contracts";
-
-            for (int i = 0; i < maintContracts.Count; i++)
-            {
-                orderComboBox.Items.Add(maintContracts[i].contract_id);
-            }
-        }
-        private void InitializeProjectsCombo()
-        {
-            if (!commonQueries.GetCompanyProjects(ref companyProjects))
-                return;
-
-            orderComboBox.Items.Clear();
-            orderCheckBox.Content = "Projects";
-
-            for (int i = 0; i < companyProjects.Count; i++)
-            {
-                orderComboBox.Items.Add(companyProjects[i].project_name);
-            }
-
-        }
-        private void InitializeStockComboBox()
-        {
-            orderComboBox.Items.Clear();
-            orderCheckBox.Content = "Stock";
-
-
-            for (int i = workFormList.Count - 2; i < workFormList.Count; i++)
-            {
-                orderComboBox.Items.Add(workFormList[i].work_form_name);
-                workFormId.Add(workFormList[i].work_form_id);
-            }
-            orderComboBox.Items.Add(workFormList[0].work_form_name);
-            workFormId.Add(workFormList[0].work_form_id);
-        }
-        private void InitializeStatusCombo()
-        {
-            statusComboBox.Items.Clear();
-            if (!commonQueries.GetRFPStatuses(ref rfp_status))
-                return;
-            for (int i = 0; i < rfp_status.Count; i++)
-            {
-                statusComboBox.Items.Add(rfp_status[i].rfp_status);
-            }
-
-
-        }
-
-        private bool InitializeItemsStatusCombo()
-        {
-
-            if (!commonQueries.GetRFPStatuses(ref rfpItemsStatus))
-                return false;
-
-            itemStatusComboBox.Items.Clear();
-
-            for (int i = 0; i < rfpItemsStatus.Count; i++)
-                itemStatusComboBox.Items.Add(rfpItemsStatus[i].rfp_status);
-
-            itemStatusComboBox.SelectedIndex = -1;
-
-            return true;
-        }
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// SYSTEM WATCHER HANDLER FUNCTIONS
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1344,14 +1345,14 @@ namespace _01electronics_inventory
 
                 //for (int i = 0; i < rfpsFolder.sub_folders.Count; i++)
                 //{
-                //    if (rfpFolders[i].rfp.requestor_team_id == int.Parse(currentRFPCategoryStackPanel.Tag.ToString()))
+                //    if (rfpFolders[i].selectedRfp.requestor_team_id == int.Parse(currentRFPCategoryStackPanel.Tag.ToString()))
                 //    {
-                //        DateTime currentRFP = DateTime.Parse(rfpFolders[i].rfp.issue_date.ToString());
+                //        DateTime currentRFP = DateTime.Parse(rfpFolders[i].selectedRfp.issue_date.ToString());
                 //    
                 //    
                 //        if (searchCheckBox.IsChecked == true && searchTextBox.Text != null)
                 //        {
-                //            String tempId = rfpFolders[i].rfp.rfp_id;
+                //            String tempId = rfpFolders[i].selectedRfp.rfp_id;
                 //    
                 //            if (tempId.IndexOf(searchTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 || tempId.IndexOf(searchTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0)
                 //          {
@@ -1365,31 +1366,31 @@ namespace _01electronics_inventory
                 //        if (yearCheckBox.IsChecked == true && yearComboBox.SelectedIndex != -1 && currentRFP.Year != selectedYear)
                 //            continue;
                 //    
-                //        if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfpFolders[i].rfp.rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].id)
+                //        if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfpFolders[i].selectedRfp.rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].id)
                 //            continue;
                 //    
-                //        if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfpFolders[i].rfp.rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
+                //        if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfpFolders[i].selectedRfp.rfps_items.FindIndex(x => x.status_name.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
                 //            continue;
                 //    
-                //        if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfpFolders[i].rfp.work_form != workFormComboBox.SelectedIndex)
+                //        if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfpFolders[i].selectedRfp.work_form != workFormComboBox.SelectedIndex)
                 //            continue;
                 //    
-                //        if (orderCheckBox.IsChecked == true && orderComboBox.SelectedIndex != -1 && workFormComboBox.SelectedIndex == 1 && rfpFolders[i].rfp.order_serial != workOrders[orderComboBox.SelectedIndex].order_serial)
+                //        if (orderCheckBox.IsChecked == true && orderComboBox.SelectedIndex != -1 && workFormComboBox.SelectedIndex == 1 && rfpFolders[i].selectedRfp.order_serial != workOrders[orderComboBox.SelectedIndex].order_serial)
                 //            continue;
                 //    
-                //        if (orderCheckBox.IsChecked == true && orderComboBox.SelectedIndex != -1 && workFormComboBox.SelectedIndex == 2 && rfpFolders[i].rfp.maintenance_contract_serial != maintContracts[orderComboBox.SelectedIndex].contract_serial)
+                //        if (orderCheckBox.IsChecked == true && orderComboBox.SelectedIndex != -1 && workFormComboBox.SelectedIndex == 2 && rfpFolders[i].selectedRfp.maintenance_contract_serial != maintContracts[orderComboBox.SelectedIndex].contract_serial)
                 //            continue;
                 //    
-                //        if (orderCheckBox.IsChecked == true && orderComboBox.SelectedIndex != -1 && workFormComboBox.SelectedIndex == 3 && rfpFolders[i].rfp.project_serial != companyProjects[orderComboBox.SelectedIndex].project_serial)
+                //        if (orderCheckBox.IsChecked == true && orderComboBox.SelectedIndex != -1 && workFormComboBox.SelectedIndex == 3 && rfpFolders[i].selectedRfp.project_serial != companyProjects[orderComboBox.SelectedIndex].project_serial)
                 //            continue;
                 //    
-                //        if (requestorCheckBox.IsChecked == true && requestorComboBox.SelectedIndex != -1 && rfpFolders[i].rfp.requestor_id != rfpRequestors[requestorComboBox.SelectedIndex].employee_id)
+                //        if (requestorCheckBox.IsChecked == true && requestorComboBox.SelectedIndex != -1 && rfpFolders[i].selectedRfp.requestor_id != rfpRequestors[requestorComboBox.SelectedIndex].employee_id)
                 //            continue;
                 //    
-                //        if (teamCheckBox.IsChecked == true && teamComboBox.SelectedIndex != -1 && rfpFolders[i].rfp.requestor_team_id != rfpRequestors[teamComboBox.SelectedIndex].team_id)
+                //        if (teamCheckBox.IsChecked == true && teamComboBox.SelectedIndex != -1 && rfpFolders[i].selectedRfp.requestor_team_id != rfpRequestors[teamComboBox.SelectedIndex].team_id)
                 //            continue;
                 //    
-                //        if (assignedOfficerCheckBox.IsChecked == true && assignedOfficerComboBox.SelectedIndex != -1 && rfpFolders[i].rfp.assigned_officer_id != assignees[assignedOfficerComboBox.SelectedIndex].employee_id)
+                //        if (assignedOfficerCheckBox.IsChecked == true && assignedOfficerComboBox.SelectedIndex != -1 && rfpFolders[i].selectedRfp.assigned_officer_id != assignees[assignedOfficerComboBox.SelectedIndex].employee_id)
                 //            continue;
                 //    
                 //        StackPanel stackPanel = new StackPanel();
@@ -1645,7 +1646,7 @@ namespace _01electronics_inventory
 
                 string selectedFile = selectedRFPFolder.files.Find(rfp_file => rfp_file == currentFileName.Content.ToString());
 
-                //PROCUREMENT_STRUCTS.RFPS_STRUCT tempRFP = new PROCUREMENT_STRUCTS.RFPS_STRUCT();
+                //PROCUREMENT_STRUCTS.RFP_MAX_STRUCT tempRFP = new PROCUREMENT_STRUCTS.RFP_MAX_STRUCT();
                 //String serverFilePath = BASIC_MACROS.RFP_FILES_PATH + selectedCategoryFolder + "/" + selectedRFPIdFolder + "/" + currentFileName.Content.ToString();
 
                 //Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/01 Electronics");
@@ -1864,7 +1865,7 @@ namespace _01electronics_inventory
 
                 string selectedFile = selectedRFPFolder.files.Find(rfp_file => rfp_file == currentFileName.Content.ToString());
 
-                //PROCUREMENT_STRUCTS.RFPS_STRUCT tempRFP = new PROCUREMENT_STRUCTS.RFPS_STRUCT();
+                //PROCUREMENT_STRUCTS.RFP_MAX_STRUCT tempRFP = new PROCUREMENT_STRUCTS.RFP_MAX_STRUCT();
                 //String serverFilePath = BASIC_MACROS.RFP_FILES_PATH + selectedCategoryFolder + "/" + selectedRFPIdFolder + "/" + selectedQuotationPOFolder + "/" + currentFileName.Content.ToString();
 
                 //Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/01 Electronics");
@@ -1972,7 +1973,7 @@ namespace _01electronics_inventory
                     if (loggedInUser.GetEmployeeId() == tmpRequestorsTeamsList[i].employee_id)
                     {
                         index = i;
-                        teamComboBox.Items.Add(tmpRequestorsTeamsList[i].employee_team);
+                        teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
                         rfpRequestors.Add(tmpRequestorsTeamsList[i]);
                     }
                 }
@@ -2119,9 +2120,9 @@ namespace _01electronics_inventory
         
         private void OnBtnClickedAddRFP(object sender, RoutedEventArgs e)
         {
-            RFP rfp = new RFP();
+            RFP selectedRfp = new RFP();
             int viewAddCondition = 1;
-            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref rfp, false);
+            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref selectedRfp, false);
             addRFPWindow.Closed += OnClosedAddRFPWindow;
             addRFPWindow.Show();
         }
@@ -2135,15 +2136,15 @@ namespace _01electronics_inventory
             StackPanel currentStackPanel = (StackPanel)currentGrid.Children[0];
             Label rfpIdLabel = (Label)currentStackPanel.Children[0];
 
-            PROCUREMENT_STRUCTS.RFPS_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString(
+            PROCUREMENT_STRUCTS.RFP_MAX_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString(
                 ));
-            RFP rfp = new RFP();
+            RFP selectedRfp = new RFP();
 
-            if (!rfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
+            if (!selectedRfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
                 return;
 
             int viewAddCondition = COMPANY_WORK_MACROS.RFP_VIEW_CONDITION;
-            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref rfp, false);
+            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref selectedRfp, false);
             addRFPWindow.Closed += OnClosedAddRFPWindow;
             addRFPWindow.Show();
         }
@@ -2157,13 +2158,13 @@ namespace _01electronics_inventory
             StackPanel currentStackPanel = (StackPanel)currentGrid.Children[0];
             Label rfpIdLabel = (Label)currentStackPanel.Children[0];
 
-            PROCUREMENT_STRUCTS.RFPS_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
-            RFP rfp = new RFP();
+            PROCUREMENT_STRUCTS.RFP_MAX_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
+            RFP selectedRfp = new RFP();
 
-            if (!rfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
+            if (!selectedRfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
                 return;
-            rfp.CancelRFP();
-            if (!commonQueries.GetRFPs(ref rfps))
+            selectedRfp.CancelRFP();
+            if (!GetRFPs())
                 return;
             InitializeRFPsStackPanel();
             InitializeRFPsGrid();
@@ -2179,14 +2180,14 @@ namespace _01electronics_inventory
             StackPanel currentStackPanel = (StackPanel)currentGrid.Children[0];
             Label rfpIdLabel = (Label)currentStackPanel.Children[0];
 
-            PROCUREMENT_STRUCTS.RFPS_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
-            RFP rfp = new RFP();
+            PROCUREMENT_STRUCTS.RFP_MAX_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
+            RFP selectedRfp = new RFP();
 
-            if (!rfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
+            if (!selectedRfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
                 return;
 
             int viewAddCondition = COMPANY_WORK_MACROS.RFP_REVISE_CONDITION;
-            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref rfp, false);
+            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref selectedRfp, false);
             addRFPWindow.Closed += OnClosedAddRFPWindow;
             addRFPWindow.Show();
         }
@@ -2200,14 +2201,14 @@ namespace _01electronics_inventory
             StackPanel currentStackPanel = (StackPanel)currentGrid.Children[0];
             Label rfpIdLabel = (Label)currentStackPanel.Children[0];
 
-            PROCUREMENT_STRUCTS.RFPS_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
-            RFP rfp = new RFP();
+            PROCUREMENT_STRUCTS.RFP_MAX_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
+            RFP selectedRfp = new RFP();
 
-            if (!rfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
+            if (!selectedRfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
                 return;
 
             int viewAddCondition = COMPANY_WORK_MACROS.RFP_EDIT_CONDITION;
-            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref rfp, false);
+            AddRFPWindow addRFPWindow = new AddRFPWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref viewAddCondition, ref selectedRfp, false);
             addRFPWindow.Closed += OnClosedAddRFPWindow;
             addRFPWindow.Show();
         }
@@ -2226,20 +2227,20 @@ namespace _01electronics_inventory
             StackPanel currentStackPanel = (StackPanel)currentGrid.Children[0];
             Label rfpIdLabel = (Label)currentStackPanel.Children[0];
 
-            PROCUREMENT_STRUCTS.RFPS_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
-            RFP rfp = new RFP();
+            PROCUREMENT_STRUCTS.RFP_MAX_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
+            RFP selectedRfp = new RFP();
 
-            if (!rfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
+            if (!selectedRfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
                 return;
 
-            AprroveRFPItemsWindow aprroveRFPItemsWindow = new AprroveRFPItemsWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp);
+            ApproveRFPItemsWindow aprroveRFPItemsWindow = new ApproveRFPItemsWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref selectedRfp);
             aprroveRFPItemsWindow.Closed += OnClosedAddRFPWindow;
             aprroveRFPItemsWindow.Show();
         }
 
         private void OnClosedAddRFPWindow(object sender, EventArgs e)
         {
-            if (!commonQueries.GetRFPs(ref rfps))
+            if (!GetRFPs())
                 return;
 
             InitializeRFPsStackPanel();
@@ -2271,56 +2272,60 @@ namespace _01electronics_inventory
             StackPanel currentStackPanel = (StackPanel)currentGrid.Children[0];
             Label rfpIdLabel = (Label)currentStackPanel.Children[0];
 
-            PROCUREMENT_STRUCTS.RFPS_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
-            RFP rfp = new RFP();
+            PROCUREMENT_STRUCTS.RFP_MAX_STRUCT currentRFP = rfps.Find(x1 => x1.rfp_id == rfpIdLabel.Content.ToString());
+            RFP selectedRfp = new RFP();
 
-            if (!rfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
+            if (!selectedRfp.InitializeRFP(currentRFP.requestor_team_id, currentRFP.rfp_serial, currentRFP.rfp_version))
                 return;
 
-            if (!commonQueries.GetRfpItemsMapping(rfp.GetRFPSerial(), rfp.GetRFPVersion(), rfp.GetRFPRequestorTeamId(), ref rfpMappedItems))
+            if (!commonQueries.GetRfpItemsMapping(selectedRfp.GetRFPSerial(), selectedRfp.GetRFPVersion(), selectedRfp.GetRFPRequestorTeamId(), ref rfpMappedItems))
                 return;
 
-            for (int i = 0; i < rfp.rfpItems.Count; i++)
+            for (int i = 0; i < selectedRfp.rfpItems.Count; i++)
             {
-                PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING foundItem = rfpMappedItems.Find(f => f.rfpItem.item_number == rfp.rfpItems[i].item_number);
-                if (foundItem.rfpItem.item_number != 0)
+                PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT foundItem = rfpMappedItems.Find(f => f.rfp_item_number == selectedRfp.rfpItems[i].rfp_item_number);
+
+                if (foundItem.rfp_item_number != 0)
                 {
-                    PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT();
-                    rfpItem.company_category = foundItem.rfpItem.company_category;
-                    rfpItem.company_product = foundItem.rfpItem.company_product;
-                    rfpItem.company_brand = foundItem.rfpItem.company_brand;
-                    rfpItem.company_model = foundItem.rfpItem.company_model;
-                    rfpItem.company_model_spec = foundItem.rfpItem.company_model_spec;
-
-                    rfpItem.generic_product_category = foundItem.rfpItem.generic_product_category;
-                    rfpItem.generic_product_type = foundItem.rfpItem.generic_product_type;
-                    rfpItem.generic_product_brand = foundItem.rfpItem.generic_product_brand;
-                    rfpItem.generic_product_model = foundItem.rfpItem.generic_product_model;
-
-                    rfpItem.itemSelected = rfp.rfpItems[i].itemSelected;
-                    rfpItem.item_description = rfp.rfpItems[i].item_description;
-                    rfpItem.item_measure_unit = rfp.rfpItems[i].item_measure_unit;
-                    rfpItem.item_measure_unit_id = rfp.rfpItems[i].item_measure_unit_id;
-                    rfpItem.item_notes = rfp.rfpItems[i].item_notes;
-                    rfpItem.item_number = rfp.rfpItems[i].item_number;
-                    rfpItem.item_quantity = rfp.rfpItems[i].item_quantity;
-                    rfpItem.item_status = rfp.rfpItems[i].item_status;
+                    PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
                     rfpItem.item_vendors = new List<PROCUREMENT_STRUCTS.VENDOR_MIN_STRUCT>();
-                    for (int j = 0; j < rfp.rfpItems[i].item_vendors.Count; j++)
+
+                    rfpItem.product_category = foundItem.product_category;
+                    rfpItem.product_type = foundItem.product_type;
+                    rfpItem.product_brand = foundItem.product_brand;
+                    rfpItem.product_model = foundItem.product_model;
+                    rfpItem.product_specs = foundItem.product_specs;
+
+                    rfpItem.product_category = foundItem.product_category;
+                    rfpItem.product_type = foundItem.product_type;
+                    rfpItem.product_brand = foundItem.product_brand;
+                    rfpItem.product_model = foundItem.product_model;
+
+                    rfpItem.itemSelected = selectedRfp.rfpItems[i].itemSelected;
+                    rfpItem.item_description = selectedRfp.rfpItems[i].item_description;
+                    rfpItem.measure_unit = selectedRfp.rfpItems[i].measure_unit;
+                    rfpItem.measure_unit_id = selectedRfp.rfpItems[i].measure_unit_id;
+                    rfpItem.item_notes = selectedRfp.rfpItems[i].item_notes;
+                    rfpItem.rfp_item_number = selectedRfp.rfpItems[i].rfp_item_number;
+                    rfpItem.item_quantity = selectedRfp.rfpItems[i].item_quantity;
+                    rfpItem.status_name = selectedRfp.rfpItems[i].status_name;
+                    
+                    
+                    for (int j = 0; j < selectedRfp.rfpItems[i].item_vendors.Count; j++)
                     {
                         PROCUREMENT_STRUCTS.VENDOR_MIN_STRUCT brand = new PROCUREMENT_STRUCTS.VENDOR_MIN_STRUCT();
-                        brand.vendor_id = rfp.rfpItems[i].item_vendors[j].vendor_id;
-                        brand.vendor_name = rfp.rfpItems[i].item_vendors[j].vendor_name;
+                        brand.vendor_id = selectedRfp.rfpItems[i].item_vendors[j].vendor_id;
+                        brand.vendor_name = selectedRfp.rfpItems[i].item_vendors[j].vendor_name;
                         rfpItem.item_vendors.Add(brand);
                     }
-                    rfp.rfpItems.RemoveAt(i);
-                    rfp.rfpItems.Insert(i, rfpItem);
+                    selectedRfp.rfpItems.RemoveAt(i);
+                    selectedRfp.rfpItems.Insert(i, rfpItem);
 
                 }
             }
-            if (!rfp.DeleteRFP())
+            if (!selectedRfp.DeleteRFP())
                 return;
-            if (!commonQueries.GetRFPs(ref rfps))
+            if (!GetRFPs())
                 return;
 
             InitializeRFPsStackPanel();
@@ -2467,7 +2472,7 @@ namespace _01electronics_inventory
         {
             requestorComboBox.IsEnabled = true;
 
-            requestorComboBox.SelectedIndex = rfpRequestors.FindIndex(x1 => x1.team_id == loggedInUser.GetEmployeeTeamId());
+            requestorComboBox.SelectedIndex = rfpRequestors.FindIndex(x1 => x1.requestor_team.team_id == loggedInUser.GetEmployeeTeamId());
             if (requestorComboBox.SelectedIndex == -1)
                 requestorComboBox.SelectedIndex = 0;
         }
@@ -2493,7 +2498,7 @@ namespace _01electronics_inventory
         private void OnCheckTeamCheckBox(object sender, RoutedEventArgs e)
         {
             teamComboBox.IsEnabled = true;
-            teamComboBox.SelectedIndex = rfpRequestors.FindIndex(x1 => x1.team_id == loggedInUser.GetEmployeeTeamId());
+            teamComboBox.SelectedIndex = rfpRequestors.FindIndex(x1 => x1.requestor_team.team_id == loggedInUser.GetEmployeeTeamId());
             if (teamComboBox.SelectedIndex == -1)
                 teamComboBox.SelectedIndex = 0;
         }

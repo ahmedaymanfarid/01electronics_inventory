@@ -34,11 +34,11 @@ namespace _01electronics_inventory
 
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> salesEmployeesList = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> preSalesEmployeesList = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
-        private List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
-        private List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrdersAfterFiltering = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
-        private List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> productTypes = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-        private List<COMPANY_WORK_MACROS.BRAND_STRUCT> brandTypes = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-        private List<COMPANY_WORK_MACROS.STATUS_STRUCT> orderStatuses = new List<COMPANY_WORK_MACROS.STATUS_STRUCT>();
+        private List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
+        private List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrdersAfterFiltering = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> productTypes = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brandTypes = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+        private List<BASIC_STRUCTS.STATUS_STRUCT> orderStatuses = new List<BASIC_STRUCTS.STATUS_STRUCT>();
 
         private int selectedYear;
         private int selectedQuarter;
@@ -172,7 +172,7 @@ namespace _01electronics_inventory
                 return false;
 
             for (int i = 0; i < productTypes.Count; i++)
-                productComboBox.Items.Add(productTypes[i].typeName);
+                productComboBox.Items.Add(productTypes[i].product_name);
 
             return true;
         }
@@ -184,7 +184,7 @@ namespace _01electronics_inventory
                 return false;
 
             for (int i = 0; i < brandTypes.Count; i++)
-                brandComboBox.Items.Add(brandTypes[i].brandName);
+                brandComboBox.Items.Add(brandTypes[i].brand_name);
 
             brandComboBox.IsEnabled = false;
             return true;
@@ -351,12 +351,12 @@ namespace _01electronics_inventory
 
                 bool productCondition = false;
                 for (int productNo = 0; productNo < workOrders[i].products.Count(); productNo++)
-                    if (workOrders[i].products[productNo].productType.typeId == selectedProduct)
+                    if (workOrders[i].products[productNo].productType.type_id == selectedProduct)
                         productCondition |= true;
 
                 bool brandCondition = false;
                 for (int productNo = 0; productNo < workOrders[i].products.Count(); productNo++)
-                    if (workOrders[i].products[productNo].productBrand.brandId == selectedBrand)
+                    if (workOrders[i].products[productNo].productBrand.brand_id == selectedBrand)
                         brandCondition |= true;
 
                 if (searchCheckBox.IsChecked == true && searchTextBox.Text != null)
@@ -420,14 +420,14 @@ namespace _01electronics_inventory
                 companyAndContactLabel.Style = (Style)FindResource("stackPanelItemBody");
 
                 Label productTypeAndBrandLabel = new Label();
-                List<COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT> temp = workOrders[i].products;
+                List<PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT> temp = workOrders[i].products;
 
                 for (int j = 0; j < temp.Count(); j++)
                 {
-                    COMPANY_WORK_MACROS.PRODUCT_STRUCT tempType1 = temp[j].productType;
-                    COMPANY_WORK_MACROS.BRAND_STRUCT tempBrand1 = temp[j].productBrand;
+                    PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT tempType1 = temp[j].productType;
+                    PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT tempBrand1 = temp[j].productBrand;
 
-                    productTypeAndBrandLabel.Content += tempType1.typeName + " - " + tempBrand1.brandName;
+                    productTypeAndBrandLabel.Content += tempType1.product_name + " - " + tempBrand1.brand_name;
 
                     if (j != temp.Count() - 1)
                         productTypeAndBrandLabel.Content += ", ";
@@ -677,12 +677,12 @@ namespace _01electronics_inventory
 
                 bool productCondition = false;
                 for (int productNo = 0; productNo < workOrders[i].products.Count(); productNo++)
-                    if (workOrders[i].products[productNo].productType.typeId == selectedProduct)
+                    if (workOrders[i].products[productNo].productType.type_id == selectedProduct)
                         productCondition |= true;
 
                 bool brandCondition = false;
                 for (int productNo = 0; productNo < workOrders[i].products.Count(); productNo++)
-                    if (workOrders[i].products[productNo].productBrand.brandId == selectedBrand)
+                    if (workOrders[i].products[productNo].productBrand.brand_id == selectedBrand)
                         brandCondition |= true;
 
 
@@ -804,15 +804,15 @@ namespace _01electronics_inventory
                 Grid.SetColumn(modelHeader, 3);
 
 
-                List<COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT> temp = workOrders[i].products;
+                List<PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT> temp = workOrders[i].products;
 
                 for (int j = 0; j < temp.Count(); j++)
                 {
-                    COMPANY_WORK_MACROS.PRODUCT_STRUCT tempType1 = temp[j].productType;
-                    COMPANY_WORK_MACROS.BRAND_STRUCT tempBrand1 = temp[j].productBrand;
-                    COMPANY_WORK_MACROS.MODEL_STRUCT tempModel1 = temp[j].productModel;
+                    PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT tempType1 = temp[j].productType;
+                    PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT tempBrand1 = temp[j].productBrand;
+                    PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT tempModel1 = temp[j].productModel;
 
-                    if (tempType1.typeId == 0)
+                    if (tempType1.type_id == 0)
                         continue;
 
                     productGrid.RowDefinitions.Add(new RowDefinition());
@@ -827,7 +827,7 @@ namespace _01electronics_inventory
                     Grid.SetColumn(productNumberHeader, 0);
 
                     Label type = new Label();
-                    type.Content = tempType1.typeName;
+                    type.Content = tempType1.product_name;
                     type.Style = (Style)FindResource("tableSubItemLabel");
 
                     productGrid.Children.Add(type);
@@ -835,7 +835,7 @@ namespace _01electronics_inventory
                     Grid.SetColumn(type, 1);
 
                     Label brand = new Label();
-                    brand.Content = tempBrand1.brandName;
+                    brand.Content = tempBrand1.brand_name;
                     brand.Style = (Style)FindResource("tableSubItemLabel");
 
                     productGrid.Children.Add(brand);
@@ -843,7 +843,7 @@ namespace _01electronics_inventory
                     Grid.SetColumn(brand, 2);
 
                     Label model = new Label();
-                    model.Content = tempModel1.modelName;
+                    model.Content = tempModel1.model_name;
                     model.Style = (Style)FindResource("tableSubItemLabel");
 
                     productGrid.Children.Add(model);
@@ -1159,7 +1159,7 @@ namespace _01electronics_inventory
             //DisableReviseButton();
 
             if (productComboBox.SelectedItem != null)
-                selectedProduct = productTypes[productComboBox.SelectedIndex].typeId;
+                selectedProduct = productTypes[productComboBox.SelectedIndex].type_id;
             else
                 selectedProduct = 0;
 
@@ -1173,7 +1173,7 @@ namespace _01electronics_inventory
             //DisableReviseButton();
 
             if (brandComboBox.SelectedItem != null)
-                selectedBrand = brandTypes[brandComboBox.SelectedIndex].brandId;
+                selectedBrand = brandTypes[brandComboBox.SelectedIndex].brand_id;
             else
                 selectedBrand = 0;
 
@@ -1349,7 +1349,7 @@ namespace _01electronics_inventory
         //
         //    commonQueries.GetEmployeeTeam(workOrdersAfterFiltering[workOrdersStackPanel.Children.IndexOf(currentSelectedOrderItem)].sales_person_id, ref salesPersonTeam);
         //
-        //    int viewAddCondition = COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION;
+        //    int viewAddCondition = COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION;
         //    WorkOfferWindow viewOffer = new WorkOfferWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref selectedWorkOffer, viewAddCondition, false);
         //    viewOffer.Show();
         //}

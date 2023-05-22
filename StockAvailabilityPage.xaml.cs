@@ -141,10 +141,6 @@ namespace _01electronics_inventory
             Grid grid = CreateTable(12, stock.GetStockAvailabiltyList().Count + 1);
             GridHeader("LOCATION", 0, grid);
             GridHeader("STOCK CATEGORY", 1, grid);
-            //GridHeader("GENERIC CATEGORY", 2, grid);
-            //GridHeader("GENERIC PRODUCT", 3, grid);
-            //GridHeader("GENERIC BRAND", 4, grid);
-            //GridHeader("GENERIC MODEL", 5, grid);
             GridHeader("CATEGORY", 2, grid);
             GridHeader("PRODUCT", 3, grid);
             GridHeader("BRAND", 4, grid);
@@ -159,39 +155,39 @@ namespace _01electronics_inventory
             {
                 if(rowCount%2==0)
                 {
-                    GridEvenRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.nickName, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
+                    GridEvenRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
                     GridEvenRows(1, rowCount, stock.GetStockAvailabiltyList()[i].stock_category_name, stock.GetStockAvailabiltyList()[i].stock_category_id, grid);
 
-                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.genericModel.model_name != "")
+                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name != "")
                     {
 
-                        GridEvenRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericCategory.category_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericCategory.category_id, grid);
-                        GridEvenRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericProduct.product_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericProduct.product_id, grid);
-                        GridEvenRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericBrand.brand_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericBrand.brand_id, grid);
-                        GridEvenRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericModel.model_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericModel.model_id, grid);
+                        GridEvenRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_category.category_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_category.category_id, grid);
+                        GridEvenRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.product_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.type_id, grid);
+                        GridEvenRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_id, grid);
+                        GridEvenRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_id, grid);
 
                     }
 
                     else {
 
-                        GridEvenRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyCategory.category, 0, grid);
-                        GridEvenRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyProduct.typeName, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyProduct.typeId, grid);
-                        GridEvenRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyBrand.brandName, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyBrand.brandId, grid);
-                        GridEvenRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyModel.modelName, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyModel.modelId, grid);
+                        GridEvenRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_category.category_name, 0, grid);
+                        GridEvenRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.product_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.type_id, grid);
+                        GridEvenRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_id, grid);
+                        GridEvenRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_id, grid);
 
                     }
 
-                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_name == null || stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_name == "")
+                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_name == null || stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_name == "")
                     {
                         
-                            BASIC_STRUCTS.STOCK_AVAILABILITY item = new BASIC_STRUCTS.STOCK_AVAILABILITY();
+                            INVENTORY_STRUCTS.STOCK_AVAILABILITY item = new INVENTORY_STRUCTS.STOCK_AVAILABILITY();
                         item = stock.GetStockAvailabiltyList()[i];
-                        item.entry_permit_item.companySpec.spec_name = "NULL";
+                        item.entry_permit_item.product_specs.spec_name = "NULL";
                         stock.GetStockAvailabiltyList()[i] = item;
 
                     }
 
-                    GridEvenRows(6, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_id, grid);
+                    GridEvenRows(6, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_id, grid);
 
                     int availableQuantity = stock.GetStockAvailabiltyList()[i].entry_permit_item.quantity; /*- (stock.GetStockAvailabiltyList()[i].entry_permit_item.released_quantity + stock.GetStockAvailabiltyList()[i].material_reservation.quantity);*/
                     GridEvenRows(7, rowCount, availableQuantity.ToString(), 0, grid);
@@ -200,37 +196,37 @@ namespace _01electronics_inventory
                 }
                 else
                 {
-                    GridOddRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.nickName, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
+                    GridOddRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
                     GridOddRows(1, rowCount, stock.GetStockAvailabiltyList()[i].stock_category_name, stock.GetStockAvailabiltyList()[i].stock_category_id, grid);
 
-                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.genericModel.model_name != "")
+                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name != "")
                     {
 
-                        GridOddRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericCategory.category_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericCategory.category_id, grid);
-                        GridOddRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericProduct.product_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericProduct.product_id, grid);
-                        GridOddRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericBrand.brand_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericBrand.brand_id, grid);
-                        GridOddRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericModel.model_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.genericModel.model_id, grid);
+                        GridOddRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_category.category_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_category.category_id, grid);
+                        GridOddRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.product_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.type_id, grid);
+                        GridOddRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_id, grid);
+                        GridOddRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_id, grid);
 
                     }
 
                     else {
 
-                        GridOddRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyCategory.category, 0, grid);
-                        GridOddRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyProduct.typeName, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyProduct.typeId, grid);
-                        GridOddRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyBrand.brandName, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyBrand.brandId, grid);
-                        GridOddRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyModel.modelName, stock.GetStockAvailabiltyList()[i].entry_permit_item.companyModel.modelId, grid);
+                        GridOddRows(2, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_category.category_name, 0, grid);
+                        GridOddRows(3, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.product_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_type.type_id, grid);
+                        GridOddRows(4, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_brand.brand_id, grid);
+                        GridOddRows(5, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_id, grid);
 
 
                     }
 
-                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_name == null|| stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_name=="") {
-                        BASIC_STRUCTS.STOCK_AVAILABILITY item = new BASIC_STRUCTS.STOCK_AVAILABILITY();
+                    if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_name == null|| stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_name=="") {
+                        INVENTORY_STRUCTS.STOCK_AVAILABILITY item = new INVENTORY_STRUCTS.STOCK_AVAILABILITY();
                         item = stock.GetStockAvailabiltyList()[i];
-                        item.entry_permit_item.companySpec.spec_name = "NULL";
+                        item.entry_permit_item.product_specs.spec_name = "NULL";
                         stock.GetStockAvailabiltyList()[i] = item;
                     }
 
-                    GridOddRows(6, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.companySpec.spec_id, grid);
+                    GridOddRows(6, rowCount, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_name, stock.GetStockAvailabiltyList()[i].entry_permit_item.product_specs.spec_id, grid);
 
 
                     int availableQuantity = stock.GetStockAvailabiltyList()[i].entry_permit_item.quantity; /*- (stock.GetStockAvailabiltyList()[i].entry_permit_item.released_quantity + stock.GetStockAvailabiltyList()[i].material_reservation.quantity);*/
