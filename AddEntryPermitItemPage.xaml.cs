@@ -41,28 +41,28 @@ namespace _01electronics_inventory
 
         public EntryPermitUploadFilesPage EntryPermitUploadFilesPage=null;
 
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> genericCategories = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY>();
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> genericProducts = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS>();
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> genericBrands = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL> genericModels = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL>();
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> genericCategories;
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> genericProducts;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands;
+        List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> genericModels;
 
-        List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT> companyCategories = new List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT>();
-        List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> companyProducts = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-        List<COMPANY_WORK_MACROS.BRAND_STRUCT> companyBrands = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-        List<COMPANY_WORK_MACROS.MODEL_STRUCT> companyModels = new List<COMPANY_WORK_MACROS.MODEL_STRUCT>();
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> companyCategories;
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> companyProducts;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> companyBrands;
+        List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> companyModels;
 
-        List<BASIC_STRUCTS.CURRENCY_STRUCT> currencies = new List<BASIC_STRUCTS.CURRENCY_STRUCT>();
-        List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requesters = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
+        List<BASIC_STRUCTS.CURRENCY_STRUCT> currencies;
+        List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requesters;
 
-        List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT> rfps = new List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT>();
+        List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> rfps;
 
-        List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING>();
+        List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems;
 
-        List<BASIC_STRUCTS.STOCK_TYPES> stockTypes = new List<BASIC_STRUCTS.STOCK_TYPES>();
+        List<INVENTORY_STRUCTS.STOCK_TYPES> stockTypes;
 
-        List<COMPANY_WORK_MACROS.SPEC_STRUCT> specs = new List<COMPANY_WORK_MACROS.SPEC_STRUCT>();
+        List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT> specs;
 
-        List<MATERIAL_RESERVATION_MED_STRUCT> materialReservations = new List<MATERIAL_RESERVATION_MED_STRUCT>();
+        List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> materialReservations;
 
 
         public AddEntryPermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddEntryPermitWindow mEntryPermitWindow,bool isedit, ref MaterialEntryPermit moldMaterialEntryPermit) 
@@ -77,7 +77,30 @@ namespace _01electronics_inventory
             entryPermitWindow = mEntryPermitWindow;
             
             oldMaterialEntryPermit = moldMaterialEntryPermit;
-            
+
+            genericCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            genericProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            genericModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+
+            companyCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            companyProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            companyBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            companyModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+
+            currencies = new List<BASIC_STRUCTS.CURRENCY_STRUCT>();
+            requesters = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
+
+            rfps = new List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>();
+
+            rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+
+            stockTypes = new List<INVENTORY_STRUCTS.STOCK_TYPES>();
+
+            specs = new List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT>();
+
+            materialReservations = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
+
             InitializeComponent();
             InitializeNewCard();
 
@@ -91,7 +114,7 @@ namespace _01electronics_inventory
             return currencies;
         }
 
-        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> GetRfpItems()
+        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> GetRfpItems()
         {
             return rfpItems;
         }
@@ -101,7 +124,7 @@ namespace _01electronics_inventory
             return requesters;
         }
 
-        public List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT> GetRfps()
+        public List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> GetRfps()
         {
 
             return rfps;
@@ -232,7 +255,7 @@ namespace _01electronics_inventory
             commonQueries.GetRFPRequestors(ref requesters);
 
 
-            requesters.ForEach(a => rfpRequstorComboBox.Items.Add(a.employee_team));
+            requesters.ForEach(a => rfpRequstorComboBox.Items.Add(a.requestor_team.team_name));
             
 
             rfpRequstorPanel.Children.Add(rfpRequestorLabel);
@@ -311,9 +334,9 @@ namespace _01electronics_inventory
 
 
             WrapPanel wrapPanel1 = new WrapPanel();
-            Label genericCategory = new Label();
-            genericCategory.Content = "Generic Category";
-            genericCategory.Style = (Style)FindResource("tableItemLabel");
+            Label product_category = new Label();
+            product_category.Content = "Generic Category";
+            product_category.Style = (Style)FindResource("tableItemLabel");
             ComboBox genericCategoryComoBox = new ComboBox();
             genericCategoryComoBox.IsEnabled = false;
 
@@ -322,7 +345,7 @@ namespace _01electronics_inventory
             genericCategories.Clear();
             commonQueries.GetGenericProductCategories(ref genericCategories);
             genericCategories.ForEach(a=> genericCategoryComoBox.Items.Add(a.category_name));
-            wrapPanel1.Children.Add(genericCategory);
+            wrapPanel1.Children.Add(product_category);
             wrapPanel1.Children.Add(genericCategoryComoBox);
 
 
@@ -333,9 +356,9 @@ namespace _01electronics_inventory
             WrapPanel wrapPanel2 = new WrapPanel();
 
 
-            Label genericProduct = new Label();
-            genericProduct.Content = "Generic Product";
-            genericProduct.Style = (Style)FindResource("tableItemLabel");
+            Label product_type = new Label();
+            product_type.Content = "Generic Product";
+            product_type.Style = (Style)FindResource("tableItemLabel");
 
             ComboBox genericProductComoBox = new ComboBox();
             genericProductComoBox.SelectionChanged += GenericProductComoBoxSelectionChanged;
@@ -344,7 +367,7 @@ namespace _01electronics_inventory
 
             genericProductComoBox.Style = (Style)FindResource("comboBoxStyle");
 
-            wrapPanel2.Children.Add(genericProduct);
+            wrapPanel2.Children.Add(product_type);
             wrapPanel2.Children.Add(genericProductComoBox);
 
             card.Children.Add(wrapPanel2);
@@ -355,9 +378,9 @@ namespace _01electronics_inventory
 
             WrapPanel wrapPanel3 = new WrapPanel();
 
-            Label genericBrand = new Label();
-            genericBrand.Content = "Generic Brand";
-            genericBrand.Style = (Style)FindResource("tableItemLabel");
+            Label product_brand = new Label();
+            product_brand.Content = "Generic Brand";
+            product_brand.Style = (Style)FindResource("tableItemLabel");
 
             ComboBox genericBrandComoBox = new ComboBox();
             genericBrandComoBox.IsEnabled = false;
@@ -369,7 +392,7 @@ namespace _01electronics_inventory
 
 
 
-            wrapPanel3.Children.Add(genericBrand);
+            wrapPanel3.Children.Add(product_brand);
             wrapPanel3.Children.Add(genericBrandComoBox);
 
             card.Children.Add(wrapPanel3);
@@ -380,16 +403,16 @@ namespace _01electronics_inventory
             WrapPanel wrapPanel4 = new WrapPanel();
 
 
-            Label genericModel = new Label();
-            genericModel.Content = "Generic Model";
-            genericModel.Style = (Style)FindResource("tableItemLabel");
+            Label product_model = new Label();
+            product_model.Content = "Generic Model";
+            product_model.Style = (Style)FindResource("tableItemLabel");
 
             ComboBox genericModelComboBox = new ComboBox();
             genericModelComboBox.IsEnabled = false;
 
             genericModelComboBox.Style = (Style)FindResource("comboBoxStyle");
 
-            wrapPanel4.Children.Add(genericModel);
+            wrapPanel4.Children.Add(product_model);
             wrapPanel4.Children.Add(genericModelComboBox);
 
             card.Children.Add(wrapPanel4);
@@ -398,9 +421,9 @@ namespace _01electronics_inventory
 
             WrapPanel wrapPanel5 = new WrapPanel();
 
-            Label companyCategory = new Label();
-            companyCategory.Content = "Company Category";
-            companyCategory.Style = (Style)FindResource("tableItemLabel");
+            Label companyCategoryLabel = new Label();
+            companyCategoryLabel.Content = "Company Category";
+            companyCategoryLabel.Style = (Style)FindResource("tableItemLabel");
 
 
             ComboBox companyCategoryComoBox = new ComboBox();
@@ -410,14 +433,14 @@ namespace _01electronics_inventory
             companyCategories.Clear();
             commonQueries.GetProductCategories(ref companyCategories);
 
-            companyCategories.ForEach(a => companyCategoryComoBox.Items.Add(a.category));
+            companyCategories.ForEach(a => companyCategoryComoBox.Items.Add(a.category_name));
             companyCategoryComoBox.Style = (Style)FindResource("comboBoxStyle");
 
             companyCategoryComoBox.SelectionChanged += CompanyCategoryComoBoxSelectionChanged;
 
 
 
-            wrapPanel5.Children.Add(companyCategory);
+            wrapPanel5.Children.Add(companyCategoryLabel);
             wrapPanel5.Children.Add(companyCategoryComoBox);
 
             card.Children.Add(wrapPanel5);
@@ -427,9 +450,9 @@ namespace _01electronics_inventory
 
             WrapPanel wrapPanel6 = new WrapPanel();
 
-            Label companyProduct = new Label();
-            companyProduct.Content = "Company Product";
-            companyProduct.Style = (Style)FindResource("tableItemLabel");
+            Label companyTypeLabel = new Label();
+            companyTypeLabel.Content = "Company Product";
+            companyTypeLabel.Style = (Style)FindResource("tableItemLabel");
             
 
             ComboBox companyProductComoBox = new ComboBox();
@@ -444,7 +467,7 @@ namespace _01electronics_inventory
             companyProductComoBox.Style = (Style)FindResource("comboBoxStyle");
 
 
-            wrapPanel6.Children.Add(companyProduct);
+            wrapPanel6.Children.Add(companyTypeLabel);
             wrapPanel6.Children.Add(companyProductComoBox);
 
             card.Children.Add(wrapPanel6);
@@ -455,9 +478,9 @@ namespace _01electronics_inventory
             WrapPanel wrapPanel7 = new WrapPanel();
 
 
-            Label companyBrand = new Label();
-            companyBrand.Content = "Company Brand";
-            companyBrand.Style = (Style)FindResource("tableItemLabel");
+            Label companyBrandLabel = new Label();
+            companyBrandLabel.Content = "Company Brand";
+            companyBrandLabel.Style = (Style)FindResource("tableItemLabel");
 
 
             ComboBox companyBrandComoBox = new ComboBox();
@@ -470,7 +493,7 @@ namespace _01electronics_inventory
 
 
 
-            wrapPanel7.Children.Add(companyBrand);
+            wrapPanel7.Children.Add(companyBrandLabel);
             wrapPanel7.Children.Add(companyBrandComoBox);
 
             card.Children.Add(wrapPanel7);
@@ -482,9 +505,9 @@ namespace _01electronics_inventory
             WrapPanel wrapPanel8 = new WrapPanel();
 
 
-            Label companyModel = new Label();
-            companyModel.Content = "Company Model";
-            companyModel.Style = (Style)FindResource("tableItemLabel");
+            Label companyModelLabel = new Label();
+            companyModelLabel.Content = "Company Model";
+            companyModelLabel.Style = (Style)FindResource("tableItemLabel");
 
             ComboBox companyModelComoBox = new ComboBox();
 
@@ -493,7 +516,7 @@ namespace _01electronics_inventory
             companyModelComoBox.SelectionChanged += OnCompanyModelComoBoxSelectionChanged;
 
 
-            wrapPanel8.Children.Add(companyModel);
+            wrapPanel8.Children.Add(companyModelLabel);
             wrapPanel8.Children.Add(companyModelComoBox);
 
             card.Children.Add(wrapPanel8);
@@ -824,13 +847,13 @@ namespace _01electronics_inventory
 
             
 
-            rfpItemsComboBox.Tag = rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity;
+            rfpItemsComboBox.Tag = rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity;
 
-            if (rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.company_category.category != "")
+            if (rfpItems[rfpItemsComboBox.SelectedIndex].product_category.category_name != "")
             {
 
 
-                if (rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.company_model.has_serial_number == false)
+                if (rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == false)
                 {
 
                     startSerialPanel.Visibility = Visibility.Collapsed;
@@ -862,7 +885,7 @@ namespace _01electronics_inventory
             else {
 
 
-                if (rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.generic_product_model.has_serial_number == false)
+                if (rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == false)
                 {
 
                     startSerialPanel.Visibility = Visibility.Collapsed;
@@ -966,7 +989,7 @@ namespace _01electronics_inventory
             specsComboBox.Items.Clear();
 
 
-            commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].categoryId, companyProducts[productComboBox.SelectedIndex].typeId, companyBrands[brandComboBox.SelectedIndex].brandId, companyModels[companyModelComboBox.SelectedIndex].modelId, ref specs);
+            commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[productComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
 
 
 
@@ -993,7 +1016,7 @@ namespace _01electronics_inventory
         //SEPARATE GET DATA FUNCTIONS FROM GUI FUNCTIONS
         //COMMON QUERIES
         //IF NOT RETURN
-           commonQueries.GetTeamRFPs(ref rfps, requesters[requsterComboBox.SelectedIndex].team_id);
+           commonQueries.GetTeamRFPs(ref rfps, requesters[requsterComboBox.SelectedIndex].requestor_team.team_id);
 
 
             rfpItems.Clear();
@@ -1004,7 +1027,7 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < rfpItems.Count; i++) {
 
-                if (rfpItems[i].rfpItem.item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED) {
+                if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED) {
 
                     rfpItems.RemoveAt(i);
                     i--;
@@ -1032,9 +1055,9 @@ namespace _01electronics_inventory
             for (int i = 0; i < rfpItems.Count; i++) {
 
 
-                if (rfpItems[i].rfpItem.generic_product_category.category_id == 0)
+                if (rfpItems[i].product_category.category_id == 0)
                 {
-                    itemDescription.Items.Add(rfpItems[i].rfpItem.company_product.typeName + "," + rfpItems[i].rfpItem.company_brand.brandName + "," + rfpItems[i].rfpItem.company_model.modelName);
+                    itemDescription.Items.Add(rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
 
 
                 }
@@ -1042,7 +1065,7 @@ namespace _01electronics_inventory
                 else {
 
 
-                    itemDescription.Items.Add(rfpItems[i].rfpItem.generic_product_category.category_name + "," + rfpItems[i].rfpItem.generic_product_type.product_name + "," + rfpItems[i].rfpItem.generic_product_brand.brand_name+","+rfpItems[i].rfpItem.generic_product_model.model_name);
+                    itemDescription.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name+","+rfpItems[i].product_model.model_name);
 
 
 
@@ -1069,7 +1092,7 @@ namespace _01electronics_inventory
                 return;
             rfps.Clear();
             serialComboBox.Items.Clear();
-            commonQueries.GetTeamRFPs(ref rfps, requesters[rfpRequesterComboBoxBox.SelectedIndex].team_id);
+            commonQueries.GetTeamRFPs(ref rfps, requesters[rfpRequesterComboBoxBox.SelectedIndex].requestor_team.team_id);
 
             rfps.ForEach(a => serialComboBox.Items.Add(a.rfpID));
             serialComboBox.IsEnabled = true;
@@ -1263,7 +1286,7 @@ namespace _01electronics_inventory
 
 
             companyModelComboBox.Items.Clear();
-            companyModels.ForEach(a => companyModelComboBox.Items.Add(a.modelName));
+            companyModels.ForEach(a => companyModelComboBox.Items.Add(a.model_name));
 
         }
 
@@ -1311,10 +1334,10 @@ namespace _01electronics_inventory
             stockTypesPanel.Visibility = Visibility.Collapsed;
 
             companyBrands.Clear();
-            commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].typeId, ref companyBrands);
+            commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].type_id, ref companyBrands);
 
             companyBrandComboBox.Items.Clear();
-            companyBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brandName));
+            companyBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brand_name));
         }
 
         private void CompanyCategoryComoBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1365,10 +1388,10 @@ namespace _01electronics_inventory
             stockTypesPanel.Visibility = Visibility.Collapsed;
 
             companyProducts.Clear();
-            commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].categoryId);
+            commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].category_id);
 
             companyProductComboBox.Items.Clear();
-            companyProducts.ForEach(a => companyProductComboBox.Items.Add(a.typeName));
+            companyProducts.ForEach(a => companyProductComboBox.Items.Add(a.product_name));
 
 
         }
@@ -1512,7 +1535,7 @@ namespace _01electronics_inventory
             genericModelComboBox.IsEnabled = true;
             genericModels.Clear();
 
-            commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id ,genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
+            commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id ,genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
 
             genericModelComboBox.Items.Clear();
 
@@ -1593,7 +1616,7 @@ namespace _01electronics_inventory
 
             genericBrands.Clear();
 
-            commonQueries.GetGenericProductBrands(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
+            commonQueries.GetGenericProductBrands(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
 
             genericBrandComboBox.Items.Clear();
             genericModelComboBox.Items.Clear();
@@ -2091,28 +2114,28 @@ namespace _01electronics_inventory
 
 
 
-                                BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM materialEntryItem = new BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM();
+                                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
-                                materialEntryItem.genericCategory.category_id = genericCategories[genericCategoryComboBox.SelectedIndex].category_id;
+                                materialEntryItem.product_category.category_id = genericCategories[genericCategoryComboBox.SelectedIndex].category_id;
 
                                 genericProducts.Clear();
 
                                 commonQueries.GetGenericProducts(ref genericProducts, genericCategories[genericCategoryComboBox.SelectedIndex].category_id);
 
-                                materialEntryItem.genericProduct.product_id = genericProducts[genericProductComboBox.SelectedIndex].product_id;
+                                materialEntryItem.product_type.type_id = genericProducts[genericProductComboBox.SelectedIndex].type_id;
 
                                 genericBrands.Clear();
 
-                                commonQueries.GetGenericProductBrands(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
+                                commonQueries.GetGenericProductBrands(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
 
-                                materialEntryItem.genericBrand.brand_id = genericBrands[genericBrandComboBox.SelectedIndex].brand_id;
+                                materialEntryItem.product_brand.brand_id = genericBrands[genericBrandComboBox.SelectedIndex].brand_id;
 
                                 genericModels.Clear();
 
-                                commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
+                                commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
 
 
-                                materialEntryItem.genericModel.model_id = genericModels[genericModelComboBox.SelectedIndex].model_id;
+                                materialEntryItem.product_model.model_id = genericModels[genericModelComboBox.SelectedIndex].model_id;
 
                                 materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
@@ -2121,11 +2144,11 @@ namespace _01electronics_inventory
                                 materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
 
 
-                                commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].categoryId, companyProducts[companyProductComboBox.SelectedIndex].typeId, companyBrands[companyBrandComboBox.SelectedIndex].brandId, companyModels[companyModelComboBox.SelectedIndex].modelId, ref specs);
+                                commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].category_id, companyProducts[companyProductComboBox.SelectedIndex].type_id, companyBrands[companyBrandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
 
 
-                                materialEntryItem.companySpec.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                materialEntryItem.companySpec.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+                                materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                                materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
 
 
 
@@ -2140,7 +2163,7 @@ namespace _01electronics_inventory
 
                                 materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_id;
                                 materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_name;
-                                materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
+                                //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
 
 
 
@@ -2158,28 +2181,28 @@ namespace _01electronics_inventory
                                 {
                                    
 
-                                    BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM materialEntryItem = new BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM();
+                                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
-                                    materialEntryItem.genericCategory.category_id = genericCategories[genericCategoryComboBox.SelectedIndex].category_id;
+                                    materialEntryItem.product_category.category_id = genericCategories[genericCategoryComboBox.SelectedIndex].category_id;
 
                                     genericProducts.Clear();
 
                                     commonQueries.GetGenericProducts(ref genericProducts, genericCategories[genericCategoryComboBox.SelectedIndex].category_id);
 
-                                    materialEntryItem.genericProduct.product_id = genericProducts[genericProductComboBox.SelectedIndex].product_id;
+                                    materialEntryItem.product_type.type_id = genericProducts[genericProductComboBox.SelectedIndex].type_id;
 
                                     genericBrands.Clear();
 
-                                    commonQueries.GetGenericProductBrands(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
+                                    commonQueries.GetGenericProductBrands(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
 
-                                    materialEntryItem.genericBrand.brand_id = genericBrands[genericBrandComboBox.SelectedIndex].brand_id;
+                                    materialEntryItem.product_brand.brand_id = genericBrands[genericBrandComboBox.SelectedIndex].brand_id;
 
                                     genericModels.Clear();
 
-                                    commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
+                                    commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
 
 
-                                    materialEntryItem.genericModel.model_id = genericModels[genericModelComboBox.SelectedIndex].model_id;
+                                    materialEntryItem.product_model.model_id = genericModels[genericModelComboBox.SelectedIndex].model_id;
                                     materialEntryItem.quantity = 0;
 
                                     materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
@@ -2187,11 +2210,11 @@ namespace _01electronics_inventory
                                     materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
 
 
-                                    commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].categoryId, companyProducts[companyProductComboBox.SelectedIndex].typeId, companyBrands[companyBrandComboBox.SelectedIndex].brandId, companyModels[companyModelComboBox.SelectedIndex].modelId, ref specs);
+                                    commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].category_id, companyProducts[companyProductComboBox.SelectedIndex].type_id, companyBrands[companyBrandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
 
 
-                                    materialEntryItem.companySpec.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                    materialEntryItem.companySpec.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+                                    materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                                    materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
 
 
 
@@ -2216,7 +2239,7 @@ namespace _01electronics_inventory
 
                                     materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
                                     materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
-                                    materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
+                                    //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
 
 
 
@@ -2255,29 +2278,29 @@ namespace _01electronics_inventory
                             if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "")
                             {
 
-                                BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM materialEntryItem = new BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM();
+                                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
 
 
-                                materialEntryItem.companyCategory.categoryId = companyCategories[companyCategoryComboBox.SelectedIndex].categoryId;
+                                materialEntryItem.product_category.category_id = companyCategories[companyCategoryComboBox.SelectedIndex].category_id;
                                 companyProducts.Clear();
 
-                                commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].categoryId);
+                                commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].category_id);
 
-                                materialEntryItem.companyProduct.typeId = companyProducts[companyProductComboBox.SelectedIndex].typeId;
+                                materialEntryItem.product_type.type_id = companyProducts[companyProductComboBox.SelectedIndex].type_id;
 
                                 companyBrands.Clear();
 
-                                commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].typeId, ref companyBrands);
+                                commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].type_id, ref companyBrands);
 
-                                materialEntryItem.companyBrand.brandId = companyBrands[companyBrandComboBox.SelectedIndex].brandId;
+                                materialEntryItem.product_brand.brand_id = companyBrands[companyBrandComboBox.SelectedIndex].brand_id;
 
                                 companyModels.Clear();
 
                                 commonQueries.GetCompanyModels(companyProducts[companyProductComboBox.SelectedIndex], companyBrands[companyBrandComboBox.SelectedIndex], ref companyModels);
 
 
-                                materialEntryItem.companyModel.modelId = companyModels[companyModelComboBox.SelectedIndex].modelId;
+                                materialEntryItem.product_model.model_id = companyModels[companyModelComboBox.SelectedIndex].model_id;
 
                                 if(priceTextBox.Text!="")
                                 materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
@@ -2287,11 +2310,11 @@ namespace _01electronics_inventory
                                 materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
 
 
-                                commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].categoryId, companyProducts[companyProductComboBox.SelectedIndex].typeId, companyBrands[companyBrandComboBox.SelectedIndex].brandId, companyModels[companyModelComboBox.SelectedIndex].modelId, ref specs);
+                                commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].category_id, companyProducts[companyProductComboBox.SelectedIndex].type_id, companyBrands[companyBrandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
 
 
-                                materialEntryItem.companySpec.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                materialEntryItem.companySpec.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+                                materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                                materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
 
 
                                 if (stockTypeComboBoxMain.SelectedIndex == -1)
@@ -2305,7 +2328,7 @@ namespace _01electronics_inventory
 
                                 materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_id;
                                 materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_name;
-                                materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
+                                //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
 
 
                                 addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
@@ -2320,39 +2343,39 @@ namespace _01electronics_inventory
                                 for (int j = 0; j < serialGrid.Children.Count; j++)
                                 {
 
-                                    BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM materialEntryItem = new BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM();
+                                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
-                                    materialEntryItem.companyCategory.categoryId = companyCategories[companyCategoryComboBox.SelectedIndex].categoryId;
+                                    materialEntryItem.product_category.category_id = companyCategories[companyCategoryComboBox.SelectedIndex].category_id;
 
                                     companyProducts.Clear();
 
-                                    commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].categoryId);
+                                    commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].category_id);
 
-                                    materialEntryItem.companyProduct.typeId = companyProducts[companyProductComboBox.SelectedIndex].typeId;
+                                    materialEntryItem.product_type.type_id = companyProducts[companyProductComboBox.SelectedIndex].type_id;
 
                                     companyBrands.Clear();
 
-                                    commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].typeId, ref companyBrands);
+                                    commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].type_id, ref companyBrands);
 
-                                    materialEntryItem.companyBrand.brandId = companyBrands[companyBrandComboBox.SelectedIndex].brandId;
+                                    materialEntryItem.product_brand.brand_id = companyBrands[companyBrandComboBox.SelectedIndex].brand_id;
 
                                     companyModels.Clear();
 
                                     commonQueries.GetCompanyModels(companyProducts[companyProductComboBox.SelectedIndex], companyBrands[companyBrandComboBox.SelectedIndex], ref companyModels);
 
 
-                                    materialEntryItem.companyModel.modelId = companyModels[companyModelComboBox.SelectedIndex].modelId;
+                                    materialEntryItem.product_model.model_id = companyModels[companyModelComboBox.SelectedIndex].model_id;
 
                                     materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
                                     materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
 
 
-                                    commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].categoryId, companyProducts[companyProductComboBox.SelectedIndex].typeId, companyBrands[companyBrandComboBox.SelectedIndex].brandId, companyModels[companyModelComboBox.SelectedIndex].modelId, ref specs);
+                                    commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].category_id, companyProducts[companyProductComboBox.SelectedIndex].type_id, companyBrands[companyBrandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
 
 
-                                    materialEntryItem.companySpec.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                    materialEntryItem.companySpec.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+                                    materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                                    materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
 
 
                                     materialEntryItem.quantity = 0;
@@ -2378,7 +2401,7 @@ namespace _01electronics_inventory
 
                                     materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
                                     materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
-                                    materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
+                                    //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
 
                                     materialEntryItem.product_serial_number = serialText.Text;
 
@@ -2413,13 +2436,13 @@ namespace _01electronics_inventory
                     if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "")
                     {
 
-                        BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM materialEntryItem = new BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM();
+                        INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
-                        materialEntryItem.rfp_info.rfpRequestorTeam = requesters[requesterComboBox.SelectedIndex].team_id;
+                        materialEntryItem.rfp_info.rfpRequestorTeam = requesters[requesterComboBox.SelectedIndex].requestor_team.team_id;
 
                         rfps.Clear();
 
-                        commonQueries.GetTeamRFPs(ref rfps, requesters[requesterComboBox.SelectedIndex].team_id);
+                        commonQueries.GetTeamRFPs(ref rfps, requesters[requesterComboBox.SelectedIndex].requestor_team.team_id);
 
                         materialEntryItem.rfp_info.rfpSerial = rfps[rfpSerialComboBox.SelectedIndex].rfpSerial;
                         materialEntryItem.rfp_info.rfpVersion = rfps[rfpSerialComboBox.SelectedIndex].rfpVersion;
@@ -2428,7 +2451,7 @@ namespace _01electronics_inventory
 
                         commonQueries.GetRfpItemsMapping(rfps[rfpSerialComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialComboBox.SelectedIndex].rfpVersion, materialEntryItem.rfp_info.rfpRequestorTeam, ref rfpItems);
 
-                        materialEntryItem.rfp_item_number = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.item_number;
+                        materialEntryItem.rfp_item_number = rfpItems[itemDescriptionComboBox.SelectedIndex].rfp_item_number;
                         materialEntryItem.entry_permit_item_serial = rfpItemCount;
 
 
@@ -2439,7 +2462,7 @@ namespace _01electronics_inventory
 
                         materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
 
-                        MATERIAL_RESERVATION_MED_STRUCT materialReservation = new MATERIAL_RESERVATION_MED_STRUCT();
+                        INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT materialReservation = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
 
 
                         materialReservation.hold_until=validityDate.DisplayDate;
@@ -2461,25 +2484,25 @@ namespace _01electronics_inventory
                         materialReservations.Add(materialReservation);
 
 
-                        if (rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_category.category_id == 0)
+                        if (rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_id == 0)
                         {
 
 
-                            materialEntryItem.companyCategory.categoryId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_category.categoryId;
-                            materialEntryItem.companyProduct.typeId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_product.typeId;
-                            materialEntryItem.companyBrand.brandId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_brand.brandId;
-                            materialEntryItem.companyModel.modelId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_model.modelId;
-                            materialEntryItem.companySpec.spec_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_model_spec.spec_id;
+                            materialEntryItem.product_category.category_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_id;
+                            materialEntryItem.product_type.type_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_type.type_id;
+                            materialEntryItem.product_brand.brand_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                            materialEntryItem.product_model.model_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_model.model_id;
+                            materialEntryItem.product_specs.spec_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_specs.spec_id;
 
 
                         }
 
                         else {
 
-                            materialEntryItem.genericCategory.category_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_category.category_id;
-                            materialEntryItem.genericProduct.product_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_type.product_id;
-                            materialEntryItem.genericBrand.brand_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_brand.brand_id;
-                            materialEntryItem.genericModel.model_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_model.model_id;
+                            materialEntryItem.product_category.category_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_id;
+                            materialEntryItem.product_type.type_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_type.type_id;
+                            materialEntryItem.product_brand.brand_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                            materialEntryItem.product_model.model_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_model.model_id;
 
 
                         }
@@ -2512,13 +2535,13 @@ namespace _01electronics_inventory
                         {
 
 
-                            BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM materialEntryItem = new BASIC_STRUCTS.MATERIAL_ENTRY_PERMIT_ITEM();
+                            INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
-                            materialEntryItem.rfp_info.rfpRequestorTeam = requesters[requesterComboBox.SelectedIndex].team_id;
+                            materialEntryItem.rfp_info.rfpRequestorTeam = requesters[requesterComboBox.SelectedIndex].requestor_team.team_id;
 
                             rfps.Clear();
 
-                            commonQueries.GetTeamRFPs(ref rfps, requesters[requesterComboBox.SelectedIndex].team_id);
+                            commonQueries.GetTeamRFPs(ref rfps, requesters[requesterComboBox.SelectedIndex].requestor_team.team_id);
 
                             materialEntryItem.rfp_info.rfpSerial = rfps[rfpSerialComboBox.SelectedIndex].rfpSerial;
                             materialEntryItem.rfp_info.rfpVersion = rfps[rfpSerialComboBox.SelectedIndex].rfpVersion;
@@ -2527,7 +2550,7 @@ namespace _01electronics_inventory
 
                             commonQueries.GetRfpItemsMapping(rfps[rfpSerialComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialComboBox.SelectedIndex].rfpVersion, materialEntryItem.rfp_info.rfpRequestorTeam, ref rfpItems);
 
-                            materialEntryItem.rfp_item_number = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.item_number;
+                            materialEntryItem.rfp_item_number = rfpItems[itemDescriptionComboBox.SelectedIndex].rfp_item_number;
 
 
                             if(priceTextBox.Text!="")
@@ -2542,7 +2565,7 @@ namespace _01electronics_inventory
                             materialEntryItem.entry_permit_item_serial = rfpItemCount;
 
 
-                            MATERIAL_RESERVATION_MED_STRUCT materialReservation = new MATERIAL_RESERVATION_MED_STRUCT();
+                            INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT materialReservation = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
 
 
                             materialReservation.hold_until = validityDate.DisplayDate;
@@ -2585,15 +2608,15 @@ namespace _01electronics_inventory
 
                             materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
                             materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
-                            materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
+                            //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
 
-                            if (rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_category.category_name == "")
+                            if (rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_name == "")
                             {
-                                materialEntryItem.companyCategory.categoryId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_category.categoryId;
-                                materialEntryItem.companyProduct.typeId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_product.typeId;
-                                materialEntryItem.companyBrand.brandId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_brand.brandId;
-                                materialEntryItem.companyModel.modelId = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_model.modelId;
-                                materialEntryItem.companySpec.spec_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.company_model_spec.spec_id;
+                                materialEntryItem.product_category.category_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_id;
+                                materialEntryItem.product_type.type_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_type.type_id;
+                                materialEntryItem.product_brand.brand_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                                materialEntryItem.product_model.model_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_model.model_id;
+                                materialEntryItem.product_specs.spec_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_specs.spec_id;
 
 
 
@@ -2602,10 +2625,10 @@ namespace _01electronics_inventory
                             else
                             {
 
-                                materialEntryItem.genericCategory.category_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_category.category_id;
-                                materialEntryItem.genericProduct.product_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_type.product_id;
-                                materialEntryItem.genericBrand.brand_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_brand.brand_id;
-                                materialEntryItem.genericModel.model_id = rfpItems[itemDescriptionComboBox.SelectedIndex].rfpItem.generic_product_model.model_id;
+                                materialEntryItem.product_category.category_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_id;
+                                materialEntryItem.product_type.type_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_type.type_id;
+                                materialEntryItem.product_brand.brand_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                                materialEntryItem.product_model.model_id = rfpItems[itemDescriptionComboBox.SelectedIndex].product_model.model_id;
 
 
                             }
@@ -2632,8 +2655,8 @@ namespace _01electronics_inventory
 
                     for (int i = 0; i < materialReservations.Count; i++)
                     {
-                        BASIC_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT reservationItem = materialReservations[i];
-                        reservationItem.entry_permit_serial = addEntryPermitPage.materialEntryPermit.GetEntryPermitSerialid();
+                        INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT reservationItem = materialReservations[i];
+                        reservationItem.entry_permit_serial = addEntryPermitPage.materialEntryPermit.GetEntryPermitSerial();
 
                         materialReservations[i] = reservationItem;
                     }

@@ -17,9 +17,9 @@ using _01electronics_library;
 namespace _01electronics_inventory
 {
     /// <summary>
-    /// Interaction logic for AprroveRFPItemsWindow.xaml
+    /// Interaction logic for ApproveRFPItemsWindow.xaml
     /// </summary>
-    public partial class AprroveRFPItemsWindow : Window
+    public partial class ApproveRFPItemsWindow : Window
     {
         private CommonQueries commonQueries;
         private SecuredCommonQueries securedCommonQueries;
@@ -29,7 +29,7 @@ namespace _01electronics_inventory
 
         private RFP rfp;
 
-        public AprroveRFPItemsWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRFP)
+        public ApproveRFPItemsWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRFP)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
@@ -96,7 +96,7 @@ namespace _01electronics_inventory
                        //
                        //
                        //
-                       // if (!rfp.ApproveRFPItem(itemStatus, itemAvailabilityStatus, rfp.rfpItems[int.Parse(currentCheckBox.Tag.ToString())].item_number, approvedLevel, loggedInUser.GetEmployeeId()))
+                       // if (!rfp.ApproveRFPItem(itemStatus, itemAvailabilityStatus, rfp.rfpItems[int.Parse(currentCheckBox.Tag.ToString())].rfp_item_number, approvedLevel, loggedInUser.GetEmployeeId()))
                        //     return;
                         
 
@@ -114,7 +114,7 @@ namespace _01electronics_inventory
                        // int itemStatus = COMPANY_WORK_MACROS.RFP_ITEM_AT_SITE;
                        // int approvedLevel = COMPANY_WORK_MACROS.RFP_ITEM_APPROVED_SITE_ENGINEER;
                        //
-                       // if (!rfp.ApproveRFPItem(itemStatus, itemAvailabilityStatus, rfp.rfpItems[int.Parse(currentCheckBox.Tag.ToString())].item_number, approvedLevel, loggedInUser.GetEmployeeId()))
+                       // if (!rfp.ApproveRFPItem(itemStatus, itemAvailabilityStatus, rfp.rfpItems[int.Parse(currentCheckBox.Tag.ToString())].rfp_item_number, approvedLevel, loggedInUser.GetEmployeeId()))
                        //     return;
                     }
                 }

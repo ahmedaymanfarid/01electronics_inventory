@@ -37,25 +37,24 @@ namespace _01electronics_inventory
 
         public RFPBasicInfoPage basicInfoPage;
 
-        private List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> genericBrands;
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands;
         private List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT> measureUnits;
-        private List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT> rfpItemsStatus;
-        private List<RFPS_ITEMS_MIN_STRUCT> oldRFPsItemsList;
+        private List<BASIC_STRUCTS.STATUS_STRUCT> rfpItemsStatus;
+        private List<RFP_ITEM_MAX_STRUCT> oldRFPsItemsList;
 
         private RFP rfp;
 
-        private RFP oldRfp = new RFP();
-        private Object obj;
+        private Object mailObject;
 
         private int viewAddCondition;
         bool uncheckAll = true;
-        int index;
-        bool view;
+        
         Button saveChangesButton;
-        PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT rfpItem;
+        PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem;
 
         public RFPBasicInfoPage rfpBasicInfoPage;
         public RFPUploadFilesPage rfpUploadFilesPage;
+
         public RFPItemsPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRFP, ref int mViewAddCondition)
         {
             commonFunctions = mCommonFunctions;
@@ -63,26 +62,41 @@ namespace _01electronics_inventory
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
 
+            viewAddCondition = mViewAddCondition;
+            rfp = mRFP;
+
             InitializeComponent();
 
             saveChangesButton = new Button();
-            rfp = mRFP;
-            viewAddCondition = mViewAddCondition;
-            obj = new Object();
+            
+            mailObject = new Object();
+            
             emailFormat = new EmailFormat();
-            oldRfp.rfpItems = new List<PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT>(rfp.rfpItems);
+            
             emailTo = new List<string>();
             emailCC = new List<string>();
-            genericBrands = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
+
+            genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
             measureUnits = new List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT>();
-            rfpItemsStatus = new List<PROCUREMENT_STRUCTS.RFPS_STATUS_STRUCT>();
-            index = 0;
-            view = false;
-            oldRFPsItemsList = new List<RFPS_ITEMS_MIN_STRUCT>();
-            //addButton.Tag = itemNumber;
+            rfpItemsStatus = new List<BASIC_STRUCTS.STATUS_STRUCT>();
+            
+            oldRFPsItemsList = new List<RFP_ITEM_MAX_STRUCT>();
+            rfpItem = new RFP_ITEM_MAX_STRUCT();
+
+  
             InitializeVendors();
             InitializeMeasureUnits();
             InitializeRFPsItemsStatus();
+
+            InitializeUIElements();
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// GET FUNCTIONS
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        private void InitializeUIElements()
+        {
             if (viewAddCondition == COMPANY_WORK_MACROS.RFP_ADD_CONDITION)
             {
                 nextButton.IsEnabled = false;
@@ -90,7 +104,7 @@ namespace _01electronics_inventory
             if (viewAddCondition != COMPANY_WORK_MACROS.RFP_ADD_CONDITION)
             {
                 InitializeItemsGrid();
-                view = true;
+                
                 if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                 {
                     finishButton.Content = "Add PO";
@@ -102,12 +116,9 @@ namespace _01electronics_inventory
                         button.IsEnabled = false;
                     }
                 }
-
-                //if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                //    SetUIElementsEdit(itemsGrid);
             }
 
-            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID)))
+            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && ((loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID)))
             {
 
                 saveChangesButton = new Button();
@@ -119,11 +130,8 @@ namespace _01electronics_inventory
                 buttonsGrid.Children.Add(saveChangesButton);
                 Grid.SetColumn(saveChangesButton, buttonsGrid.ColumnDefinitions.Count - 1);
             }
-        }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// GET FUNCTIONS
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
         private void SetUIElementsEdit(Grid currentGrid)
         {
             foreach (var var in currentGrid.Children)
@@ -185,7 +193,7 @@ namespace _01electronics_inventory
                 for (int i = 0; i < rfp.rfpItems.Count(); i++)
                 {
                     ///////////////////////// copy items //////////////////////////////////
-                    RFPS_ITEMS_MIN_STRUCT oldItem = new RFPS_ITEMS_MIN_STRUCT();
+                    RFP_ITEM_MAX_STRUCT oldItem = new RFP_ITEM_MAX_STRUCT();
                     oldItem.Copy(rfp.rfpItems[i]);
                     oldRFPsItemsList.Add(oldItem);
                     ////////////////////////////////////////////////////////////////////////
@@ -206,7 +214,7 @@ namespace _01electronics_inventory
 
 
                     Label itemNumberLabel = new Label();
-                    itemNumberLabel.Content = rfp.rfpItems[i].item_number + "-";
+                    itemNumberLabel.Content = rfp.rfpItems[i].rfp_item_number + "-";
                     itemNumberLabel.Style = (Style)FindResource("miniLabelStyle");
 
                     subGrid.Children.Add(itemNumberLabel);
@@ -222,7 +230,7 @@ namespace _01electronics_inventory
                     editButton.Style = (Style)FindResource("buttonStyle2");
                     editButton.Content = description;
                     editButton.Click += OnBtnClickAddDescriptionn;
-                    editButton.Tag = rfp.rfpItems[i].item_number;
+                    editButton.Tag = rfp.rfpItems[i].rfp_item_number;
                     editButton.FontSize = 16;
 
                     TextBox descriptionTextBox = new TextBox();
@@ -374,7 +382,7 @@ namespace _01electronics_inventory
 
                     FillMeasureUnitsCombo(ref unitComboBox);
                     //unitComboBox.SelectedIndex = measureUnits.FindIndex(x1 => x1.measure_unit_id == rfp.rfpItems[i].item_measure_unit_id);
-                    unitComboBox.SelectedItem = rfp.rfpItems[i].item_measure_unit;
+                    unitComboBox.SelectedItem = rfp.rfpItems[i].measure_unit;
 
                     quantityWrapPanel.Children.Add(quantityTextBox);
                     quantityWrapPanel.Children.Add(unitComboBox);
@@ -386,7 +394,7 @@ namespace _01electronics_inventory
                     statusComboBox.Style = (Style)FindResource("miniComboBoxStyle");
                     FillRFPsItemsStatusCombo(ref statusComboBox);
 
-                    statusComboBox.SelectedItem = rfp.rfpItems[i].item_status.item_status;
+                    statusComboBox.SelectedItem = rfp.rfpItems[i].item_status.status_name;
                     statusComboBox.IsEnabled = false;
 
                     subGrid.Children.Add(statusComboBox);
@@ -467,12 +475,12 @@ namespace _01electronics_inventory
 
                         itemsGrid.Children.Add(tempGrid);
                         itemsGrid.RowDefinitions.Add(new RowDefinition());
-                        Grid.SetRow(tempGrid, rfp.rfpItems[i].item_number + 1);
+                        Grid.SetRow(tempGrid, rfp.rfpItems[i].rfp_item_number + 1);
 
                     }
 
                     itemsGrid.Children.Add(subGrid);
-                    Grid.SetRow(subGrid, rfp.rfpItems[i].item_number);
+                    Grid.SetRow(subGrid, rfp.rfpItems[i].rfp_item_number);
 
                 }
             }
@@ -525,7 +533,7 @@ namespace _01electronics_inventory
             itemStatusCombo.Items.Clear();
 
             for (int i = 0; i < rfpItemsStatus.Count; i++)
-                itemStatusCombo.Items.Add(rfpItemsStatus[i].rfp_status);
+                itemStatusCombo.Items.Add(rfpItemsStatus[i].status_name);
 
             itemStatusCombo.SelectedIndex = 0;
 
@@ -536,7 +544,7 @@ namespace _01electronics_inventory
             currentCombo.Items.Clear();
 
             for (int i = 0; i < rfpItemsStatus.Count; i++)
-                currentCombo.Items.Add(rfpItemsStatus[i].rfp_status);
+                currentCombo.Items.Add(rfpItemsStatus[i].status_name);
 
             currentCombo.SelectedIndex = 0;
             //currentCombo.IsEnabled = false;
@@ -564,17 +572,17 @@ namespace _01electronics_inventory
                         if (currentGrid.Children.Count != 1)
                         {
 
-                            PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT tempItem = rfp.rfpItems[j];
+                            PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT tempItem = rfp.rfpItems[j];
                             tempItem.item_vendors = new List<PROCUREMENT_STRUCTS.VENDOR_MIN_STRUCT>();
 
                             Label itemNumberLabel = (Label)currentGrid.Children[0];
-                            tempItem.item_number = int.Parse(itemNumberLabel.Content.ToString().Split('-')[0]);
+                            tempItem.rfp_item_number = int.Parse(itemNumberLabel.Content.ToString().Split('-')[0]);
 
                             Button description = (Button)currentGrid.Children[1];
                             TextBlock textBlock = description.Content as TextBlock;
                             if (textBlock.Text == "ADD")
                             {
-                                System.Windows.Forms.MessageBox.Show("Item #" + tempItem.item_number + " Description must be specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                System.Windows.Forms.MessageBox.Show("Item #" + tempItem.rfp_item_number + " Description must be specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 return false;
                             }
                             tempItem.item_description = textBlock.Text;
@@ -597,7 +605,7 @@ namespace _01electronics_inventory
                                 else
                                 {
 
-                                    //System.Windows.Forms.MessageBox.Show("Item #" + tempItem.item_number + " Brand #" + (i + 1) +
+                                    //System.Windows.Forms.MessageBox.Show("Item #" + tempItem.rfp_item_number + " Brand #" + (i + 1) +
                                     //    " must be specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                     //return false;
                                 }
@@ -611,29 +619,29 @@ namespace _01electronics_inventory
 
                             if (quantityTextBox.Text.ToString() == String.Empty)
                             {
-                                System.Windows.Forms.MessageBox.Show("Item #" + tempItem.item_number +
+                                System.Windows.Forms.MessageBox.Show("Item #" + tempItem.rfp_item_number +
                                     " Quantity must be specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 return false;
                             }
 
                             if (unitCombo.SelectedIndex == -1)
                             {
-                                System.Windows.Forms.MessageBox.Show("Item #" + tempItem.item_number +
+                                System.Windows.Forms.MessageBox.Show("Item #" + tempItem.rfp_item_number +
                                     " Measuring Unit must be specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 return false;
                             }
 
                             tempItem.item_quantity = Decimal.Parse(quantityTextBox.Text.ToString());
-                            tempItem.item_measure_unit_id = measureUnits[unitCombo.SelectedIndex].measure_unit_id;
-                            tempItem.item_measure_unit = measureUnits[unitCombo.SelectedIndex].measure_unit;
+                            tempItem.measure_unit_id = measureUnits[unitCombo.SelectedIndex].measure_unit_id;
+                            tempItem.measure_unit = measureUnits[unitCombo.SelectedIndex].measure_unit;
 
                             ComboBox itemStatusCombo = (ComboBox)currentGrid.Children[5];
-                            tempItem.item_status.status_id = rfpItemsStatus[itemStatusCombo.SelectedIndex].id;
-                            tempItem.item_status.item_status = rfpItemsStatus[itemStatusCombo.SelectedIndex].rfp_status;
+                            tempItem.item_status.status_id = rfpItemsStatus[itemStatusCombo.SelectedIndex].status_id;
+                            tempItem.item_status.status_name = rfpItemsStatus[itemStatusCombo.SelectedIndex].status_name;
 
                             TextBox notes = (TextBox)currentGrid.Children[6];
                             tempItem.item_notes = notes.Text;
-                            tempItem.item_number = Int32.Parse(description.Tag.ToString());
+                            tempItem.rfp_item_number = Int32.Parse(description.Tag.ToString());
                             rfp.rfpItems[j] = tempItem;
                             j++;
                             // rfp.rfpItems.Add(tempItem);
@@ -903,10 +911,9 @@ namespace _01electronics_inventory
 
                 for (int i = 0; i < rfp.rfpItems.Count; i++)
                 {
-                    if (itemNo == rfp.rfpItems[i].item_number)
+                    if (itemNo == rfp.rfpItems[i].rfp_item_number)
                     {
                         rfp.rfpItems.RemoveAt(i);
-                        index--;
                         break;
                     }
 
@@ -926,10 +933,9 @@ namespace _01electronics_inventory
                 }
                 for (int i = 0; i < rfp.rfpItems.Count; i++)
                 {
-                    if (itemNo == rfp.rfpItems[i].item_number)
+                    if (itemNo == rfp.rfpItems[i].rfp_item_number)
                     {
                         rfp.rfpItems.RemoveAt(i);
-                        index--;
                         break;
                     }
 
@@ -1191,12 +1197,6 @@ namespace _01electronics_inventory
                 finishButton.IsEnabled = true;
                 return;
             }
-
-            //else if (rfp.GetOrderSerial() == 0 && rfp.GetContractSerial() == 0 && rfp.GetProjectSerial() == 0)
-            //{
-            //    System.Windows.Forms.MessageBox.Show("RFP Order/Contract/Project must be specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-            //    return;
-            //}
             else if (!GetUIValues())
                 return;
             else
@@ -1226,8 +1226,8 @@ namespace _01electronics_inventory
                         string subject = "";
                         string header = "NEW RFP ADDED !";
                         SubjectMaker(ref subject, viewAddCondition);
-                        object obj = rfp as object;
-                        emailFormat.SendEmail(ref emailTo, ref emailCC, subject, header, ref obj, BASIC_MACROS.IS_RFP);
+                        object mailObject = rfp as object;
+                        emailFormat.SendEmail(ref emailTo, ref emailCC, subject, header, ref mailObject, BASIC_MACROS.IS_RFP);
 
                     }
                 }
@@ -1262,27 +1262,21 @@ namespace _01electronics_inventory
                     string subject = "";
                     string header = "RFP IS UPDATED !";
                     SubjectMaker(ref subject, viewAddCondition);
-                    object obj = rfp as object;
-                    emailFormat.SendEmail(ref emailTo, ref emailCC, subject, header, ref obj, BASIC_MACROS.IS_RFP);
+                    object mailObject = rfp as object;
+                    emailFormat.SendEmail(ref emailTo, ref emailCC, subject, header, ref mailObject, BASIC_MACROS.IS_RFP);
                 }
 
                 if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                 {
                     PurchaseOrder purchaseOrder = new PurchaseOrder();
-                    if (view)
-                    {
-
-                        if (!rfp.UpdateRfpItemMapping())
-                            return;
-
-
-                    }
+                    if (!rfp.UpdateRfpItemMapping())
+                        return;
                     if (!purchaseOrder.InitializeRFP(rfp.GetRFPRequestor().GetEmployeeTeamId(), rfp.GetRFPSerial(), rfp.GetRFPVersion()))
                         return;
                     if (!purchaseOrder.InitializeProcurementOfficer(loggedInUser.GetEmployeeId()))
                         return;
 
-                    List<PROCUREMENT_STRUCTS.PO_ITEM> tempPOItems = new List<PROCUREMENT_STRUCTS.PO_ITEM>();
+                    List<PROCUREMENT_STRUCTS.PO_ITEM_STRUCT> tempPOItems = new List<PROCUREMENT_STRUCTS.PO_ITEM_STRUCT>();
 
                     int itemNumber = 1;
 
@@ -1294,11 +1288,11 @@ namespace _01electronics_inventory
 
                         if (currentItemCheckBox.IsChecked == true)
                         {
-                            PROCUREMENT_STRUCTS.PO_ITEM tempPOItem = new PROCUREMENT_STRUCTS.PO_ITEM();
-                            tempPOItem.rfp_item.rfp_item_number = rfp.rfpItems[i - 1].item_number;
+                            PROCUREMENT_STRUCTS.PO_ITEM_STRUCT tempPOItem = new PROCUREMENT_STRUCTS.PO_ITEM_STRUCT();
+                            tempPOItem.rfp_item.rfp_item_number = rfp.rfpItems[i - 1].rfp_item_number;
                             tempPOItem.rfp_item.item_quantity = rfp.rfpItems[i - 1].item_quantity;
-                            tempPOItem.rfp_item.measure_unit = rfp.rfpItems[i - 1].item_measure_unit;
-                            tempPOItem.rfp_item.measure_unit_id = rfp.rfpItems[i - 1].item_measure_unit_id;
+                            tempPOItem.rfp_item.measure_unit = rfp.rfpItems[i - 1].measure_unit;
+                            tempPOItem.rfp_item.measure_unit_id = rfp.rfpItems[i - 1].measure_unit_id;
                             tempPOItem.po_item_no = itemNumber;
                             itemNumber += 1;
 
@@ -1353,11 +1347,11 @@ namespace _01electronics_inventory
                 if (currentItemCheckBox.IsChecked == true)
                 {
                     PROCUREMENT_STRUCTS.INCOMING_QUOTATIONS_ITEM_MIN_STRUCT tempQuotationItem = new PROCUREMENT_STRUCTS.INCOMING_QUOTATIONS_ITEM_MIN_STRUCT();
-                    tempQuotationItem.rfp_item_number = rfp.rfpItems[i - 1].item_number;
+                    tempQuotationItem.rfp_item_number = rfp.rfpItems[i - 1].rfp_item_number;
                     tempQuotationItem.item_quantity = rfp.rfpItems[i - 1].item_quantity;
-                    tempQuotationItem.measure_unit = rfp.rfpItems[i - 1].item_measure_unit;
-                    tempQuotationItem.measure_unit_id = rfp.rfpItems[i - 1].item_measure_unit_id;
-                    tempQuotationItem.item_number = itemNumber;
+                    tempQuotationItem.measure_unit = rfp.rfpItems[i - 1].measure_unit;
+                    tempQuotationItem.measure_unit_id = rfp.rfpItems[i - 1].measure_unit_id;
+                    tempQuotationItem.rfp_item_number = itemNumber;
                     itemNumber += 1;
 
                     tempQuotationItems.Add(tempQuotationItem);
@@ -1390,7 +1384,7 @@ namespace _01electronics_inventory
                 {
                     //if (rfp.rfpItems[i].item_availablilty_status.status_id == COMPANY_WORK_MACROS.RFP_CANCELLED_AVAILABILITY_STATUS)
                     //{
-                    //    if (!rfp.UpdateRFPItemStatus(COMPANY_WORK_MACROS.RFP_CANCELLED, rfp.rfpItems[i].item_number))
+                    //    if (!rfp.UpdateRFPItemStatus(COMPANY_WORK_MACROS.RFP_CANCELLED, rfp.rfpItems[i].rfp_item_number))
                     //        return;
                     //}
                 }
@@ -1409,15 +1403,14 @@ namespace _01electronics_inventory
             int itemNo = Int32.Parse(addButtonn.Tag.ToString());
 
             bool edit = false;
-            obj = null;
-            obj = (Object)addButtonn;
+            mailObject = null;
+            mailObject = (Object)addButtonn;
 
             for (int i = 0; i < rfp.rfpItems.Count; i++)
             {
-                if (rfp.rfpItems[i].item_number == itemNo)
+                if (rfp.rfpItems[i].rfp_item_number == itemNo)
                 {
                     edit = true;
-                    index = i;
                     break;
                 }
             }
@@ -1425,20 +1418,18 @@ namespace _01electronics_inventory
             {
 
                 rfpItem = rfp.rfpItems[index];
-                rfpItem.item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem, ref index, ref view);
+                rfpItem.rfp_item_number = itemNo;
+                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
                 rfpItemWindow.Show();
                 rfpItemWindow.Closed += OnCloseRFPItemWindow;
             }
             else
             {
-                rfpItem = new PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT();
-                rfpItem.item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem, ref index, ref view);
+                rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
+                rfpItem.rfp_item_number = itemNo;
+                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
                 rfpItemWindow.Show();
                 rfpItemWindow.Closed += OnCloseRFPItemWindow;
-                if (itemNo > 1)
-                    index++;
             }
         }
 
@@ -1447,32 +1438,29 @@ namespace _01electronics_inventory
             Button addButtonn = (Button)sender;
             int itemNo = Int32.Parse(addButtonn.Tag.ToString());
 
-            bool edit = false;
-            obj = new object();
-            obj = (Object)addButtonn;
+            mailObject = new object();
+            mailObject = (Object)addButtonn;
             for (int i = 0; i < rfp.rfpItems.Count; i++)
             {
-                if (rfp.rfpItems[i].item_number == itemNo)
+                if (rfp.rfpItems[i].rfp_item_number == itemNo)
                 {
-                    edit = true;
-                    index = i;
                     break;
                 }
             }
             if (edit)
             {
 
-                PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT rfpItem = rfp.rfpItems[index];
-                rfpItem.item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem, ref index, ref view);
+                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = rfp.rfpItems[index];
+                rfpItem.rfp_item_number = itemNo;
+                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
                 rfpItemWindow.Show();
                 rfpItemWindow.Closed += OnCloseRFPItemWindow;
             }
             else
             {
-                PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT();
-                rfpItem.item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem, ref index, ref view);
+                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
+                rfpItem.rfp_item_number = itemNo;
+                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
                 rfpItemWindow.Show();
                 rfpItemWindow.Closed += OnCloseRFPItemWindow;
                 if (itemNo > 1)
@@ -1485,7 +1473,7 @@ namespace _01electronics_inventory
             if (view)
                 saveChangesButton.IsEnabled = true;
 
-            Button addButton = (Button)obj;
+            Button addButton = (Button)mailObject;
 
             TextBlock description = addButton.Content as TextBlock;
             if (index >= rfp.rfpItems.Count || rfp.rfpItems.Count == 0)

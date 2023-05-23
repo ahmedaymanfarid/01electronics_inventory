@@ -29,7 +29,7 @@ namespace _01electronics_inventory
 
         public  AddEntryPermitItemPage addEntryPermitItem ;
 
-        List<BASIC_STRUCTS.WARE_HOUSE_LOCATION> Locations = new List<BASIC_STRUCTS.WARE_HOUSE_LOCATION>();
+        List<INVENTORY_STRUCTS.WARE_HOUSE_LOCATION_STRUCT> Locations = new List<INVENTORY_STRUCTS.WARE_HOUSE_LOCATION_STRUCT>();
 
         AddEntryPermitWindow entryPermitWindow;
 
@@ -47,12 +47,12 @@ namespace _01electronics_inventory
             entryPermitWindow = w;
 
             commonQueries.GetWareHouseLocations(ref Locations);
-            Locations.ForEach(a => WareHouseCombo.Items.Add(a.nickName));
+            Locations.ForEach(a => WareHouseCombo.Items.Add(a.location_nick_name));
 
 
             if (isedit == true) {
 
-                materialEntryPermit.SetEntryPermitSerialid(noldMaterialEntryPermit.GetEntryPermitSerialid());
+                materialEntryPermit.SetEntryPermitSerialid(noldMaterialEntryPermit.GetEntryPermitSerial());
 
                 materialEntryPermit.InitializeMaterialEntryPermit();
 
@@ -90,7 +90,7 @@ namespace _01electronics_inventory
         private void WareHouseComboSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            materialEntryPermit.SetNickName(Locations[WareHouseCombo.SelectedIndex].nickName);
+            materialEntryPermit.SetWarehouseNickName(Locations[WareHouseCombo.SelectedIndex].location_nick_name);
             materialEntryPermit.SetWareHouseLocationId(Locations[WareHouseCombo.SelectedIndex].address.location_id);
             materialEntryPermit.SetAddedBy(loggedInUser.GetEmployeeId());
 

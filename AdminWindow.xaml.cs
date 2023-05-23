@@ -53,8 +53,8 @@ namespace _01electronics_inventory
             {
                 COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT tmp = new COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT();
                 tmp.employee_id = employee.employee_id;
-                tmp.team.team_id = employee.team_id;
-                tmp.team.team_name = employee.employee_team;
+                tmp.team.team_id = employee.requestor_team.team_id;
+                tmp.team.team_name = employee.requestor_team.team_name;
                 tmp.employee_name = employee.employee_name;
                 authorizedEmployees.Add(tmp);
 

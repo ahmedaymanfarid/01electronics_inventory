@@ -37,15 +37,15 @@ namespace _01electronics_inventory
         public MaterialReleasePermits materialReleasePermit = new MaterialReleasePermits();
         public List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> employees = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
 
-        public List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
+        public List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
 
          List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requsters = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
         public List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requstersFiltered = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
 
-        public List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT> rfps = new List<PROCUREMENT_STRUCTS.RFPS_MIN_STRUCT>();
+        public List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> rfps = new List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>();
         List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT> companyContacts=new List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT>();
 
-        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING> rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING>();
+        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
 
 
         public List<int> serialProducts = new List<int>();
@@ -65,7 +65,7 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < requsters.Count; i++)
             {
-                if (i != 0 && requsters[i].employee_team != requsters[i - 1].employee_team)
+                if (i != 0 && requsters[i].requestor_team.team_name != requsters[i - 1].requestor_team.team_name)
                 {
                     requstersFiltered.Add(requsters[i]);
                 }
@@ -100,7 +100,7 @@ namespace _01electronics_inventory
             WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
             ComboBox rfpRequstersComboBox = rfpPanel.Children[0] as ComboBox;
 
-            requstersFiltered.ForEach(a => rfpRequstersComboBox.Items.Add(a.employee_team));
+            requstersFiltered.ForEach(a => rfpRequstersComboBox.Items.Add(a.requestor_team.team_name));
 
             workOrders.ForEach(a => orderSerialsComboBox.Items.Add(a.order_id));  
 
@@ -211,7 +211,7 @@ namespace _01electronics_inventory
            ComboBox rfpsRequsters= rfpPanel.Children[0] as ComboBox;
 
             ComboBox rfpComboBox = rfpPanel.Children[1] as ComboBox;
-            commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpsRequsters.SelectedIndex].team_id);
+            commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpsRequsters.SelectedIndex].requestor_team.team_id);
             rfpComboBox.Items.Clear();
 
             rfps.ForEach(a => rfpComboBox.Items.Add(a.rfpID));
@@ -319,7 +319,7 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < rfpItems.Count; i++) {
 
-                if (rfpItems[i].rfpItem.item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].rfpItem.item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK) {
+                if (rfpItems[i].rfpItem.status_name.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].rfpItem.status_name.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK) {
 
                     rfpItems.Remove(rfpItems[i]);
                     i--;
@@ -331,7 +331,7 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < rfpItems.Count; i++) {
 
-                if (rfpItems[i].rfpItem.company_model.modelName != "")
+                if (rfpItems[i].rfpItem.company_model.model_name != "")
                 {
 
                     if (rfpItems[i].rfpItem.company_model.has_serial_number == true)
@@ -358,7 +358,7 @@ namespace _01electronics_inventory
                 {
 
 
-                    if (rfpItems[i].rfpItem.generic_product_model.has_serial_number == true)
+                    if (rfpItems[i].rfpItem.product_model.has_serial_number == true)
                     {
 
 

@@ -28,7 +28,7 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        MaintenanceContract maintenanceContract = new MaintenanceContract();
+        //MaintenanceContract maintenanceContract = new MaintenanceContract();
 
         int itemsCounter=1;
         int numberOfSelectedItems = 0;
@@ -37,33 +37,31 @@ namespace _01electronics_inventory
 
         List<string> Serials = new List<string>();
 
-        MaterialEntryPermit materialEntry = new MaterialEntryPermit();
-        public AddReleasePermitPage addReleasePermitPage;
-        public ReleasePermitUploadFilesPage ReleasePermitUploadFilesPage;
-        List<MaterialEntryPermit> entryPermits = new List<MaterialEntryPermit>();
+        private MaterialEntryPermit materialEntry;
+        private AddReleasePermitPage addReleasePermitPage;
+        private ReleasePermitUploadFilesPage ReleasePermitUploadFilesPage;
+        //private List<MaterialEntryPermit> entryPermits = new List<MaterialEntryPermit>();
 
 
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> genericCategories = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY>();
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> genericProducts = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS>();
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> genericBrands = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL> genericModels = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> genericCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> genericProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> genericModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+        
+        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> companyCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> companyProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> companyBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> companyModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
 
-        List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT> companyCategories = new List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT>();
-        List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> companyProducts = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-        List<COMPANY_WORK_MACROS.BRAND_STRUCT> companyBrands = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-        List<COMPANY_WORK_MACROS.MODEL_STRUCT> companyModels = new List<COMPANY_WORK_MACROS.MODEL_STRUCT>();
-        public List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT> workOrders = new List<COMPANY_WORK_MACROS.WORK_ORDER_MAX_STRUCT>();
+        private List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT> workOrders;
 
-        List<BASIC_STRUCTS.ADDRESS_STRUCT> workOrdersLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+        private List<BASIC_STRUCTS.ADDRESS_STRUCT> workOrdersLocations;
 
-        List<BASIC_STRUCTS.ADDRESS_STRUCT> maintenanceContractLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+        private List<BASIC_STRUCTS.ADDRESS_STRUCT> maintenanceContractLocations;
 
-        List<BASIC_STRUCTS.ADDRESS_STRUCT> companyProjectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+        private List<BASIC_STRUCTS.ADDRESS_STRUCT> companyProjectLocations;
 
-
-        List<COMPANY_WORK_MACROS.SPEC_STRUCT> specs = new List<COMPANY_WORK_MACROS.SPEC_STRUCT>();
-
-
+        private List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT> specs;
 
         public AddReleasePermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddReleasePermitWindow mReleasePermitWindow)
         {
@@ -74,13 +72,35 @@ namespace _01electronics_inventory
 
             InitializeComponent();
 
-            if (!materialEntry.InitializeMaterialEntryPermits(ref entryPermits))
+            materialEntry = new MaterialEntryPermit();
+
+            genericCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            genericProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+
+            genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            genericModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+
+            companyCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            companyProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            companyBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            companyModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+
+            workOrders = new List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT>();
+
+            workOrdersLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+
+            maintenanceContractLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+            companyProjectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+            
+            specs = new List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT>();
+
+
+            if (!commonQueries.InitializeMaterialEntryPermits(ref entryPermits))
                 return;
             
             parentWindow = mReleasePermitWindow;
 
             InitializeStock();
-            workOrders.Clear();
 
             commonQueries.GetWorkOrders(ref workOrders);
 
@@ -285,7 +305,7 @@ namespace _01electronics_inventory
             companyCategories.Clear();
             commonQueries.GetProductCategories(ref companyCategories);
 
-            companyCategories.ForEach(a => companyCategoryComboBox.Items.Add(a.category));
+            companyCategories.ForEach(a => companyCategoryComboBox.Items.Add(a.category_name));
             companyCategoryComboBox.Style = (Style)FindResource("comboBoxStyle");
 
             companyCategoryComboBox.SelectionChanged += OnCompanyCategoryComboBoxSelectionChanged;
@@ -632,13 +652,13 @@ namespace _01electronics_inventory
 
                 for (int i = 0; i < entryPermits.Count; i++)
                 {
-                    if (previousSerial == entryPermits[i].GetEntryPermitSerialid())
+                    if (previousSerial == entryPermits[i].GetEntryPermitSerial())
                         continue;
 
-                    previousSerial = entryPermits[i].GetEntryPermitSerialid();
+                    previousSerial = entryPermits[i].GetEntryPermitSerial();
 
 
-                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerialid());
+                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerial());
                     materialEntry.InitializeMaterialEntryPermit();
 
 
@@ -649,7 +669,7 @@ namespace _01electronics_inventory
                         if (genericCategoryComboBox.SelectedIndex != -1)
                         {
 
-                            if (genericCategories[genericCategoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].genericCategory.category_id)
+                            if (genericCategories[genericCategoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].product_category.category_id)
                                 continue;
                         }
 
@@ -657,7 +677,7 @@ namespace _01electronics_inventory
                         if (genericProductComboBox.SelectedIndex != -1)
                         {
 
-                            if (genericProducts[genericProductComboBox.SelectedIndex].product_id != materialEntry.GetItems()[j].genericProduct.product_id)
+                            if (genericProducts[genericProductComboBox.SelectedIndex].product_id != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
                         }
 
@@ -665,7 +685,7 @@ namespace _01electronics_inventory
                         if (genericBrandComboBox.SelectedIndex != -1)
                         {
 
-                            if (genericBrands[genericBrandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].genericBrand.brand_id)
+                            if (genericBrands[genericBrandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].product_brand.brand_id)
                                 continue;
                         }
 
@@ -673,7 +693,7 @@ namespace _01electronics_inventory
                         if (genericModelComboBox.SelectedIndex != -1)
                         {
                             if(genericModelComboBox.SelectedIndex!=-1)
-                            if (genericModels[genericModelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].genericModel.model_id)
+                            if (genericModels[genericModelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].product_model.model_id)
                                 continue;
                         }
 
@@ -688,7 +708,7 @@ namespace _01electronics_inventory
 
                         itemm.ShowGridLines = true;
 
-                        itemm.Tag = entryPermits[i].GetEntryPermitSerialid().ToString()+" "+materialEntry.GetItems()[j].entry_permit_item_serial+" "+itemsCounter;
+                        itemm.Tag = entryPermits[i].GetEntryPermitSerial().ToString()+" "+materialEntry.GetItems()[j].entry_permit_item_serial+" "+itemsCounter;
 
                         itemsCounter++;
 
@@ -733,7 +753,7 @@ namespace _01electronics_inventory
                         ItemName.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
-                        ItemName.Text = $"{materialEntry.GetItems()[j].genericCategory.category_name + "-" + materialEntry.GetItems()[j].genericProduct.product_name + "-" + materialEntry.GetItems()[j].genericBrand.brand_name + "-" + materialEntry.GetItems()[j].genericModel.model_name}";
+                        ItemName.Text = $"{materialEntry.GetItems()[j].product_category.category_name + "-" + materialEntry.GetItems()[j].product_type.product_name + "-" + materialEntry.GetItems()[j].product_brand.brand_name + "-" + materialEntry.GetItems()[j].product_model.model_name}";
 
 
                         Grid.SetColumn(ItemName, 1);
@@ -857,13 +877,13 @@ namespace _01electronics_inventory
 
                 for (int i=0;i<entryPermits.Count;i++)
                 {
-                    if (previousSerial == entryPermits[i].GetEntryPermitSerialid())
+                    if (previousSerial == entryPermits[i].GetEntryPermitSerial())
                         continue;
 
-                    previousSerial = entryPermits[i].GetEntryPermitSerialid();
+                    previousSerial = entryPermits[i].GetEntryPermitSerial();
 
 
-                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerialid());
+                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerial());
                     materialEntry.InitializeMaterialEntryPermit();
 
 
@@ -876,7 +896,7 @@ namespace _01electronics_inventory
                         if (companyCategoryComboBox.SelectedIndex != -1) {
 
 
-                            if (companyCategories[companyCategoryComboBox.SelectedIndex].categoryId != materialEntry.GetItems()[j].companyCategory.categoryId)
+                            if (companyCategories[companyCategoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].product_category.category_id)
                                 continue;
 
                         }
@@ -884,7 +904,7 @@ namespace _01electronics_inventory
                         if (companyProductComboBox.SelectedIndex != -1)
                         {
 
-                            if (companyProducts[companyProductComboBox.SelectedIndex].typeId != materialEntry.GetItems()[j].companyProduct.typeId)
+                            if (companyProducts[companyProductComboBox.SelectedIndex].type_id != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
                         }
 
@@ -892,7 +912,7 @@ namespace _01electronics_inventory
                         if (companyBrandComboBox.SelectedIndex != -1)
                         {
 
-                            if (companyBrands[companyBrandComboBox.SelectedIndex].brandId != materialEntry.GetItems()[j].companyBrand.brandId)
+                            if (companyBrands[companyBrandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].product_brand.brand_id)
                                 continue;
                         }
 
@@ -900,7 +920,7 @@ namespace _01electronics_inventory
                         if (companyModelComboBox.SelectedIndex != -1)
                         {
 
-                            if (companyModels[companyModelComboBox.SelectedIndex].modelId != materialEntry.GetItems()[j].companyModel.modelId)
+                            if (companyModels[companyModelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].product_model.model_id)
                                 continue;
                         }
 
@@ -915,7 +935,7 @@ namespace _01electronics_inventory
 
                         itemm.ShowGridLines = true;
 
-                        itemm.Tag = entryPermits[i].GetEntryPermitSerialid().ToString()+ " " +materialEntry.GetItems()[j].entry_permit_item_serial+" "+ itemsCounter;
+                        itemm.Tag = entryPermits[i].GetEntryPermitSerial().ToString()+ " " +materialEntry.GetItems()[j].entry_permit_item_serial+" "+ itemsCounter;
 
 
                         itemsCounter++;
@@ -956,7 +976,7 @@ namespace _01electronics_inventory
 
                         ItemName.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
-                        ItemName.Text = $"{materialEntry.GetItems()[j].companyProduct.typeName + "-" + materialEntry.GetItems()[j].companyBrand.brandName + "-" + materialEntry.GetItems()[j].companyModel.modelName}";
+                        ItemName.Text = $"{materialEntry.GetItems()[j].product_type.product_name + "-" + materialEntry.GetItems()[j].product_brand.brand_name + "-" + materialEntry.GetItems()[j].product_model.model_name}";
 
 
                         Grid.SetColumn(ItemName, 1);
@@ -1516,25 +1536,24 @@ namespace _01electronics_inventory
             if (addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
             {
 
-                WorkOrder w = new WorkOrder();
-                w.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
+                WorkOrder workOrder = new WorkOrder();
+                workOrder.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
 
                 workOrdersLocations.Clear();
-                w.GetProjectLocations(ref workOrdersLocations);
+                workOrder.GetProjectLocations(ref workOrdersLocations);
 
 
                 workOrdersLocations.ForEach(a => locations.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
 
-                identityTextBox.Text = w.GetOrderID();
+                identityTextBox.Text = workOrder.GetOrderID();
 
-                projectName.Text = w.GetprojectName();
+                projectName.Text = workOrder.GetprojectName();
 
             }
 
             else if (addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial() != 0)
             {
-
-
+                MaintenanceContract maintenanceContract = new MaintenanceContract();
                 maintenanceContract.InitializeMaintenanceContractInfo(addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial(), addReleasePermitPage.rfp.GetMaintContract().GetMaintContractVersion());
 
                 maintenanceContractLocations = maintenanceContract.GetMaintContractProjectLocations();
@@ -1580,19 +1599,19 @@ namespace _01electronics_inventory
             {
                 //String itemName = rfpItemsDescription[i].item_description;
                 String itemName = String.Empty;
-                if (addReleasePermitPage.rfpItems[i].rfpItem.company_model.modelName != "" &&addReleasePermitPage.rfpItems[i].rfpItem.company_model.modelName != null)
+                if (addReleasePermitPage.rfpItems[i].product_model.model_name != "" &&addReleasePermitPage.rfpItems[i].product_model.model_name != null)
                 {
-                    itemName = addReleasePermitPage.rfpItems[i].rfpItem.company_category.category + " - " +
-                               addReleasePermitPage.rfpItems[i].rfpItem.company_product.typeName + " - " +
-                               addReleasePermitPage.rfpItems[i].rfpItem.company_brand.brandName + " - " +
-                               addReleasePermitPage.rfpItems[i].rfpItem.company_model.modelName;
+                    itemName = addReleasePermitPage.rfpItems[i].product_category.category_name + " - " +
+                               addReleasePermitPage.rfpItems[i].product_type.product_name + " - " +
+                               addReleasePermitPage.rfpItems[i].product_brand.brand_name + " - " +
+                               addReleasePermitPage.rfpItems[i].product_model.model_name;
                 }
-                else if (addReleasePermitPage.rfpItems[i].rfpItem.generic_product_model.model_name != "" && addReleasePermitPage.rfpItems[i].rfpItem.generic_product_model.model_name != null)
+                else if (addReleasePermitPage.rfpItems[i].product_model.model_name != "" && addReleasePermitPage.rfpItems[i].product_model.model_name != null)
                 {
-                    itemName = addReleasePermitPage.rfpItems[i].rfpItem.generic_product_category.category_name + " - " +
-                               addReleasePermitPage.rfpItems[i].rfpItem.generic_product_type.product_name + " - " +
-                               addReleasePermitPage.rfpItems[i].rfpItem.generic_product_brand.brand_name + " - " +
-                               addReleasePermitPage.rfpItems[i].rfpItem.generic_product_model.model_name;
+                    itemName = addReleasePermitPage.rfpItems[i].product_category.category_name + " - " +
+                               addReleasePermitPage.rfpItems[i].product_type.product_name + " - " +
+                               addReleasePermitPage.rfpItems[i].product_brand.brand_name + " - " +
+                               addReleasePermitPage.rfpItems[i].product_model.model_name;
                 }
                 if (itemName != string.Empty)
                     rfpsItemsComboBox.Items.Add(itemName);
@@ -1607,13 +1626,13 @@ namespace _01electronics_inventory
 
 
 
-            if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.company_model.modelName != "")
+            if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.model_name != "")
             {
 
 
-                if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.company_model.has_serial_number == true)
+                if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == true)
                 {
-                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
                         System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1654,7 +1673,7 @@ namespace _01electronics_inventory
                             addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex] += int.Parse(availableQuantityTextBox.Text);
                     }
 
-                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
                         System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1670,9 +1689,9 @@ namespace _01electronics_inventory
             else
             {
 
-                if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.generic_product_model.has_serial_number == true)
+                if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == true)
                 {
-                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
                         System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1716,7 +1735,7 @@ namespace _01electronics_inventory
                             addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex] += int.Parse(availableQuantityTextBox.Text);
                     }
 
-                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].rfpItem.item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
+                    if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
                         System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1790,14 +1809,14 @@ namespace _01electronics_inventory
             workOrdersLocations.ForEach(a => orderLocationsComboBox.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
 
 
-            COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
+            PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
 
             orderItemsComboBox.Items.Clear();
 
             for (int i = 0; i < workOrderProducts.Length; i++)
             {
 
-                orderItemsComboBox.Items.Add(workOrderProducts[i].productCategory.category + " ," + workOrderProducts[i].productType.typeName + " ," + workOrderProducts[i].productBrand.brandName + " ," + workOrderProducts[i].productModel.modelName);
+                orderItemsComboBox.Items.Add(workOrderProducts[i].product_category.category_name + " ," + workOrderProducts[i].productType.product_name + " ," + workOrderProducts[i].productBrand.brand_name + " ," + workOrderProducts[i].productModel.model_name);
             }
 
         }
@@ -1868,7 +1887,7 @@ namespace _01electronics_inventory
                 return;
 
 
-            WorkOrder w = new WorkOrder();
+            WorkOrder workOrder = new WorkOrder();
 
 
             Grid order = ordersComboBox.Parent as Grid;
@@ -1881,23 +1900,23 @@ namespace _01electronics_inventory
 
             orderLocationComboBox.Items.Clear();
 
-            w.InitializeWorkOrderInfo(workOrders[ordersComboBox.SelectedIndex].order_serial);
+            workOrder.InitializeWorkOrderInfo(workOrders[ordersComboBox.SelectedIndex].order_serial);
 
             workOrdersLocations.Clear();
-            w.GetProjectLocations(ref workOrdersLocations);
+            workOrder.GetProjectLocations(ref workOrdersLocations);
 
 
             workOrdersLocations.ForEach(a => orderLocationComboBox.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
 
             orderLocationComboBox.IsEnabled = true;
 
-            COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT[]workOrderProducts=w.GetOrderProductsList();
+            PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[]workOrderProducts=workOrder.GetOrderProductsList();
 
             orderItemsComboBox.Items.Clear();
 
             for (int i = 0; i < workOrderProducts.Length; i++) {
 
-                orderItemsComboBox.Items.Add(workOrderProducts[i].productCategory.category + " ," + workOrderProducts[i].productType.typeName + " ," + workOrderProducts[i].productBrand.brandName + " ," + workOrderProducts[i].productModel.modelName);
+                orderItemsComboBox.Items.Add(workOrderProducts[i].product_category.category_name + " ," + workOrderProducts[i].productType.product_name + " ," + workOrderProducts[i].productBrand.brand_name + " ," + workOrderProducts[i].productModel.model_name);
             }
 
         }
@@ -1929,7 +1948,7 @@ namespace _01electronics_inventory
             ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
 
             if(companyModelComboBox.SelectedIndex!=-1)
-            commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].categoryId, companyProducts[companyProductComboBox.SelectedIndex].typeId, companyBrands[companyBrandComboBox.SelectedIndex].brandId, companyModels[companyModelComboBox.SelectedIndex].modelId, ref specs);
+            commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].category_id, companyProducts[companyProductComboBox.SelectedIndex].type_id, companyBrands[companyBrandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
 
             companySpecsComboBox.Items.Clear();
             specs.ForEach(a => companySpecsComboBox.Items.Add(a.spec_name));
@@ -1964,7 +1983,7 @@ namespace _01electronics_inventory
             commonQueries.GetCompanyModels(companyProducts[companyProductComboBox.SelectedIndex], companyBrands[companyBrandComboBox.SelectedIndex], ref companyModels);
 
 
-            companyModels.ForEach(a => companyModelComboBox.Items.Add(a.modelName));
+            companyModels.ForEach(a => companyModelComboBox.Items.Add(a.model_name));
 
             FilterItems();
         }
@@ -1999,9 +2018,9 @@ namespace _01electronics_inventory
                 return;
 
             companyBrands.Clear();
-            commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].typeId, ref companyBrands);
+            commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].type_id, ref companyBrands);
 
-            companyBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brandName));
+            companyBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brand_name));
 
             FilterItems();
 
@@ -2036,11 +2055,11 @@ namespace _01electronics_inventory
 
             companyProducts.Clear();
 
-            commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].categoryId);
+            commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].category_id);
 
             companyProductComboBox.Items.Clear();
 
-            companyProducts.ForEach(a => companyProductComboBox.Items.Add(a.typeName));
+            companyProducts.ForEach(a => companyProductComboBox.Items.Add(a.product_name));
 
             FilterItems();
 
@@ -2449,7 +2468,7 @@ namespace _01electronics_inventory
 
                 counter++;
 
-                BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM releaseItem = new BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM();
+                INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM releaseItem = new INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM();
 
                 Grid item = itemsBody.Children[i] as Grid;
 
@@ -2532,27 +2551,27 @@ namespace _01electronics_inventory
                                 return false;
                             }
 
-                            releaseItem.rfp_item_number = addReleasePermitPage.rfpItems[rfpItems.SelectedIndex].rfpItem.item_number;
+                            releaseItem.rfp_item_number = addReleasePermitPage.rfpItems[rfpItems.SelectedIndex].rfp_item_number;
 
 
                             if (addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
                             {
-                                WorkOrder w = new WorkOrder();
+                                WorkOrder workOrder = new WorkOrder();
 
 
-                                w.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
+                                workOrder.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
 
                                 workOrdersLocations.Clear();
-                                w.GetProjectLocations(ref workOrdersLocations);
+                                workOrder.GetProjectLocations(ref workOrdersLocations);
 
-                                releaseItem.order_serial = w.GetOrderSerial();
+                                releaseItem.order_serial = workOrder.GetOrderSerial();
 
                                 if (locationsComboBox.Items.Count != 0)
                                 {
 
                                     releaseItem.order_location_id = workOrdersLocations[locationsComboBox.SelectedIndex].location_id;
 
-                                    releaseItem.order_project_serial = w.GetprojectSerial();
+                                    releaseItem.order_project_serial = workOrder.GetprojectSerial();
 
 
                                 }
@@ -2652,7 +2671,7 @@ namespace _01electronics_inventory
                                 if (orderItemsComboBox.SelectedIndex != -1)
                                 {
 
-                                    COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
+                                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
 
                                     releaseItem.workOrder_product_number = workOrderProducts[orderItemsComboBox.SelectedIndex].productNumber;
 
@@ -2783,28 +2802,28 @@ namespace _01electronics_inventory
                             }
 
 
-                            releaseItem.rfp_item_number = addReleasePermitPage.rfpItems[rfpItems.SelectedIndex].rfpItem.item_number;
+                            releaseItem.rfp_item_number = addReleasePermitPage.rfpItems[rfpItems.SelectedIndex].rfp_item_number;
 
 
                             if (addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
                             {
 
-                                WorkOrder w = new WorkOrder();
+                                WorkOrder workOrder = new WorkOrder();
 
 
-                                w.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
+                                workOrder.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
 
                                 workOrdersLocations.Clear();
-                                w.GetProjectLocations(ref workOrdersLocations);
+                                workOrder.GetProjectLocations(ref workOrdersLocations);
 
-                                releaseItem.order_serial = w.GetOrderSerial();
+                                releaseItem.order_serial = workOrder.GetOrderSerial();
 
                                 if (locationsComboBox.Items.Count != 0)
                                 {
 
                                     releaseItem.order_location_id = workOrdersLocations[locationsComboBox.SelectedIndex].location_id;
 
-                                    releaseItem.order_project_serial = w.GetprojectSerial();
+                                    releaseItem.order_project_serial = workOrder.GetprojectSerial();
 
 
                                 }
@@ -2901,7 +2920,7 @@ namespace _01electronics_inventory
                                 if (orderItemsComboBox.SelectedIndex != -1)
                                 {
 
-                                    COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
+                                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
 
                                     releaseItem.workOrder_product_number = workOrderProducts[orderItemsComboBox.SelectedIndex].productNumber;
 

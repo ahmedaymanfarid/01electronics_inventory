@@ -38,8 +38,8 @@ namespace _01electronics_inventory
         private List<COMPANY_ORGANISATION_MACROS.CONTACT_BASIC_STRUCT> contactInfo = new List<COMPANY_ORGANISATION_MACROS.CONTACT_BASIC_STRUCT>();
         private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> employeesList = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
         //private List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> techOfficeList = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
-        private List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT> outgoingQuotationsList = new List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT>();
-        private List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT> offersAddedToComboList = new List<COMPANY_WORK_MACROS.OUTGOING_QUOTATION_MAX_STRUCT>();
+        private List<SALES_STRUCTS.QUOTATION_MAX_STRUCT> outgoingQuotationsList = new List<SALES_STRUCTS.QUOTATION_MAX_STRUCT>();
+        private List<SALES_STRUCTS.QUOTATION_MAX_STRUCT> offersAddedToComboList = new List<SALES_STRUCTS.QUOTATION_MAX_STRUCT>();
 
         private int viewAddCondition;
         private int salesPersonID;
@@ -339,7 +339,7 @@ namespace _01electronics_inventory
                 {
                     for (int i = 0; i < outgoingQuotationsList.Count(); i++)
                     {
-                        if (outgoingQuotationsList[i].sales_person_id == salesPersonID && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_OUTGOING_QUOTATION)
+                        if (outgoingQuotationsList[i].sales_person_id == salesPersonID && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_QUOTATION)
                         {
                             OfferSerialCombo.Items.Add(outgoingQuotationsList[i].offer_id);
                             offersAddedToComboList.Add(outgoingQuotationsList[i]);
@@ -351,7 +351,7 @@ namespace _01electronics_inventory
                 {
                     for (int i = 0; i < outgoingQuotationsList.Count(); i++)
                     {
-                        if (outgoingQuotationsList[i].sales_person_id == salesPersonID && outgoingQuotationsList[i].offer_proposer_id == loggedInUser.GetEmployeeId() && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_OUTGOING_QUOTATION)
+                        if (outgoingQuotationsList[i].sales_person_id == salesPersonID && outgoingQuotationsList[i].offer_proposer_id == loggedInUser.GetEmployeeId() && outgoingQuotationsList[i].offer_status_id == COMPANY_WORK_MACROS.PENDING_QUOTATION)
                         {
                             OfferSerialCombo.Items.Add(outgoingQuotationsList[i].offer_id);
                             offersAddedToComboList.Add(outgoingQuotationsList[i]);

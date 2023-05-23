@@ -20,10 +20,10 @@ namespace _01electronics_inventory
     /// </summary>
     public partial class SortGridViewGenericProductsWindow : Window
     {
-        BASIC_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProductsStruct;
+        PRODUCTS_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProductsStruct;
         Employee loggedInUser;
         GenericProductsPage genericProductsPage;
-        public SortGridViewGenericProductsWindow(ref Employee loggedInUserr , ref BASIC_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProducts , ref GenericProductsPage page)
+        public SortGridViewGenericProductsWindow(ref Employee loggedInUserr , ref PRODUCTS_STRUCTS.SORT_GENERIC_PRODUCTS sortGenericProducts , ref GenericProductsPage page)
         {
             InitializeComponent();
             loggedInUser = loggedInUserr;
@@ -39,7 +39,7 @@ namespace _01electronics_inventory
                 brandCheckBox.IsChecked = false;
                 modelCheckBox.IsChecked = false;
                 pricingCriteriaCheckBox.IsChecked = false;
-                sortGenericProductsStruct.category = true;
+                sortGenericProductsStruct.category_name = true;
                 sortGenericProductsStruct.brand = false;
                 sortGenericProductsStruct.type = false;
                 sortGenericProductsStruct.model = false;
@@ -56,7 +56,7 @@ namespace _01electronics_inventory
                 modelCheckBox.IsChecked = false;
                 pricingCriteriaCheckBox.IsChecked = false;
 
-                sortGenericProductsStruct.category = false;
+                sortGenericProductsStruct.category_name = false;
                 sortGenericProductsStruct.brand = false;
                 sortGenericProductsStruct.type = true;
                 sortGenericProductsStruct.model = false;
@@ -73,7 +73,7 @@ namespace _01electronics_inventory
                 modelCheckBox.IsChecked = false;
                 pricingCriteriaCheckBox.IsChecked = false;
 
-                sortGenericProductsStruct.category = false;
+                sortGenericProductsStruct.category_name = false;
                 sortGenericProductsStruct.brand = true;
                 sortGenericProductsStruct.type = false;
                 sortGenericProductsStruct.model = false;
@@ -90,7 +90,7 @@ namespace _01electronics_inventory
                 categoryCheckBox.IsChecked = false;
                 pricingCriteriaCheckBox.IsChecked = false;
 
-                sortGenericProductsStruct.category = false;
+                sortGenericProductsStruct.category_name = false;
                 sortGenericProductsStruct.brand = false;
                 sortGenericProductsStruct.type = false;
                 sortGenericProductsStruct.model = true;
@@ -107,7 +107,7 @@ namespace _01electronics_inventory
                 modelCheckBox.IsChecked = false;
                 categoryCheckBox.IsChecked = false;
 
-                sortGenericProductsStruct.category = false ;
+                sortGenericProductsStruct.category_name = false ;
                 sortGenericProductsStruct.brand = false;
                 sortGenericProductsStruct.type = false;
                 sortGenericProductsStruct.model = false;

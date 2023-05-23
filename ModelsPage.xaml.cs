@@ -28,7 +28,7 @@ namespace _01electronics_inventory
 
         protected FTPServer ftpServer;
 
-        protected List<COMPANY_WORK_MACROS.MODEL_STRUCT> brandModels;
+        protected List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> brandModels;
         private Model selectedProduct;
 
         //protected BackgroundWorker downloadBackground;
@@ -57,7 +57,7 @@ namespace _01electronics_inventory
 
             modelsNames = new List<String>();
 
-            brandModels = new List<COMPANY_WORK_MACROS.MODEL_STRUCT>();
+            brandModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
 
          
             QueryGetModels();
@@ -81,13 +81,13 @@ namespace _01electronics_inventory
         }
         private void QueryGetModels()
         {
-            COMPANY_WORK_MACROS.PRODUCT_STRUCT product = new COMPANY_WORK_MACROS.PRODUCT_STRUCT();
-            product.typeId = selectedProduct.GetProductID();
-            product.typeName = selectedProduct.GetProductName();
+            PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT product = new PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT();
+            product.type_id = selectedProduct.GetProductID();
+            product.product_name = selectedProduct.GetProductName();
 
-            COMPANY_WORK_MACROS.BRAND_STRUCT brand = new COMPANY_WORK_MACROS.BRAND_STRUCT();
-            brand.brandId = selectedProduct.GetBrandID();
-            brand.brandName = selectedProduct.GetBrandName();
+            PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT brand = new PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT();
+            brand.brand_id = selectedProduct.GetBrandID();
+            brand.brand_name = selectedProduct.GetBrandName();
 
             if (!commonQueries.GetCompanyModels(product, brand, ref brandModels))
                 return;
@@ -110,10 +110,10 @@ namespace _01electronics_inventory
 
                 for (int i = 0; i < brandModels.Count(); i++)
                 {
-                    selectedProduct.SetModelID(brandModels[i].modelId);
+                    selectedProduct.SetModelID(brandModels[i].model_id);
 
 
-                    if (brandModels[i].modelId != 0)
+                    if (brandModels[i].model_id != 0)
                     {
                         Grid currentModelGrid = new Grid();
                         currentModelGrid.Margin = new Thickness(55, 24, 24, 24);
@@ -161,7 +161,7 @@ namespace _01electronics_inventory
                         brandImage.Height = 220;
                         brandImage.Width = 190;
                         //brandImage.MouseDown += ImageMouseDown;
-                        brandImage.Tag = brandModels[i].modelId.ToString();
+                        brandImage.Tag = brandModels[i].model_id.ToString();
                         column1Grid.Children.Add(brandImage);
 
                         Grid.SetColumn(column1Grid, 0);
@@ -200,14 +200,14 @@ namespace _01electronics_inventory
                         modelTextBox.BorderThickness = new Thickness(0);
                         modelTextBox.FontSize = 16;
                         modelTextBox.Height = 30;
-                        modelTextBox.Text = " " + brandModels[i].modelName;
+                        modelTextBox.Text = " " + brandModels[i].model_name;
                         modelTextBox.TextWrapping = TextWrapping.Wrap;
                         Grid.SetRow(modelTextBox, 0);
                         Grid.SetColumn(modelTextBox, 0);
 
 
                         Expander expander = new Expander();
-                        expander.Tag = brandModels[i].modelId.ToString(); ;
+                        expander.Tag = brandModels[i].model_id.ToString(); ;
                         expander.ExpandDirection = ExpandDirection.Down;
 
                         expander.VerticalAlignment = VerticalAlignment.Stretch;
@@ -338,7 +338,7 @@ namespace _01electronics_inventory
                     }
                 }
 
-                if (brandModels.Count() == 0 || brandModels[0].modelId == 0)
+                if (brandModels.Count() == 0 || brandModels[0].model_id == 0)
                 {
                     Image brandImage = new Image();
                     BitmapImage src = new BitmapImage();
@@ -362,7 +362,7 @@ namespace _01electronics_inventory
         //    ModelsGrid.Children.Clear();
         //    for (int i = 0; i < brandModels.Count(); i++)
         //    {
-        //        selectedProduct.SetModelID(brandModels[i].modelId);
+        //        selectedProduct.SetModelID(brandModels[i].model_id);
         //        selectedProduct.GetNewModelPhotoLocalPath();
         //        selectedProduct.GetNewPhotoServerPath();
 
@@ -384,7 +384,7 @@ namespace _01electronics_inventory
         //{
         //    for (int i = 0; i < brandModels.Count(); i++)
         //    {
-        //        selectedProduct.SetModelID(brandModels[i].modelId);
+        //        selectedProduct.SetModelID(brandModels[i].model_id);
         //        selectedProduct.GetNewModelPhotoLocalPath();
         //        selectedProduct.GetNewPhotoServerPath();
 
@@ -555,9 +555,9 @@ namespace _01electronics_inventory
             currentGrid = (Grid)currentExpander.Parent;
 
             selectedProduct.SetModelID(int.Parse(currentExpander.Tag.ToString()));
-            int i = brandModels.FindIndex(brandModels => brandModels.modelId == selectedProduct.GetModelID());
+            int i = brandModels.FindIndex(brandModels => brandModels.model_id == selectedProduct.GetModelID());
             selectedProduct.InitializeModelInfo(selectedProduct.GetProductID(), selectedProduct.GetBrandID(), selectedProduct.GetModelID());
-            selectedProduct.SetModelName(brandModels[i].modelName);
+            selectedProduct.SetModelName(brandModels[i].model_name);
             selectedProduct.InitializeModelSummaryPoints();
 
 
@@ -582,9 +582,9 @@ namespace _01electronics_inventory
             //ViewModel();
             selectedProduct.GetModelSpecs().Clear();
             selectedProduct.SetModelID(int.Parse(currentExpander.Tag.ToString()));
-            int i = brandModels.FindIndex(brandModels => brandModels.modelId == selectedProduct.GetModelID());
+            int i = brandModels.FindIndex(brandModels => brandModels.model_id == selectedProduct.GetModelID());
             selectedProduct.InitializeModelInfo(selectedProduct.GetProductID(), selectedProduct.GetBrandID(), selectedProduct.GetModelID());
-            selectedProduct.SetModelName(brandModels[i].modelName);
+            selectedProduct.SetModelName(brandModels[i].model_name);
             selectedProduct.InitializeModelSummaryPoints();
 
             ModelsWindow modelsWindow = new ModelsWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref selectedProduct, viewAddCondition, false);

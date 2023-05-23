@@ -362,7 +362,7 @@ namespace _01electronics_inventory
         }
         private void OnClickUploadFiles(object sender, MouseButtonEventArgs e)
         {
-            if (viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+            if (viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
             {
                 maintContractsUploadFilesPage.maintContractsBasicInfoPage = maintContractsBasicInfoPage;
                 maintContractsUploadFilesPage.maintContractsProjectsPage = maintContractsProjectsPage;
@@ -382,7 +382,7 @@ namespace _01electronics_inventory
 
         private void OnClickNextButton(object sender, RoutedEventArgs e)
         {
-            if (viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+            if (viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
             {
                 maintContractsUploadFilesPage.maintContractsBasicInfoPage = maintContractsBasicInfoPage;
                 maintContractsUploadFilesPage.maintContractsProductsPage = maintContractsProductsPage;
@@ -491,7 +491,7 @@ namespace _01electronics_inventory
                     maintenanceContract.SetContractIncreaseRate(0);
                 }
 
-                if (viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_ADD_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_RESOLVE_CONDITION)
+                if (viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_ADD_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_RESOLVE_CONDITION)
                 {
                     if (!maintenanceContract.IssueNewMaintContract())
                         return;
@@ -500,9 +500,9 @@ namespace _01electronics_inventory
                         if (!maintenanceContract.ConfirmMaintOffer())
                             return;
 
-                    if (viewAddCondition != COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+                    if (viewAddCondition != COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
                     {
-                        viewAddCondition = COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION;
+                        viewAddCondition = COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION;
 
                         MaintenanceContractsWindow viewOffer = new MaintenanceContractsWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref maintenanceContract, viewAddCondition, true);
 
@@ -512,7 +512,7 @@ namespace _01electronics_inventory
                         viewOffer.Show();
                     }
                 }
-                else if (viewAddCondition == COMPANY_WORK_MACROS.OUTGOING_QUOTATION_REVISE_CONDITION)
+                else if (viewAddCondition == COMPANY_WORK_MACROS.QUOTATION_REVISE_CONDITION)
                 {
                     //if (!maintenanceContract.ReviseMaintContract())
                     //    return;
@@ -520,9 +520,9 @@ namespace _01electronics_inventory
                     if (!maintenanceContract.UpdateMaintContractInfo(maintContractsBasicInfoPage.oldMaintContract))
                         return;
 
-                    if (viewAddCondition != COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+                    if (viewAddCondition != COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
                     {
-                        viewAddCondition = COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION;
+                        viewAddCondition = COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION;
 
                         MaintenanceContractsWindow viewOffer = new MaintenanceContractsWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref maintenanceContract, viewAddCondition, true);
 
@@ -537,9 +537,9 @@ namespace _01electronics_inventory
                     if (!maintenanceContract.RenewMaintContract())
                         return;
 
-                    if (viewAddCondition != COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION)
+                    if (viewAddCondition != COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION)
                     {
-                        viewAddCondition = COMPANY_WORK_MACROS.OUTGOING_QUOTATION_VIEW_CONDITION;
+                        viewAddCondition = COMPANY_WORK_MACROS.QUOTATION_VIEW_CONDITION;
 
                         MaintenanceContractsWindow viewOffer = new MaintenanceContractsWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref maintenanceContract, viewAddCondition, true);
 
@@ -610,7 +610,7 @@ namespace _01electronics_inventory
                     TextBox firstRowSerialTextBox = firstRowGrid.Children[1] as TextBox;
 
                     firstRowSerialTextBox.IsEnabled = false;
-                    BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
+                    PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
                         (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == 1);
                     if (currentModelSerial2.model_serial_id != 0)
                         firstRowSerialTextBox.Text = currentModelSerial2.model_serial;
@@ -627,7 +627,7 @@ namespace _01electronics_inventory
                     Grid firstRowGrid = modelSerialGrid.Children[0] as Grid;
                     TextBox firstRowSerialTextBox = firstRowGrid.Children[1] as TextBox;
 
-                    BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
+                    PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
                         (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == 1);
 
                     firstRowSerialTextBox.Text = currentModelSerial2.model_serial;
@@ -680,7 +680,7 @@ namespace _01electronics_inventory
 
                         serialTextBox.IsEnabled = false;
 
-                        BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial = maintenanceContract.GetMaintContractModelsSerialsList().Find
+                        PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial = maintenanceContract.GetMaintContractModelsSerialsList().Find
                             (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == i + 1);
 
                         //serialLabel.Content = currentModelSerial.model_serial;
@@ -701,7 +701,7 @@ namespace _01electronics_inventory
                         //firstRowSerialLabel.Visibility = Visibility.Visible;
 
                         //firstRowSerialTextBox.IsEnabled = false;
-                        //BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
+                        //PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
                         //    (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == 1);
                         //
                         //firstRowSerialTextBox.Text = currentModelSerial2.model_serial;
@@ -709,7 +709,7 @@ namespace _01electronics_inventory
                     }
                     else if(viewAddCondition == COMPANY_WORK_MACROS.CONTRACT_EDIT_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.CONTRACT_RENEW_CONDITION)
                     {
-                        BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial = maintenanceContract.GetMaintContractModelsSerialsList().Find
+                        PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial = maintenanceContract.GetMaintContractModelsSerialsList().Find
                             (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == i + 1);
 
                         serialTextBox.Text = currentModelSerial.model_serial;
@@ -719,7 +719,7 @@ namespace _01electronics_inventory
                         //Grid firstRowGrid = modelSerialGrid.Children[0] as Grid;
                         //TextBox firstRowSerialTextBox = firstRowGrid.Children[1] as TextBox;
                         //
-                        //BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
+                        //PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentModelSerial2 = maintenanceContract.GetMaintContractModelsSerialsList().Find
                         //    (tmpSerial => tmpSerial.product_id == index + 1 && tmpSerial.model_serial_id == 1);
                         //
                         //firstRowSerialTextBox.Text = currentModelSerial2.model_serial;
@@ -738,7 +738,7 @@ namespace _01electronics_inventory
             {
                 Grid CurrentSerialGrid = currentGrid.Children[i] as Grid;
                 TextBox currentTextBox = CurrentSerialGrid.Children[1] as TextBox;
-                BASIC_STRUCTS.MODEL_SERIAL_STRUCT currentSerialItem = new BASIC_STRUCTS.MODEL_SERIAL_STRUCT();
+                PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT currentSerialItem = new PRODUCTS_STRUCTS.MODEL_SERIAL_STRUCT();
 
                 if (currentTextBox.Text == String.Empty || currentTextBox.Text == "NULL")
                 {

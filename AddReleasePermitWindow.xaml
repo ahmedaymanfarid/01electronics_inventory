@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_01electronics_inventory"
         mc:Ignorable="d"
-        Title="AddReleasePermitWindow" Height="450" Width="800">
+        Background="#EDEDED"
+        Title="Add New Release Permit" Height="730" Width="1200" MinWidth="700">
     <Grid>
         
         <Frame x:Name="frame" Content="" NavigationUIVisibility="Hidden"/>

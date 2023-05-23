@@ -27,7 +27,7 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        List<BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT> materialReleasePermits = new List<BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT>();
+        List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT> materialReleasePermits = new List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT>();
 
         Grid previousGrid = null;
 
@@ -118,17 +118,17 @@ namespace _01electronics_inventory
                 Grid.SetColumn(transactionDate, 0);
 
 
-                Label nickName = new Label();
-                nickName.Content = $"{materialReleasePermits[i].releaseByName}";
+                Label warehouseNiceName = new Label();
+                warehouseNiceName.Content = $"{materialReleasePermits[i].releaseByName}";
 
-                nickName.Style = (Style)FindResource("stackPanelItemBody");
-                nickName.HorizontalAlignment = HorizontalAlignment.Left;
+                warehouseNiceName.Style = (Style)FindResource("stackPanelItemBody");
+                warehouseNiceName.HorizontalAlignment = HorizontalAlignment.Left;
 
-                card.Children.Add(nickName);
+                card.Children.Add(warehouseNiceName);
 
-                Grid.SetRow(nickName, 2);
+                Grid.SetRow(warehouseNiceName, 2);
 
-                Grid.SetColumn(nickName, 0);
+                Grid.SetColumn(warehouseNiceName, 0);
 
 
                 StackPanel expand = new StackPanel();
@@ -228,14 +228,14 @@ namespace _01electronics_inventory
             Grid card = sender as Grid;
             Label serial = card.Children[0] as Label;
             Label transactionDate = card.Children[1] as Label;
-            Label nickName = card.Children[2] as Label;
+            Label warehouseNiceName = card.Children[2] as Label;
 
 
             BrushConverter brush = new BrushConverter();
             card.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
             serial.Foreground = Brushes.White;
             transactionDate.Foreground = Brushes.White;
-            nickName.Foreground = Brushes.White;
+            warehouseNiceName.Foreground = Brushes.White;
 
             previousGrid = card;
         }
@@ -257,7 +257,7 @@ namespace _01electronics_inventory
 
             materialReleasePermit.InitializeMaterialReleasePermit();
 
-            List<BASIC_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM> releaseItems = materialReleasePermit.GetReleaseItems();
+            List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM> releaseItems = materialReleasePermit.GetReleaseItems();
 
 
              addReleasePermitWindow = new AddReleasePermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, materialReleasePermit, true);
@@ -288,7 +288,7 @@ namespace _01electronics_inventory
                 addReleasePermitWindow.releasePermitPage.rfpChecked.IsChecked = true;
 
 
-                addReleasePermitWindow.releasePermitPage.rfpRequesters.SelectedItem = addReleasePermitWindow.releasePermitPage.requstersFiltered.FirstOrDefault(a => a.team_id == releaseItems[0].rfp_info.rfpRequestorTeam).employee_team;
+                addReleasePermitWindow.releasePermitPage.rfpRequesters.SelectedItem = addReleasePermitWindow.releasePermitPage.requstersFiltered.FirstOrDefault(a => a.requestor_team.team_id == releaseItems[0].rfp_info.rfpRequestorTeam).requestor_team.team_name;
                 addReleasePermitWindow.releasePermitPage.rfpSerials.SelectedItem = addReleasePermitWindow.releasePermitPage.rfps.FirstOrDefault(a => a.rfpSerial == releaseItems[0].rfp_info.rfpSerial).rfpID;
 
 
@@ -601,9 +601,9 @@ namespace _01electronics_inventory
                 ItemName.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
                 if (releaseItems[i].materialItemGenericCategory.category_name != "")
-                    ItemName.Text = $"{releaseItems[i].materialItemGenericCategory.category_name + "-" + releaseItems[i].materialitemGenericproduct.typeName + "-" + releaseItems[i].materialItemGenericBrand.brandName + "-" + releaseItems[i].materialItemGenericModel.modelName}";
+                    ItemName.Text = $"{releaseItems[i].materialItemGenericCategory.category_name + "-" + releaseItems[i].materialitemGenericproduct.product_name + "-" + releaseItems[i].materialItemGenericBrand.brand_name + "-" + releaseItems[i].materialItemGenericModel.model_name}";
                 else
-                    ItemName.Text = $"{releaseItems[i].materialItemcompanyCategory.category + "-" + releaseItems[i].materialitemCompanyproduct.typeName + "-" + releaseItems[i].materialItemCompanyBrand.brandName + "-" + releaseItems[i].materialItemCompanyModel.modelName}";
+                    ItemName.Text = $"{releaseItems[i].materialItemcompanyCategory.category_name + "-" + releaseItems[i].materialitemCompanyproduct.product_name + "-" + releaseItems[i].materialItemCompanyBrand.brand_name + "-" + releaseItems[i].materialItemCompanyModel.model_name}";
 
 
 
@@ -705,7 +705,7 @@ namespace _01electronics_inventory
                 //itemm.Children.Add(ReEntryCheckBox);
                 //itemm.Children.Add(recievalNoteCheckBox);
 
-                List<BASIC_STRUCTS.RELEASE_PERMIT_ITEM_STATUS> releasePermitStatuses = new List<BASIC_STRUCTS.RELEASE_PERMIT_ITEM_STATUS>();
+                List<BASIC_STRUCTS.STATUS_STRUCT> releasePermitStatuses = new List<BASIC_STRUCTS.STATUS_STRUCT>();
 
                 commonQueries.GetReleasePermitItemStatuses(ref releasePermitStatuses);
 
@@ -783,9 +783,9 @@ namespace _01electronics_inventory
 
 
                 if (releaseItems[i].materialItemGenericCategory.category_name != "")
-                    itemHeader.Text = $"{releaseItems[i].materialItemGenericCategory.category_name + "-" + releaseItems[i].materialitemGenericproduct.typeName + "-" + releaseItems[i].materialItemGenericBrand.brandName + "-" + releaseItems[i].materialItemGenericModel.modelName + " -" + releaseItems[i].entryPermit_product_serial_number}";
+                    itemHeader.Text = $"{releaseItems[i].materialItemGenericCategory.category_name + "-" + releaseItems[i].materialitemGenericproduct.product_name + "-" + releaseItems[i].materialItemGenericBrand.brand_name + "-" + releaseItems[i].materialItemGenericModel.model_name + " -" + releaseItems[i].entryPermit_product_serial_number}";
                 else
-                    itemHeader.Text = $"{releaseItems[i].materialItemcompanyCategory.category + "-" + releaseItems[i].materialitemCompanyproduct.typeName + "-" + releaseItems[i].materialItemCompanyBrand.brandName + "-" + releaseItems[i].materialItemCompanyModel.modelName + " -" + releaseItems[i].entryPermit_product_serial_number}";
+                    itemHeader.Text = $"{releaseItems[i].materialItemcompanyCategory.category_name + "-" + releaseItems[i].materialitemCompanyproduct.product_name + "-" + releaseItems[i].materialItemCompanyBrand.brand_name + "-" + releaseItems[i].materialItemCompanyModel.model_name + " -" + releaseItems[i].entryPermit_product_serial_number}";
 
                 itemHeader.Foreground = Brushes.White;
 
@@ -830,19 +830,19 @@ namespace _01electronics_inventory
 
 
 
-                    foreach (PROCUREMENT_STRUCTS.RFP_ITEM_MAPPING element in addReleasePermitWindow.releasePermitPage.rfpItems)
+                    foreach (PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItem in addReleasePermitWindow.releasePermitPage.rfpItems)
                     {
 
-                        if (element.rfpItem.company_category.category == "")
+                        if (rfpItem.product_category.category_name == "")
                         {
 
-                            rfpsItemsComboBox.Items.Add(element.rfpItem.generic_product_category.category_name + " ," + element.rfpItem.generic_product_type.product_name + " ," + element.rfpItem.generic_product_brand.brand_name + " ," + element.rfpItem.generic_product_model.model_name);
+                            rfpsItemsComboBox.Items.Add(rfpItem.product_category.category_name + " ," + rfpItem.product_type.product_name + " ," + rfpItem.product_brand.brand_name + " ," + rfpItem.product_model.model_name);
                         }
 
                         else
                         {
 
-                            rfpsItemsComboBox.Items.Add(element.rfpItem.company_category.category + " ," + element.rfpItem.company_product.typeName + " ," + element.rfpItem.company_brand.brandName + " ," + element.rfpItem.company_model.modelName);
+                            rfpsItemsComboBox.Items.Add(rfpItem.product_category.category_name + " ," + rfpItem.product_type.product_name + " ," + rfpItem.product_brand.brand_name + " ," + rfpItem.product_model.model_name);
                         }
                     }
 
@@ -850,7 +850,7 @@ namespace _01electronics_inventory
                     for (int m = 0; m < addReleasePermitWindow.releasePermitPage.rfpItems.Count; m++)
                     {
 
-                        if (addReleasePermitWindow.releasePermitPage.rfpItems[m].rfpItem.item_number == releaseItems[i].rfp_item_number)
+                        if (addReleasePermitWindow.releasePermitPage.rfpItems[m].rfp_item_number == releaseItems[i].rfp_item_number)
                         {
 
                             index = m;
@@ -926,7 +926,7 @@ namespace _01electronics_inventory
 
 
 
-                    COMPANY_WORK_MACROS.ORDER_PRODUCT_STRUCT[] products = addReleasePermitWindow.releasePermitPage.workOrder.GetOrderProductsList();
+                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] products = addReleasePermitWindow.releasePermitPage.workOrder.GetOrderProductsList();
 
 
                     ComboBox orderItemsComboBox = new ComboBox();
@@ -937,12 +937,12 @@ namespace _01electronics_inventory
 
                     for (int j = 0; j < products.Length; j++)
                     {
-                        orderItemsComboBox.Items.Add(products[j].productCategory.category + " ," + products[j].productType.typeName + " ," + products[j].productBrand.brandName + " ," + products[j].productModel.modelName);
+                        orderItemsComboBox.Items.Add(products[j].product_category.category_name + " ," + products[j].productType.product_name + " ," + products[j].productBrand.brand_name + " ," + products[j].productModel.model_name);
 
                     }
 
 
-                    orderItemsComboBox.SelectedItem = releaseItems[i].orderCategory.category + " ," + releaseItems[i].orderproduct.typeName + " ," + releaseItems[i].orderBrand.brandName + " ," + releaseItems[i].orderModel.modelName;
+                    orderItemsComboBox.SelectedItem = releaseItems[i].orderCategory.category_name + " ," + releaseItems[i].orderproduct.product_name + " ," + releaseItems[i].orderBrand.brand_name + " ," + releaseItems[i].orderModel.model_name;
 
                     ComboBox orderLocationsComboBox = new ComboBox();
                     orderLocationsComboBox.Style = (Style)FindResource("comboBoxStyle");

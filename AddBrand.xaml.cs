@@ -44,8 +44,8 @@ namespace _01electronics_inventory
 
         protected FTPServer ftpObject;
 
-        private List<COMPANY_WORK_MACROS.BRAND_STRUCT> brands = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-        private List<COMPANY_WORK_MACROS.BRAND_STRUCT> mbrandsList = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> mbrandsList = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
 
         protected String errorMessage;
 
@@ -86,7 +86,7 @@ namespace _01electronics_inventory
 
         ProgressBar progressBar = new ProgressBar();
 
-        public AddBrand(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref Brand pBrand, ref int mViewAddCondition, ref List<COMPANY_WORK_MACROS.BRAND_STRUCT> brandsList)
+        public AddBrand(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref Brand pBrand, ref int mViewAddCondition, ref List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> brandsList)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
@@ -122,7 +122,7 @@ namespace _01electronics_inventory
             {
                 editPictureButton.IsEnabled = true;
 
-                product.SetBrandName(brands[brands.FindIndex(brandItem => brandItem.brandId == product.GetBrandID())].brandName);
+                product.SetBrandName(brands[brands.FindIndex(brandItem => brandItem.brand_id == product.GetBrandID())].brand_name);
 
                 ContactProfileHeader.Content = "VIEW BRAND";
                 serverFileName = (String)product.GetBrandID().ToString() + ".jpg";
@@ -147,7 +147,7 @@ namespace _01electronics_inventory
             int index;
             for (int i = 0; i < mbrandsList.Count; i++)
             {
-                index = brands.FindIndex(x => x.brandId == mbrandsList[i].brandId);
+                index = brands.FindIndex(x => x.brand_id == mbrandsList[i].brand_id);
                 brands.Remove(brands[index]);
 
             }
@@ -165,10 +165,10 @@ namespace _01electronics_inventory
 
             if (viewAddCondition == COMPANY_WORK_MACROS.PRODUCT_VIEW_CONDITION)
             {
-                int index = brands.FindIndex(brandItem => brandItem.brandId == product.GetBrandID());
+                int index = brands.FindIndex(brandItem => brandItem.brand_id == product.GetBrandID());
 
 
-                BrandNameComboBox.SelectedIndex = brands.FindIndex(brandItem => brandItem.brandId == product.GetBrandID());
+                BrandNameComboBox.SelectedIndex = brands.FindIndex(brandItem => brandItem.brand_id == product.GetBrandID());
                 BrandNameLabel.Content = product.GetBrandName();
                 BrandNameComboBox.Visibility = Visibility.Collapsed;
                 BrandNameLabel.Visibility = Visibility.Visible;
@@ -193,7 +193,7 @@ namespace _01electronics_inventory
             if (viewAddCondition == COMPANY_WORK_MACROS.PRODUCT_ADD_CONDITION)
             {
                 product.SetBrandName(BrandNameComboBox.SelectedItem.ToString());
-                product.SetBrandID(brands[BrandNameComboBox.SelectedIndex].brandId);
+                product.SetBrandID(brands[BrandNameComboBox.SelectedIndex].brand_id);
                 product.AddBrandToProduct();
             }
 
@@ -272,7 +272,7 @@ namespace _01electronics_inventory
         private bool InitializeBrandsComboBox()
         {
             for (int i = 0; i < brands.Count; i++)
-                BrandNameComboBox.Items.Add(brands[i].brandName);
+                BrandNameComboBox.Items.Add(brands[i].brand_name);
 
             return true;
         }
@@ -907,7 +907,7 @@ namespace _01electronics_inventory
 
         private void BrandNameComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            product.SetBrandID(brands[BrandNameComboBox.SelectedIndex].brandId);
+            product.SetBrandID(brands[BrandNameComboBox.SelectedIndex].brand_id);
             wrapPanel.Children.Clear();
             uploadFilesStackPanel.Children.Clear();
 
@@ -920,7 +920,7 @@ namespace _01electronics_inventory
             try
             {
                 Image brandLogo = new Image();
-                //string src = String.Format(@"/01electronics_crm;component/photos/brands/" + brandsList[i].brandId + ".jpg
+                //string src = String.Format(@"/01electronics_crm;component/photos/brands/" + brandsList[i].brand_id + ".jpg
                 BitmapImage src = new BitmapImage();
                 src.BeginInit();
                 src.UriSource = new Uri(product.GetBrandPhotoLocalPath(), UriKind.Relative);
@@ -935,10 +935,10 @@ namespace _01electronics_inventory
 
 
 
-                //if(brandsList[i].brandId == 0)
+                //if(brandsList[i].brand_id == 0)
                 //{
                 //    Label othersLabel = new Label();
-                //    othersLabel.Content = brandsList[i].brandName;
+                //    othersLabel.Content = brandsList[i].brand_name;
                 //    othersLabel.Style = (Style)FindResource("tableHeaderItem");
                 //    gridI.Children.Add(othersLabel);
                 //}    
@@ -960,7 +960,7 @@ namespace _01electronics_inventory
                 //{
 
                 //    Image brandLogo = new Image();
-                //    //string src = String.Format(@"/01electronics_crm;component/photos/brands/" + brandsList[i].brandId + ".jpg
+                //    //string src = String.Format(@"/01electronics_crm;component/photos/brands/" + brandsList[i].brand_id + ".jpg
                 //    BitmapImage src = new BitmapImage();
                 //    src.BeginInit();
                 //    src.UriSource = new Uri(product.GetBrandPhotoLocalPath(), UriKind.Relative);
@@ -973,10 +973,10 @@ namespace _01electronics_inventory
                 //    //brandLogo.Margin = new Thickness(80, 100, 12, 12);
 
 
-                //    //if(brandsList[i].brandId == 0)
+                //    //if(brandsList[i].brand_id == 0)
                 //    //{
                 //    //    Label othersLabel = new Label();
-                //    //    othersLabel.Content = brandsList[i].brandName;
+                //    //    othersLabel.Content = brandsList[i].brand_name;
                 //    //    othersLabel.Style = (Style)FindResource("tableHeaderItem");
                 //    //    gridI.Children.Add(othersLabel);
                 //    //}    

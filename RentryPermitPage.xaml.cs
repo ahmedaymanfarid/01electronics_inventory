@@ -32,7 +32,7 @@ namespace _01electronics_inventory
 
         Expander previousExpander = null;
 
-        List<BASIC_STRUCTS.MATERIAL_RE_ENTRY_MINSTRUCT> reEntryPermits = new List<BASIC_STRUCTS.MATERIAL_RE_ENTRY_MINSTRUCT>();
+        List<INVENTORY_STRUCTS.MATERIAL_REENTRY_MIN_STRUCT> reEntryPermits = new List<INVENTORY_STRUCTS.MATERIAL_REENTRY_MIN_STRUCT>();
 
         public RentryPermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser)
         {
@@ -102,17 +102,17 @@ namespace _01electronics_inventory
                 Grid.SetColumn(transactionDate, 0);
 
 
-                Label nickName = new Label();
-                nickName.Content = $"{reEntryPermits[i].added_by_name}";
+                Label warehouseNiceName = new Label();
+                warehouseNiceName.Content = $"{reEntryPermits[i].added_by_name}";
 
-                nickName.Style = (Style)FindResource("stackPanelItemBody");
-                nickName.HorizontalAlignment = HorizontalAlignment.Left;
+                warehouseNiceName.Style = (Style)FindResource("stackPanelItemBody");
+                warehouseNiceName.HorizontalAlignment = HorizontalAlignment.Left;
 
-                card.Children.Add(nickName);
+                card.Children.Add(warehouseNiceName);
 
-                Grid.SetRow(nickName, 2);
+                Grid.SetRow(warehouseNiceName, 2);
 
-                Grid.SetColumn(nickName, 0);
+                Grid.SetColumn(warehouseNiceName, 0);
 
 
                 Label releasePermitIdLabel = new Label();
@@ -193,7 +193,7 @@ namespace _01electronics_inventory
             Grid card = sender as Grid;
             Label serial = card.Children[0] as Label;
             Label transactionDate = card.Children[1] as Label;
-            Label nickName = card.Children[2] as Label;
+            Label warehouseNiceName = card.Children[2] as Label;
             Label releasePermitId = card.Children[3] as Label;
 
 
@@ -202,7 +202,7 @@ namespace _01electronics_inventory
             card.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
             serial.Foreground = Brushes.White;
             transactionDate.Foreground = Brushes.White;
-            nickName.Foreground = Brushes.White;
+            warehouseNiceName.Foreground = Brushes.White;
             releasePermitId.Foreground = Brushes.White;
 
             previousGrid = card;

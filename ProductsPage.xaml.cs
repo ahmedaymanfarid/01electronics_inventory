@@ -32,7 +32,7 @@ namespace _01electronics_inventory
         protected FTPServer ftpServer;
 
         List<Image> productImages = new List<Image>();
-        private List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> products;
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> products;
         protected List<String> productSummaryPoints;
         
         protected Product selectedProduct;
@@ -55,7 +55,7 @@ namespace _01electronics_inventory
 
             InitializeComponent();
             
-            products = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
+            products = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
             productSummaryPoints = new List<string>();
             selectedProduct = mSelectedProduct;
 
@@ -103,7 +103,7 @@ namespace _01electronics_inventory
                 RowDefinition imageRow = new RowDefinition();
                 gridI.RowDefinitions.Add(imageRow);
 
-                selectedProduct.SetProductID(products[i].typeId);
+                selectedProduct.SetProductID(products[i].type_id);
 
                 Image productImage = new Image();
 
@@ -129,7 +129,7 @@ namespace _01electronics_inventory
 
                     border1.Height = 300;
                     border1.BorderBrush = (Brush)converter.ConvertFrom("#105A97");
-                    border1.Tag = products[i].typeId.ToString();
+                    border1.Tag = products[i].type_id.ToString();
                     border1.MouseLeftButtonDown += BorderMouseLeftButtonDown;
                     gridI.Children.Add(border1);
                     Grid.SetRow(border1, 0);
@@ -155,7 +155,7 @@ namespace _01electronics_inventory
                         BrushConverter converter = new BrushConverter();
                         border1.BorderBrush = (Brush)converter.ConvertFrom("#105A97");
                         border1.Background = (Brush)converter.ConvertFrom("#EDEDED");
-                        border1.Tag = products[i].typeId.ToString();
+                        border1.Tag = products[i].type_id.ToString();
                         border1.MouseLeftButtonDown += BorderMouseLeftButtonDown;
                         gridI.Children.Add(border1);
                         Grid.SetRow(border1, 0);
@@ -163,7 +163,7 @@ namespace _01electronics_inventory
                     }
                 }
 
-                productImage.Tag = products[i].typeId.ToString();
+                productImage.Tag = products[i].type_id.ToString();
                 productImage.Source = src;
                 productImage.HorizontalAlignment = HorizontalAlignment.Stretch;
                 productImage.VerticalAlignment = VerticalAlignment.Stretch;
@@ -179,7 +179,7 @@ namespace _01electronics_inventory
 
 
                 Expander expander = new Expander();
-                expander.Tag = products[i].typeId.ToString();
+                expander.Tag = products[i].type_id.ToString();
                 expander.ExpandDirection = ExpandDirection.Down;
                 expander.VerticalAlignment = VerticalAlignment.Top;
                 expander.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
@@ -233,7 +233,7 @@ namespace _01electronics_inventory
                 headerLabel.FontSize = 17;
                 headerLabel.FontWeight = FontWeights.Bold;
                 headerLabel.Padding = new Thickness(10);
-                headerLabel.Text = products[i].typeName;
+                headerLabel.Text = products[i].product_name;
 
                 Grid.SetRow(headerLabel, 0);
                 headerGrid.Children.Add(headerLabel);

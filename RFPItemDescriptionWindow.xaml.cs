@@ -26,23 +26,22 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT> companyProductCategoryList;
-        List<COMPANY_WORK_MACROS.PRODUCT_STRUCT> companyProductList;
-        List<COMPANY_WORK_MACROS.BRAND_STRUCT> companyProductBrandList;
-        List<COMPANY_WORK_MACROS.MODEL_STRUCT> companyProductModelList;
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> companyProductCategoryList;
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> companyProductList;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> companyProductBrandList;
+        List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> companyProductModelList;
 
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY> genericCategoryList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS> genericProductTypeList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND> genericProductBrandsList;
-        List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL> genericProductModelList;
+        List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> genericCategoryList;
+        List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> genericProductTypeList;
+        List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericProductBrandsList;
+        List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> genericProductModelList;
+
+        PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem;
 
         string description;
         RFP rfp;
-        int index;
-        PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT rfpItem;
-        bool edit = false;
-        bool view;
-        public RFPItemDescriptionWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRfp, ref PROCUREMENT_STRUCTS.RFPS_ITEMS_MIN_STRUCT mrfpItem, ref int indexx, ref bool view)
+
+        public RFPItemDescriptionWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRfp, ref PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT mrfpItem)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
@@ -51,21 +50,20 @@ namespace _01electronics_inventory
 
             InitializeComponent();
 
-            companyProductCategoryList = new List<COMPANY_WORK_MACROS.PRODUCT_CATEGORY_STRUCT>();
-            companyProductList = new List<COMPANY_WORK_MACROS.PRODUCT_STRUCT>();
-            companyProductBrandList = new List<COMPANY_WORK_MACROS.BRAND_STRUCT>();
-            companyProductModelList = new List<COMPANY_WORK_MACROS.MODEL_STRUCT>();
+            companyProductCategoryList = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            companyProductList = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            companyProductBrandList = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            companyProductModelList = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
 
-            genericCategoryList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_CATEGORY>();
-            genericProductTypeList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_PRODUCTS>();
-            genericProductBrandsList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_BRAND>();
-            genericProductModelList = new List<BASIC_STRUCTS.GENERIC_PRODUCTS_MODEL>();
+            genericCategoryList = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            genericProductTypeList = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
+            genericProductBrandsList = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
+            genericProductModelList = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
 
             rfp = mRfp;
             rfpItem = mrfpItem;
             description = string.Empty;
-            index = indexx;
-            this.view = view;
+            
             rfp.SetRFPRequestor(loggedInUser);
             InitializationFunction();
             CheckEditOrAdd();
@@ -73,55 +71,61 @@ namespace _01electronics_inventory
         private void CheckEditOrAdd()
         {
             DisableFunction();
-            if (rfpItem.company_model.modelName != "" && rfpItem.company_model.modelName != null && rfpItem.company_category.categoryId != 0)
+            
+            if (rfpItem.is_company_product)
             {
                 edit = true;
+                
                 mapCompanyProductCheckBox.IsChecked = true;
                 mapGenericProductCheckBox.IsChecked = false;
+
                 descriptionCheckBox.IsChecked = false;
+
                 categoryCompanyComboBox.Items.Clear();
                 FillCompanyProductCategoryComboBox();
+
                 categoryCompanyComboBox.IsEnabled = true;
                 typeCompanyComboBox.IsEnabled = true;
                 brandCompanyComboBox.IsEnabled = true;
                 modelCompanyTextBlock.IsEnabled = true;
+
                 for (int i = 0; i < companyProductCategoryList.Count; i++)
                 {
-                    if (rfpItem.company_category.categoryId == companyProductCategoryList[i].categoryId)
+                    if (rfpItem.product_category.category_id == companyProductCategoryList[i].category_id)
                     {
                         categoryCompanyComboBox.SelectedIndex = i;
                         break;
                     }
                 }
-                FillCompanyProductType(rfpItem.company_category.categoryId);
+                FillCompanyProductType(rfpItem.product_category.category_id);
                 for (int i = 0; i < companyProductList.Count; i++)
                 {
-                    if (rfpItem.company_product.typeId == companyProductList[i].typeId)
+                    if (rfpItem.product_type.type_id == companyProductList[i].type_id)
                     {
                         typeCompanyComboBox.SelectedIndex = i;
                         break;
                     }
                 }
-                FillCompanyProductBrand(rfpItem.company_product.typeId);
+                FillCompanyProductBrand(rfpItem.product_type.type_id);
                 for (int i = 0; i < companyProductBrandList.Count; i++)
                 {
-                    if (rfpItem.company_brand.brandId == companyProductBrandList[i].brandId)
+                    if (rfpItem.product_brand.brand_id == companyProductBrandList[i].brand_id)
                     {
                         brandCompanyComboBox.SelectedIndex = i;
                         break;
                     }
                 }
-                FillCompanyProductModel(rfpItem.company_product, rfpItem.company_brand);
+                FillCompanyProductModel(rfpItem.product_type, rfpItem.product_brand);
                 for (int i = 0; i < companyProductModelList.Count; i++)
                 {
-                    if (rfpItem.company_model.modelId == companyProductModelList[i].modelId)
+                    if (rfpItem.product_model.model_id == companyProductModelList[i].model_id)
                     {
                         modelCompanyTextBlock.SelectedIndex = i;
                         break;
                     }
                 }
             }
-            else if (rfpItem.generic_product_model.model_name != "" && rfpItem.generic_product_model.model_name != null && rfpItem.generic_product_category.category_id != 0)
+            else if (rfpItem.product_model.model_name != "" && rfpItem.product_model.model_name != null && rfpItem.product_category.category_id != 0)
             {
                 edit = true;
                 mapCompanyProductCheckBox.IsChecked = false;
@@ -135,34 +139,34 @@ namespace _01electronics_inventory
                 FillGenericCategory();
                 for (int i = 0; i < genericCategoryList.Count; i++)
                 {
-                    if (rfpItem.generic_product_category.category_id == genericCategoryList[i].category_id)
+                    if (rfpItem.product_category.category_id == genericCategoryList[i].category_id)
                     {
                         categoryComboBox.SelectedIndex = i;
                         break;
                     }
                 }
-                FillGenericType(rfpItem.generic_product_category.category_id);
+                FillGenericType(rfpItem.product_category.category_id);
                 for (int i = 0; i < genericProductTypeList.Count; i++)
                 {
-                    if (rfpItem.generic_product_type.product_id == genericProductTypeList[i].product_id)
+                    if (rfpItem.product_type.type_id == genericProductTypeList[i].type_id)
                     {
                         typeComboBox.SelectedIndex = i;
                         break;
                     }
                 }
-                FillGenericBrand(rfpItem.generic_product_category.category_id, rfpItem.generic_product_type.product_id);
+                FillGenericBrand(rfpItem.product_category.category_id, rfpItem.product_type.type_id);
                 for (int i = 0; i < genericProductBrandsList.Count; i++)
                 {
-                    if (rfpItem.generic_product_brand.brand_id == genericProductBrandsList[i].brand_id)
+                    if (rfpItem.product_brand.brand_id == genericProductBrandsList[i].brand_id)
                     {
                         brandComboBox.SelectedIndex = i;
                         break;
                     }
                 }
-                FillGenericModel(rfpItem.generic_product_category.category_id, rfpItem.generic_product_type.product_id, rfpItem.generic_product_brand.brand_id);
+                FillGenericModel(rfpItem.product_category.category_id, rfpItem.product_type.type_id, rfpItem.product_brand.brand_id);
                 for (int i = 0; i < genericProductModelList.Count; i++)
                 {
-                    if (rfpItem.generic_product_model.model_id == genericProductModelList[i].model_id)
+                    if (rfpItem.product_model.model_id == genericProductModelList[i].model_id)
                     {
                         modelTextBlock.SelectedIndex = i;
                         break;
@@ -202,13 +206,13 @@ namespace _01electronics_inventory
             {
                 for (int i = 0; i < companyProductCategoryList.Count; i++)
                 {
-                    categoryCompanyComboBox.Items.Add(companyProductCategoryList[i].category);
+                    categoryCompanyComboBox.Items.Add(companyProductCategoryList[i].category_name);
                 }
             }
         }
-        private void FillCompanyProductType(int categoryId)
+        private void FillCompanyProductType(int category_id)
         {
-            if (!commonQueries.GetCompanyProducts(ref companyProductList, categoryId))
+            if (!commonQueries.GetCompanyProducts(ref companyProductList, category_id))
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
@@ -217,13 +221,13 @@ namespace _01electronics_inventory
                 modelCompanyTextBlock.Items.Clear();
                 for (int i = 0; i < companyProductList.Count; i++)
                 {
-                    typeCompanyComboBox.Items.Add(companyProductList[i].typeName);
+                    typeCompanyComboBox.Items.Add(companyProductList[i].product_name);
                 }
             }
         }
-        private void FillCompanyProductBrand(int typeId)
+        private void FillCompanyProductBrand(int type_id)
         {
-            if (!commonQueries.GetProductBrands(typeId, ref companyProductBrandList))
+            if (!commonQueries.GetProductBrands(type_id, ref companyProductBrandList))
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
@@ -231,11 +235,11 @@ namespace _01electronics_inventory
                 modelCompanyTextBlock.Items.Clear();
                 for (int i = 0; i < companyProductBrandList.Count; i++)
                 {
-                    brandCompanyComboBox.Items.Add(companyProductBrandList[i].brandName);
+                    brandCompanyComboBox.Items.Add(companyProductBrandList[i].brand_name);
                 }
             }
         }
-        private void FillCompanyProductModel(COMPANY_WORK_MACROS.PRODUCT_STRUCT product, COMPANY_WORK_MACROS.BRAND_STRUCT brand)
+        private void FillCompanyProductModel(PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT product, PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT brand)
         {
             if (!commonQueries.GetCompanyModels(product, brand, ref companyProductModelList))
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
@@ -244,7 +248,7 @@ namespace _01electronics_inventory
                 modelCompanyTextBlock.Items.Clear();
                 for (int i = 0; i < companyProductModelList.Count; i++)
                 {
-                    modelCompanyTextBlock.Items.Add(companyProductModelList[i].modelName);
+                    modelCompanyTextBlock.Items.Add(companyProductModelList[i].model_name);
                 }
             }
         }
@@ -263,9 +267,9 @@ namespace _01electronics_inventory
                 }
             }
         }
-        private void FillGenericType(int categoryId)
+        private void FillGenericType(int category_id)
         {
-            if (!commonQueries.GetGenericProducts(ref genericProductTypeList, categoryId))
+            if (!commonQueries.GetGenericProducts(ref genericProductTypeList, category_id))
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
@@ -279,9 +283,9 @@ namespace _01electronics_inventory
             }
 
         }
-        private void FillGenericBrand(int categoryId, int typeId)
+        private void FillGenericBrand(int category_id, int type_id)
         {
-            if (!commonQueries.GetGenericProductBrands(typeId, categoryId, ref genericProductBrandsList))
+            if (!commonQueries.GetGenericProductBrands(type_id, category_id, ref genericProductBrandsList))
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
@@ -294,9 +298,9 @@ namespace _01electronics_inventory
                 }
             }
         }
-        private void FillGenericModel(int categoryId, int typeId, int brandId)
+        private void FillGenericModel(int category_id, int type_id, int brand_id)
         {
-            if (!commonQueries.GetGenericBrandModels(typeId, brandId, categoryId, ref genericProductModelList))
+            if (!commonQueries.GetGenericBrandModels(type_id, brand_id, category_id, ref genericProductModelList))
                 System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             else
             {
@@ -383,9 +387,9 @@ namespace _01electronics_inventory
                 typeComboBox.Items.Clear();
                 brandComboBox.Items.Clear();
                 modelTextBlock.Items.Clear();
-                int categoryId = genericCategoryList[categoryComboBox.SelectedIndex].category_id;
+                int category_id = genericCategoryList[categoryComboBox.SelectedIndex].category_id;
                 typeComboBox.IsEnabled = true;
-                FillGenericType(categoryId);
+                FillGenericType(category_id);
             }
         }
 
@@ -395,10 +399,10 @@ namespace _01electronics_inventory
             {
                 brandComboBox.Items.Clear();
                 modelTextBlock.Items.Clear();
-                int categoryId = genericCategoryList[categoryComboBox.SelectedIndex].category_id;
-                int typeId = genericProductTypeList[typeComboBox.SelectedIndex].product_id;
+                int category_id = genericCategoryList[categoryComboBox.SelectedIndex].category_id;
+                int type_id = genericProductTypeList[typeComboBox.SelectedIndex].type_id;
                 brandComboBox.IsEnabled = true;
-                FillGenericBrand(categoryId, typeId);
+                FillGenericBrand(category_id, type_id);
             }
         }
 
@@ -408,10 +412,10 @@ namespace _01electronics_inventory
             {
                 modelTextBlock.Items.Clear();
                 modelTextBlock.IsEnabled = true;
-                int categoryId = genericCategoryList[categoryComboBox.SelectedIndex].category_id;
-                int typeId = genericProductTypeList[typeComboBox.SelectedIndex].product_id;
-                int brandId = genericProductBrandsList[brandComboBox.SelectedIndex].brand_id;
-                FillGenericModel(categoryId, typeId, brandId);
+                int category_id = genericCategoryList[categoryComboBox.SelectedIndex].category_id;
+                int type_id = genericProductTypeList[typeComboBox.SelectedIndex].type_id;
+                int brand_id = genericProductBrandsList[brandComboBox.SelectedIndex].brand_id;
+                FillGenericModel(category_id, type_id, brand_id);
             }
         }
 
@@ -423,7 +427,7 @@ namespace _01electronics_inventory
                 brandCompanyComboBox.Items.Clear();
                 modelCompanyTextBlock.Items.Clear();
                 typeCompanyComboBox.IsEnabled = true;
-                int companCategoryId = companyProductCategoryList[categoryCompanyComboBox.SelectedIndex].categoryId;
+                int companCategoryId = companyProductCategoryList[categoryCompanyComboBox.SelectedIndex].category_id;
                 FillCompanyProductType(companCategoryId);
             }
         }
@@ -435,7 +439,7 @@ namespace _01electronics_inventory
                 brandCompanyComboBox.Items.Clear();
                 modelCompanyTextBlock.Items.Clear();
                 brandCompanyComboBox.IsEnabled = true;
-                int companyTypeId = companyProductList[typeCompanyComboBox.SelectedIndex].typeId;
+                int companyTypeId = companyProductList[typeCompanyComboBox.SelectedIndex].type_id;
                 FillCompanyProductBrand(companyTypeId);
             }
         }
@@ -515,23 +519,23 @@ namespace _01electronics_inventory
             {
                 if (modelCompanyTextBlock.SelectedIndex != -1)
                 {
-                    rfpItem.company_category = companyProductCategoryList[categoryCompanyComboBox.SelectedIndex];
-                    rfpItem.company_product = companyProductList[typeCompanyComboBox.SelectedIndex];
-                    rfpItem.company_brand = companyProductBrandList[brandCompanyComboBox.SelectedIndex];
-                    rfpItem.company_model = companyProductModelList[modelCompanyTextBlock.SelectedIndex];
-                    rfpItem.item_description = companyProductCategoryList[categoryCompanyComboBox.SelectedIndex].category + " - " +
-                                               companyProductList[typeCompanyComboBox.SelectedIndex].typeName + " - " +
-                                               companyProductBrandList[brandCompanyComboBox.SelectedIndex].brandName + " - " +
-                                               companyProductModelList[modelCompanyTextBlock.SelectedIndex].modelName;
+                    rfpItem.product_category = companyProductCategoryList[categoryCompanyComboBox.SelectedIndex];
+                    rfpItem.product_type = companyProductList[typeCompanyComboBox.SelectedIndex];
+                    rfpItem.product_brand = companyProductBrandList[brandCompanyComboBox.SelectedIndex];
+                    rfpItem.product_model = companyProductModelList[modelCompanyTextBlock.SelectedIndex];
+                    rfpItem.item_description = companyProductCategoryList[categoryCompanyComboBox.SelectedIndex].category_name + " - " +
+                                               companyProductList[typeCompanyComboBox.SelectedIndex].product_name + " - " +
+                                               companyProductBrandList[brandCompanyComboBox.SelectedIndex].brand_name + " - " +
+                                               companyProductModelList[modelCompanyTextBlock.SelectedIndex].model_name;
 
-                    rfpItem.generic_product_category.category_id = 0;
-                    rfpItem.generic_product_category.category_name = string.Empty;
-                    rfpItem.generic_product_type.product_id = 0;
-                    rfpItem.generic_product_type.product_name = string.Empty;
-                    rfpItem.generic_product_brand.brand_id = 0;
-                    rfpItem.generic_product_brand.brand_name = string.Empty;
-                    rfpItem.generic_product_model.model_id = 0;
-                    rfpItem.generic_product_model.model_name = string.Empty;
+                    rfpItem.product_category.category_id = 0;
+                    rfpItem.product_category.category_name = string.Empty;
+                    rfpItem.product_type.type_id = 0;
+                    rfpItem.product_type.product_name = string.Empty;
+                    rfpItem.product_brand.brand_id = 0;
+                    rfpItem.product_brand.brand_name = string.Empty;
+                    rfpItem.product_model.model_id = 0;
+                    rfpItem.product_model.model_name = string.Empty;
 
                     if (!edit)
                         rfp.AddRFPItem(rfpItem);
@@ -552,23 +556,23 @@ namespace _01electronics_inventory
             {
                 if (modelTextBlock.SelectedIndex != -1)
                 {
-                    rfpItem.generic_product_category = genericCategoryList[categoryComboBox.SelectedIndex];
-                    rfpItem.generic_product_type = genericProductTypeList[typeComboBox.SelectedIndex];
-                    rfpItem.generic_product_brand = genericProductBrandsList[brandComboBox.SelectedIndex];
-                    rfpItem.generic_product_model = genericProductModelList[modelTextBlock.SelectedIndex];
+                    rfpItem.product_category = genericCategoryList[categoryComboBox.SelectedIndex];
+                    rfpItem.product_type = genericProductTypeList[typeComboBox.SelectedIndex];
+                    rfpItem.product_brand = genericProductBrandsList[brandComboBox.SelectedIndex];
+                    rfpItem.product_model = genericProductModelList[modelTextBlock.SelectedIndex];
                     rfpItem.item_description = genericCategoryList[categoryComboBox.SelectedIndex].category_name + " - " +
                                                genericProductTypeList[typeComboBox.SelectedIndex].product_name + " - " +
                                                genericProductBrandsList[brandComboBox.SelectedIndex].brand_name + " - " +
                                                genericProductModelList[modelTextBlock.SelectedIndex].model_name;
 
-                    rfpItem.company_category.categoryId = 0;
-                    rfpItem.company_category.category = string.Empty;
-                    rfpItem.company_product.typeId = 0;
-                    rfpItem.company_product.typeName = string.Empty;
-                    rfpItem.company_brand.brandId = 0;
-                    rfpItem.company_brand.brandName = string.Empty;
-                    rfpItem.company_model.modelId = 0;
-                    rfpItem.company_model.modelName = string.Empty;
+                    rfpItem.product_category.category_id = 0;
+                    rfpItem.product_category.category_name = string.Empty;
+                    rfpItem.product_type.type_id = 0;
+                    rfpItem.product_type.product_name = string.Empty;
+                    rfpItem.product_brand.brand_id = 0;
+                    rfpItem.product_brand.brand_name = string.Empty;
+                    rfpItem.product_model.model_id = 0;
+                    rfpItem.product_model.model_name = string.Empty;
                     if (!edit)
 
                         rfp.AddRFPItem(rfpItem);
@@ -587,24 +591,24 @@ namespace _01electronics_inventory
             }
             else
             {
-                rfpItem.company_category.categoryId = 0;
-                rfpItem.company_category.category = string.Empty;
-                rfpItem.company_product.typeId = 0;
-                rfpItem.company_product.typeName = string.Empty;
-                rfpItem.company_brand.brandId = 0;
-                rfpItem.company_brand.brandName = string.Empty;
-                rfpItem.company_model.modelId = 0;
-                rfpItem.company_model.modelName = string.Empty;
+                rfpItem.product_category.category_id = 0;
+                rfpItem.product_category.category_name = string.Empty;
+                rfpItem.product_type.type_id = 0;
+                rfpItem.product_type.product_name = string.Empty;
+                rfpItem.product_brand.brand_id = 0;
+                rfpItem.product_brand.brand_name = string.Empty;
+                rfpItem.product_model.model_id = 0;
+                rfpItem.product_model.model_name = string.Empty;
                 rfpItem.item_description = descriptionTextBox.Text;
 
-                rfpItem.generic_product_category.category_id = 0;
-                rfpItem.generic_product_category.category_name = string.Empty;
-                rfpItem.generic_product_type.product_id = 0;
-                rfpItem.generic_product_type.product_name = string.Empty;
-                rfpItem.generic_product_brand.brand_id = 0;
-                rfpItem.generic_product_brand.brand_name = string.Empty;
-                rfpItem.generic_product_model.model_id = 0;
-                rfpItem.generic_product_model.model_name = string.Empty;
+                rfpItem.product_category.category_id = 0;
+                rfpItem.product_category.category_name = string.Empty;
+                rfpItem.product_type.type_id = 0;
+                rfpItem.product_type.product_name = string.Empty;
+                rfpItem.product_brand.brand_id = 0;
+                rfpItem.product_brand.brand_name = string.Empty;
+                rfpItem.product_model.model_id = 0;
+                rfpItem.product_model.model_name = string.Empty;
                 if (!edit)
 
                     rfp.AddRFPItem(rfpItem);
