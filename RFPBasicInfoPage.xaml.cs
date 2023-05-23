@@ -452,7 +452,7 @@ namespace _01electronics_inventory
             { return false; }
             for (int i = 0; i < rfp.rfpItems.Count; i++)
             {
-                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT foundItem = rfpMappedItems.Find(f => f.rfp_item_number == rfp.rfpItems[i].rfp_item_number);
+                PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT foundItem = rfpMappedItems.Find(f => f.rfp_item_number == rfp.rfpItems[i].rfp_item_number);
                 if (foundItem.rfp_item_number != 0)
                 {
                     PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();

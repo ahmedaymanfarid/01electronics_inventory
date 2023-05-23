@@ -74,7 +74,8 @@ namespace _01electronics_inventory
             
             if (rfpItem.is_company_product)
             {
-                edit = true;
+                //edit = true;
+                
                 
                 mapCompanyProductCheckBox.IsChecked = true;
                 mapGenericProductCheckBox.IsChecked = false;
@@ -127,7 +128,7 @@ namespace _01electronics_inventory
             }
             else if (rfpItem.product_model.model_name != "" && rfpItem.product_model.model_name != null && rfpItem.product_category.category_id != 0)
             {
-                edit = true;
+               // edit = true;
                 mapCompanyProductCheckBox.IsChecked = false;
                 mapGenericProductCheckBox.IsChecked = true;
                 descriptionCheckBox.IsChecked = false;
@@ -175,7 +176,7 @@ namespace _01electronics_inventory
             }
             else if (rfpItem.item_description != null)
             {
-                edit = true;
+                //edit = true;
                 mapCompanyProductCheckBox.IsChecked = false;
                 mapGenericProductCheckBox.IsChecked = false;
                 descriptionCheckBox.IsChecked = true;

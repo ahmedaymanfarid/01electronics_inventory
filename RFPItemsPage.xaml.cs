@@ -1269,8 +1269,8 @@ namespace _01electronics_inventory
                 if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                 {
                     PurchaseOrder purchaseOrder = new PurchaseOrder();
-                    if (!rfp.UpdateRfpItemMapping())
-                        return;
+                    ////if (!rfp.UpdateRfpItemMapping())
+                    ////    return;
                     if (!purchaseOrder.InitializeRFP(rfp.GetRFPRequestor().GetEmployeeTeamId(), rfp.GetRFPSerial(), rfp.GetRFPVersion()))
                         return;
                     if (!purchaseOrder.InitializeProcurementOfficer(loggedInUser.GetEmployeeId()))
@@ -1389,8 +1389,8 @@ namespace _01electronics_inventory
                     //}
                 }
 
-                if (!rfp.CheckRFPStatus())
-                    return;
+                //if (!rfp.CheckRFPStatus())
+                //    return;
             }
 
             NavigationWindow parentWindow = (NavigationWindow)this.Parent;
@@ -1470,7 +1470,7 @@ namespace _01electronics_inventory
 
         private void OnCloseRFPItemWindow(object sender, EventArgs e)
         {
-            if (view)
+            if (viewAddCondition==COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                 saveChangesButton.IsEnabled = true;
 
             Button addButton = (Button)mailObject;

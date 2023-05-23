@@ -394,7 +394,7 @@ namespace _01electronics_inventory
 
         private void BasicInfoLableMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            NavigationService.Navigate(addReleasePermitItemPage.addReleasePermitPage);
+           // NavigationService.Navigate(addReleasePermitItemPage.addReleasePermitPage);
         }
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)

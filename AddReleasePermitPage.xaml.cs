@@ -116,7 +116,7 @@ namespace _01electronics_inventory
         {
 
             materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
-            addReleasePermitItem.addReleasePermitPage = this;
+           // addReleasePermitItem.addReleasePermitPage = this;
 
             this.NavigationService.Navigate(addReleasePermitItem);
 
@@ -137,7 +137,7 @@ namespace _01electronics_inventory
             }
 
             materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
-            addReleasePermitItem.addReleasePermitPage = this;
+           // addReleasePermitItem.addReleasePermitPage = this;
             this.NavigationService.Navigate(addReleasePermitItem);
 
         }
@@ -178,7 +178,7 @@ namespace _01electronics_inventory
 
             if (parentWindow.isView == true)
             {
-                addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
+               // addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
             }
 
 
@@ -200,7 +200,7 @@ namespace _01electronics_inventory
             addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
 
             if (parentWindow.isView == true) {
-                addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
+                //addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
             }
         }
 
@@ -319,7 +319,7 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < rfpItems.Count; i++) {
 
-                if (rfpItems[i].rfpItem.status_name.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].rfpItem.status_name.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK) {
+                if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK) {
 
                     rfpItems.Remove(rfpItems[i]);
                     i--;
@@ -331,10 +331,10 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < rfpItems.Count; i++) {
 
-                if (rfpItems[i].rfpItem.company_model.model_name != "")
+                if (rfpItems[i].product_model.model_name != "")
                 {
 
-                    if (rfpItems[i].rfpItem.company_model.has_serial_number == true)
+                    if (rfpItems[i].product_model.has_serial_number == true)
                     {
 
 
@@ -358,7 +358,7 @@ namespace _01electronics_inventory
                 {
 
 
-                    if (rfpItems[i].rfpItem.product_model.has_serial_number == true)
+                    if (rfpItems[i].product_model.has_serial_number == true)
                     {
 
 

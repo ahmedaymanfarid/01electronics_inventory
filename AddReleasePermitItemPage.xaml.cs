@@ -28,30 +28,30 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        //MaintenanceContract maintenanceContract = new MaintenanceContract();
+        MaintenanceContract maintenanceContract;
 
         int itemsCounter=1;
         int numberOfSelectedItems = 0;
 
         AddReleasePermitWindow parentWindow;
 
-        List<string> Serials = new List<string>();
+        List<string> serials;
 
         private MaterialEntryPermit materialEntry;
         private AddReleasePermitPage addReleasePermitPage;
         private ReleasePermitUploadFilesPage ReleasePermitUploadFilesPage;
-        //private List<MaterialEntryPermit> entryPermits = new List<MaterialEntryPermit>();
+        private List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT> entryPermits;
 
 
-        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> genericCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
-        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> genericProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
-        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
-        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> genericModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
-        
-        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> companyCategories = new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
-        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> companyProducts = new List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT>();
-        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> companyBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
-        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> companyModels = new List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT>();
+        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> genericCategories;
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> genericProducts;
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands;
+        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> genericModels;
+
+        private List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT> companyCategories;
+        private List<PRODUCTS_STRUCTS.PRODUCT_TYPE_STRUCT> companyProducts;
+        private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> companyBrands;
+        private List<PRODUCTS_STRUCTS.PRODUCT_MODEL_STRUCT> companyModels;
 
         private List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT> workOrders;
 
@@ -62,6 +62,7 @@ namespace _01electronics_inventory
         private List<BASIC_STRUCTS.ADDRESS_STRUCT> companyProjectLocations;
 
         private List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT> specs;
+
 
         public AddReleasePermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddReleasePermitWindow mReleasePermitWindow)
         {
@@ -93,9 +94,11 @@ namespace _01electronics_inventory
             companyProjectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
             
             specs = new List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT>();
-
-
-            if (!commonQueries.InitializeMaterialEntryPermits(ref entryPermits))
+            genericCategories= new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
+            serials = new List<string>();
+            entryPermits= new List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT>();
+            maintenanceContract = new MaintenanceContract();
+            if (!commonQueries.GetEntryPermits(ref entryPermits))
                 return;
             
             parentWindow = mReleasePermitWindow;
@@ -652,13 +655,13 @@ namespace _01electronics_inventory
 
                 for (int i = 0; i < entryPermits.Count; i++)
                 {
-                    if (previousSerial == entryPermits[i].GetEntryPermitSerial())
+                    if (previousSerial == entryPermits[i].entry_permit_serial)
                         continue;
 
-                    previousSerial = entryPermits[i].GetEntryPermitSerial();
+                    previousSerial = entryPermits[i].entry_permit_serial;
 
 
-                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerial());
+                    materialEntry.SetEntryPermitSerialid(entryPermits[i].entry_permit_serial);
                     materialEntry.InitializeMaterialEntryPermit();
 
 
@@ -677,7 +680,7 @@ namespace _01electronics_inventory
                         if (genericProductComboBox.SelectedIndex != -1)
                         {
 
-                            if (genericProducts[genericProductComboBox.SelectedIndex].product_id != materialEntry.GetItems()[j].product_type.type_id)
+                            if (genericProducts[genericProductComboBox.SelectedIndex].type_id != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
                         }
 
@@ -708,7 +711,7 @@ namespace _01electronics_inventory
 
                         itemm.ShowGridLines = true;
 
-                        itemm.Tag = entryPermits[i].GetEntryPermitSerial().ToString()+" "+materialEntry.GetItems()[j].entry_permit_item_serial+" "+itemsCounter;
+                        itemm.Tag = entryPermits[i].entry_permit_serial.ToString()+" "+materialEntry.GetItems()[j].entry_permit_item_serial+" "+itemsCounter;
 
                         itemsCounter++;
 
@@ -877,13 +880,13 @@ namespace _01electronics_inventory
 
                 for (int i=0;i<entryPermits.Count;i++)
                 {
-                    if (previousSerial == entryPermits[i].GetEntryPermitSerial())
+                    if (previousSerial == entryPermits[i].entry_permit_serial)
                         continue;
 
-                    previousSerial = entryPermits[i].GetEntryPermitSerial();
+                    previousSerial = entryPermits[i].entry_permit_serial;
 
 
-                    materialEntry.SetEntryPermitSerialid(entryPermits[i].GetEntryPermitSerial());
+                    materialEntry.SetEntryPermitSerialid(entryPermits[i].entry_permit_serial);
                     materialEntry.InitializeMaterialEntryPermit();
 
 
@@ -935,7 +938,7 @@ namespace _01electronics_inventory
 
                         itemm.ShowGridLines = true;
 
-                        itemm.Tag = entryPermits[i].GetEntryPermitSerial().ToString()+ " " +materialEntry.GetItems()[j].entry_permit_item_serial+" "+ itemsCounter;
+                        itemm.Tag = entryPermits[i].entry_permit_serial.ToString()+ " " +materialEntry.GetItems()[j].entry_permit_item_serial+" "+ itemsCounter;
 
 
                         itemsCounter++;
@@ -2107,7 +2110,7 @@ namespace _01electronics_inventory
             if (genericBrandComboBox.SelectedIndex == -1)
                 return;
 
-            commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].product_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
+            commonQueries.GetGenericBrandModels(genericProducts[genericProductComboBox.SelectedIndex].type_id, genericBrands[genericBrandComboBox.SelectedIndex].brand_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericModels);
 
 
             genericModels.ForEach(a => genericModelComboBox.Items.Add(a.model_name));
@@ -2151,7 +2154,7 @@ namespace _01electronics_inventory
                 genericBrands.Clear();
 
 
-            commonQueries.GetGenericProductBrands(genericProducts[genericProductCombo.SelectedIndex].product_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
+            commonQueries.GetGenericProductBrands(genericProducts[genericProductCombo.SelectedIndex].type_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
 
 
             genericBrands.ForEach(a => genericBrandComboBox.Items.Add(a.brand_name));
@@ -2420,7 +2423,7 @@ namespace _01electronics_inventory
                 addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RFP_PENDING_SITE_RECEIVAL);
 
 
-            if (!addReleasePermitPage.materialReleasePermit.IssueNewMaterialRelease(ref Serials,ref addReleasePermitPage.rfpItems))
+            if (!addReleasePermitPage.materialReleasePermit.IssueNewMaterialRelease(ref serials,ref addReleasePermitPage.rfpItems))
                 return;
 
 
@@ -2459,7 +2462,7 @@ namespace _01electronics_inventory
 
             Grid itemsBody = scroll.Content as Grid;
 
-            Serials.Clear();
+            serials.Clear();
 
             int counter = 0;
 
@@ -2493,7 +2496,7 @@ namespace _01electronics_inventory
                     {
 
 
-                        Serials.Add(productSerialCheckBox.Content.ToString());
+                        serials.Add(productSerialCheckBox.Content.ToString());
 
 
                         releaseItem.release_permit_item_serial = counter;

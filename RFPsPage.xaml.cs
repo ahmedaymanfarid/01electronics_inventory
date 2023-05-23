@@ -541,7 +541,7 @@ namespace _01electronics_inventory
                 if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].status_id)
                     continue;
 
-                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.status_name.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
+                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
                     continue;
 
                 if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfps[i].work_form != workFormComboBox.SelectedIndex)
@@ -746,7 +746,7 @@ namespace _01electronics_inventory
                     itemsGrid.Children.Add(unit);
 
                     Label status = new Label();
-                    status.Content = rfps[i].rfps_items[j].status_name.status_name;
+                    status.Content = rfps[i].rfps_items[j].item_status.status_name;
                     status.Style = (Style)FindResource("tableSubItemLabel");
 
                     Grid.SetRow(status, currentItemRow);
@@ -837,7 +837,7 @@ namespace _01electronics_inventory
                 if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].status_id)
                     continue;
 
-                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.status_name.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
+                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
                     continue;
 
                 if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfps[i].work_form != filteredWorkFormList[workFormComboBox.SelectedIndex].work_form_id && rfps[i].work_form > 0 && rfps[i].work_form < 4)
@@ -924,7 +924,7 @@ namespace _01electronics_inventory
 
                 for (int j = 0; j < rfps[i].rfps_items.Count; j++)
                 {
-                    if (itemStatusCheckBox.IsChecked == true && rfps[i].rfps_items[j].status_name.status_id != rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id)
+                    if (itemStatusCheckBox.IsChecked == true && rfps[i].rfps_items[j].item_status.status_id != rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id)
                         continue;
 
                     if (counter == 0)
@@ -952,7 +952,7 @@ namespace _01electronics_inventory
 
                     Label rfpItemStatusLabel = new Label();
                     rfpItemStatusLabel.Style = (Style)FindResource("BorderIconItemTextLabel");
-                    rfpItemStatusLabel.Content = rfps[i].rfps_items[j].status_name.status_id;
+                    rfpItemStatusLabel.Content = rfps[i].rfps_items[j].item_status.status_id;
                     rfpItemStatusLabel.FontSize = 13;
 
                     Border itemBorderIcon = new Border();
@@ -962,28 +962,28 @@ namespace _01electronics_inventory
                     itemBorderIcon.CornerRadius = new CornerRadius(15);
                     itemBorderIcon.BorderThickness = new Thickness(1);
 
-                    if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
+                    if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD000"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD000"));
                     }
-                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_QUOTED)
+                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_QUOTED)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E03C00"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E03C00"));
                     }
-                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PO)
+                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PO)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C08"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C08"));
                     }
-                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA500"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA500"));
 
                     }
-                    else if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_AT_SITE)
+                    else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_SITE)
                     {
                         itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#008000"));
                         itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#008000"));
@@ -1013,7 +1013,7 @@ namespace _01electronics_inventory
                 {
                     if (rfps[i].rfp_status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                     {
-                        if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
+                        if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                         {
                             canEdit = true;
                             canDelete = true;
@@ -1037,7 +1037,7 @@ namespace _01electronics_inventory
                 {
                     if (rfps[i].rfp_status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED || rfps[i].rfp_status_id == COMPANY_WORK_MACROS.RFP_PENDING)
                     {
-                        if (rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_PENDING || rfps[i].rfps_items[j].status_name.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
+                        if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING || rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
                         {
 
                             canDelete = true;
@@ -2308,7 +2308,7 @@ namespace _01electronics_inventory
                     rfpItem.item_notes = selectedRfp.rfpItems[i].item_notes;
                     rfpItem.rfp_item_number = selectedRfp.rfpItems[i].rfp_item_number;
                     rfpItem.item_quantity = selectedRfp.rfpItems[i].item_quantity;
-                    rfpItem.status_name = selectedRfp.rfpItems[i].status_name;
+                    rfpItem.item_status = selectedRfp.rfpItems[i].item_status;
                     
                     
                     for (int j = 0; j < selectedRfp.rfpItems[i].item_vendors.Count; j++)
