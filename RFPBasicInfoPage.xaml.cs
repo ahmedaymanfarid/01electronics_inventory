@@ -84,7 +84,7 @@ namespace _01electronics_inventory
             InitializeContractIdCombo();
             InitializeProjectCombo();
             InitializeStockComboBox();
-            InitializeRFPItems(rfp.GetRFPSerial(), rfp.GetRFPVersion(), rfp.GetRFPRequestorTeamId());
+            //InitializeRFPItems(rfp.GetRFPSerial(), rfp.GetRFPVersion(), rfp.GetRFPRequestorTeamId());
 
             SetRequestorTeamComboBox();
             SetRequestorComboBox();
@@ -135,7 +135,7 @@ namespace _01electronics_inventory
                 contractSerialCombo.IsEnabled = false;
                 projectCheckBox.IsEnabled = false;
                 projectsCombo.IsEnabled = false;
-                //notesTextBox.IsReadOnly = true;
+                notesTextBox.IsReadOnly = true;
                 stockCheckBox.IsEnabled = false;
                 stockCombo.IsEnabled = false;
 

@@ -71,16 +71,22 @@
                         <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="200"/>
-                        <ColumnDefinition MinWidth="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Name="itemNoHeader" Style="{StaticResource tableSubHeaderItem}" Content="Item no."/>
                     <Label Grid.Column="1" Name="itemDescriptionHeader" Style="{StaticResource tableSubHeaderItem}" Content="Description"/>
                     <Label Grid.Column="2" Name="itemVendorsHeader" Style="{StaticResource tableSubHeaderItem}" Content="Brands"/>
                     <Label Grid.Column="3" Name="itemQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Quantity"/>
-                    <Label Grid.Column="4" Name="itemStatusHeader" Style="{StaticResource tableSubHeaderItem}" Content="Status"/>
-                    <Label Grid.Column="5" Name="itemNotesHeader" Style="{StaticResource tableSubHeaderItem}" Content="Notes"/>
-                    <CheckBox Grid.Column="6" Name="selectItemsCheckBox" Foreground="#FFFFFF" Style="{StaticResource miniCheckBoxStyle}" Content="Select All" Visibility="Collapsed" Checked="OnCheckSelectAllCheckBox" Unchecked="OnUnCheckSelectAllCheckBox"/>
+                    <Label Grid.Column="7" Name="itemStatusHeader" Style="{StaticResource tableSubHeaderItem}" Content="Status"/>
+                    <Label Grid.Column="8" Name="itemNotesHeader" Style="{StaticResource tableSubHeaderItem}" Content="Notes"/>
+                    <Label Grid.Column="4" Name="availableQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Available Quantity"/>
+                    <Label Grid.Column="5" Name="reservedQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Reserved Quantity"/>
+                    <Label Grid.Column="6" Name="serialsHeader" Style="{StaticResource tableSubHeaderItem}" Content="Serial Numbers"/>
+                    <CheckBox Grid.Column="9" Name="selectItemsCheckBox" Foreground="#FFFFFF" Style="{StaticResource miniCheckBoxStyle}" Content="Select All" Visibility="Collapsed" Checked="OnCheckSelectAllCheckBox" Unchecked="OnUnCheckSelectAllCheckBox"/>
 
                 </Grid>
 
@@ -97,13 +103,16 @@
                         <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
                         <ColumnDefinition />
 
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Style="{StaticResource miniLabelStyle}" Content="1-" />
 
-                    <Button  Grid.Column="1" Style="{StaticResource buttonStyle2}" Click="OnBtnClickAddDescription" x:Name="addButton" Tag="1">
+                    <Button  Grid.Column="1" Style="{StaticResource buttonStyle2}" Click="OnBtnClickAddDescriptionn" x:Name="addButton" Tag="1">
                         <TextBlock Text="ADD" TextWrapping="Wrap"/>
                     </Button>
 
@@ -132,8 +141,14 @@
                         <ComboBox Name="measureUnitsCombo" Style="{StaticResource filterComboBoxStyle}" SelectionChanged="OnSelChangedUnitComboBox"/>
                     </WrapPanel>
 
-                    <ComboBox Name="itemStatusCombo" Grid.Column="4" Style="{StaticResource miniComboBoxStyle}" IsEnabled="False"/>
-                    <TextBox Grid.Column="5" Style="{StaticResource miniTextBoxStyle}" TextWrapping="Wrap" TextChanged="OnTextChangedNotesTextBox"/>
+                    <ComboBox Name="itemStatusCombo" Grid.Column="7" Style="{StaticResource miniComboBoxStyle}" IsEnabled="False"/>
+                    <TextBox Grid.Column="8" Style="{StaticResource miniTextBoxStyle}" TextWrapping="Wrap" TextChanged="OnTextChangedNotesTextBox"/>
+                    <TextBox Grid.Column="4" Style="{StaticResource microTextBoxStyle}" x:Name="availableQuantityTextBox"  />
+
+                    <TextBox Grid.Column="5" Style="{StaticResource miniTextBoxStyle}" TextWrapping="Wrap" TextChanged="OnTextChangedReservedQuantity"/>
+                    <Button  Grid.Column="6" Style="{StaticResource buttonStyle2}" Click="OnBtnClickViewsSerials" x:Name="serialButton" Tag="1">
+                        <TextBlock Text="View Serials" TextWrapping="Wrap"/>
+                    </Button>
 
                 </Grid>
 

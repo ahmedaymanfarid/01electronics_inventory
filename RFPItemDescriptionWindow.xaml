@@ -106,7 +106,16 @@
                             </Border.Effect>
                             <WrapPanel Background="White" >
                                 <Label Style="{StaticResource labelStyleCard}" Content="Model *"/>
-                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="modelCompanyTextBlock"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="modelCompanyTextBlock" SelectionChanged="OnSelChangedModelCompanyTextBlock"/>
+                            </WrapPanel>
+                        </Border>
+                        <Border Style="{StaticResource borderCard}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                            </Border.Effect>
+                            <WrapPanel Background="White" >
+                                <Label Style="{StaticResource labelStyleCard}" Content="Specs *"/>
+                                <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="specsComboBox"/>
                             </WrapPanel>
                         </Border>
                     </WrapPanel>

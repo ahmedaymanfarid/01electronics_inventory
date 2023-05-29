@@ -121,6 +121,9 @@
     <Compile Include="ReservationsPage.xaml.cs" />
     <Compile Include="RFPBasicInfoPage.xaml.cs" />
     <Compile Include="RFPItemDescriptionWindow.xaml.cs" />
+    <Compile Include="RFPItemSerialsWindow.xaml.cs">
+      <DependentUpon>RFPItemSerialsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RFPItemsPage.xaml.cs" />
     <Compile Include="RFPsPage.xaml.cs" />
     <Compile Include="RFPUploadFilesPage.xaml.cs" />
@@ -401,6 +404,10 @@
     <Page Include="RFPItemDescriptionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RFPItemSerialsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RFPItemsPage.xaml">
       <Generator>MSBuild:Compile</Generator>

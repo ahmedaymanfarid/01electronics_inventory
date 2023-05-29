@@ -302,7 +302,7 @@ namespace _01electronics_inventory
                     
                     if (!selectedRFP.InitializeRFP(rfps[rfpSerialComboBox.SelectedIndex].rfpRequestorTeam, rfps[rfpSerialComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialComboBox.SelectedIndex].rfpVersion))
                         return;
-                    selectedRFP.GetRFPItemList(ref selectedRFPItems);
+                    selectedRFP.GetRFPItemList();
 
                     materialReservation.SetRfpRequseterTeamId(rfps[rfpSerialComboBox.SelectedIndex].rfpRequestorTeam);
                     materialReservation.SetRfpSerial(rfps[rfpSerialComboBox.SelectedIndex].rfpSerial);

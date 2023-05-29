@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -34,18 +35,18 @@ namespace _01electronics_inventory
         List<string> emailTo;
         List<string> emailCC;
         private int itemNumber = 2;
-
+        private Object obj;
         public RFPBasicInfoPage basicInfoPage;
 
         private List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT> genericBrands;
         private List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT> measureUnits;
         private List<BASIC_STRUCTS.STATUS_STRUCT> rfpItemsStatus;
         private List<RFP_ITEM_MAX_STRUCT> oldRFPsItemsList;
-
+        private List<string> selectedSerials;
         private RFP rfp;
 
         private Object mailObject;
-
+        private Object viewSerialsButton;
         private int viewAddCondition;
         bool uncheckAll = true;
         
@@ -54,6 +55,13 @@ namespace _01electronics_inventory
 
         public RFPBasicInfoPage rfpBasicInfoPage;
         public RFPUploadFilesPage rfpUploadFilesPage;
+
+        Stock stock;
+        List<List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>> stockAvailableItemsListOfList;
+        MaterialReservation reservation;
+        private INVENTORY_STRUCTS.RESERVATION_RFP_MIN_STRUCT rfpInfo;
+        List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> reservedRFPSerialNumber;
+        int serialCounter;
 
         public RFPItemsPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRFP, ref int mViewAddCondition)
         {
@@ -75,16 +83,21 @@ namespace _01electronics_inventory
             
             emailTo = new List<string>();
             emailCC = new List<string>();
-
+            selectedSerials = new List<string>();
             genericBrands = new List<PRODUCTS_STRUCTS.PRODUCT_BRAND_STRUCT>();
             measureUnits = new List<PROCUREMENT_STRUCTS.MEASURE_UNITS_STRUCT>();
             rfpItemsStatus = new List<BASIC_STRUCTS.STATUS_STRUCT>();
-            
+            viewSerialsButton = new Object();
             oldRFPsItemsList = new List<RFP_ITEM_MAX_STRUCT>();
             rfpItem = new RFP_ITEM_MAX_STRUCT();
+            obj = new Object();
+            stock = new Stock();
+            stockAvailableItemsListOfList = new List<List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>>();
+            reservation = new MaterialReservation();
+            rfpInfo = new INVENTORY_STRUCTS.RESERVATION_RFP_MIN_STRUCT();
+            reservedRFPSerialNumber = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
 
-  
-            InitializeVendors();
+           
             InitializeMeasureUnits();
             InitializeRFPsItemsStatus();
 
@@ -149,179 +162,183 @@ namespace _01electronics_inventory
             }
 
         }
-        private void InitializeItemsGrid()
-        {
-            itemsGrid.Children.Clear();
-            //itemsGrid.RowDefinitions.Clear();
-
-            itemNumber = rfp.rfpItems.Count;
-
-            for (int j = itemsGrid.RowDefinitions.Count(); j > 1; j--)
+   
+            private void InitializeItemsGrid()
             {
-                itemsGrid.RowDefinitions.RemoveAt(itemsGrid.RowDefinitions.Count - 1);
-            }
+                itemsGrid.Children.Clear();
+                //itemsGrid.RowDefinitions.Clear();
 
-            //itemsGrid.RowDefinitions.Add(new RowDefinition());
+                itemNumber = rfp.rfpItems.Count;
 
-            itemsGrid.Children.Add(itemsHeaderGrid);
-            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-            {
-                selectItemsCheckBox.Visibility = Visibility.Visible;
-            }
-
-
-            if (rfp.rfpItems.Count == 0 && viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
-            {
-                Grid tempGrid = new Grid();
-                Image addRowImage = new Image();
-                addRowImage.Source = new BitmapImage(new Uri(@"Icons\add_row_icon.jpg", UriKind.Relative));
-                addRowImage.HorizontalAlignment = HorizontalAlignment.Center;
-                addRowImage.VerticalAlignment = VerticalAlignment.Center;
-                addRowImage.Height = 40;
-                addRowImage.Width = 40;
-                addRowImage.MouseLeftButtonDown += OnClickAddRowImage;
-
-                tempGrid.Children.Add(addRowImage);
-
-                itemsGrid.Children.Add(tempGrid);
-                itemsGrid.RowDefinitions.Add(new RowDefinition());
-                Grid.SetRow(tempGrid, itemsGrid.RowDefinitions.Count - 1);
-            }
-
-            else
-            {
-                for (int i = 0; i < rfp.rfpItems.Count(); i++)
+                for (int j = itemsGrid.RowDefinitions.Count(); j > 1; j--)
                 {
-                    ///////////////////////// copy items //////////////////////////////////
-                    RFP_ITEM_MAX_STRUCT oldItem = new RFP_ITEM_MAX_STRUCT();
-                    oldItem.Copy(rfp.rfpItems[i]);
-                    oldRFPsItemsList.Add(oldItem);
-                    ////////////////////////////////////////////////////////////////////////
+                    itemsGrid.RowDefinitions.RemoveAt(itemsGrid.RowDefinitions.Count - 1);
+                }
+
+                //itemsGrid.RowDefinitions.Add(new RowDefinition());
+
+                itemsGrid.Children.Add(itemsHeaderGrid);
+                if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                {
+                    selectItemsCheckBox.Visibility = Visibility.Visible;
+                }
 
 
+                if (rfp.rfpItems.Count == 0 && viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                {
+                    Grid tempGrid = new Grid();
+                    Image addRowImage = new Image();
+                    addRowImage.Source = new BitmapImage(new Uri(@"Icons\add_row_icon.jpg", UriKind.Relative));
+                    addRowImage.HorizontalAlignment = HorizontalAlignment.Center;
+                    addRowImage.VerticalAlignment = VerticalAlignment.Center;
+                    addRowImage.Height = 40;
+                    addRowImage.Width = 40;
+                    addRowImage.MouseLeftButtonDown += OnClickAddRowImage;
+                    addRowImage.Visibility=Visibility.Collapsed;
+                    tempGrid.Children.Add(addRowImage);
+
+                    itemsGrid.Children.Add(tempGrid);
                     itemsGrid.RowDefinitions.Add(new RowDefinition());
+                    Grid.SetRow(tempGrid, itemsGrid.RowDefinitions.Count - 1);
+                }
 
-                    Grid subGrid = new Grid();
-                    subGrid.ShowGridLines = true;
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(75) });
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(250) });
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(250) });
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
-                    subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
-
-
-
-                    Label itemNumberLabel = new Label();
-                    itemNumberLabel.Content = rfp.rfpItems[i].rfp_item_number + "-";
-                    itemNumberLabel.Style = (Style)FindResource("miniLabelStyle");
-
-                    subGrid.Children.Add(itemNumberLabel);
-                    Grid.SetColumn(itemNumberLabel, 0);
-
-                    Button editButton = new Button();
-                    TextBlock description = new TextBlock();
-                    //description.Text = rfp.rfpItems[index].item_description;
-                    description.Text = rfp.rfpItems[i].item_description;
-                    description.TextWrapping = TextWrapping.Wrap;
-                    description.FontSize = 16;
-
-                    editButton.Style = (Style)FindResource("buttonStyle2");
-                    editButton.Content = description;
-                    editButton.Click += OnBtnClickAddDescriptionn;
-                    editButton.Tag = rfp.rfpItems[i].rfp_item_number;
-                    editButton.FontSize = 16;
-
-                    TextBox descriptionTextBox = new TextBox();
-                    descriptionTextBox.Style = (Style)FindResource("miniTextBoxStyle");
-                    descriptionTextBox.TextWrapping = TextWrapping.Wrap;
-                    descriptionTextBox.Visibility = Visibility.Collapsed;
-
-                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                        descriptionTextBox.IsReadOnly = true;
-                    else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
+                else
+                {
+                    for (int i = 0; i < rfp.rfpItems.Count(); i++)
                     {
-                        descriptionTextBox.IsReadOnly = true;
-                    }
+                        ///////////////////////// copy items //////////////////////////////////
+                        PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT oldItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
+                        oldItem.Copy(rfp.rfpItems[i]);
+                        oldRFPsItemsList.Add(oldItem);
+                        ////////////////////////////////////////////////////////////////////////
 
-                    //descriptionTextBox.Text = rfp.rfpItems[i].item_description;
-                    subGrid.Children.Add(editButton);
-                    Grid.SetColumn(editButton, 1);
 
-                    subGrid.Children.Add(descriptionTextBox);
-                    Grid.SetColumn(descriptionTextBox, 1);
+                        itemsGrid.RowDefinitions.Add(new RowDefinition());
 
-                    Grid vendorsGrid = new Grid();
+                        Grid subGrid = new Grid();
+                        subGrid.ShowGridLines = true;
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(75) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(250) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(250) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                        subGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
 
-                    for (int k = 0; k < rfp.rfpItems[i].item_vendors.Count; k++)
-                    {
 
-                        //VENDOR_MIN_STRUCT oldBrand = new VENDOR_MIN_STRUCT();
-                        //oldBrand.vendor_id = rfp.rfpItems[i].item_vendors[k].vendor_id;
-                        //oldBrand.vendor_name = rfp.rfpItems[i].item_vendors[k].vendor_name;
-                        //oldRFPsItemsList[i].item_vendors.Add(oldBrand);
 
-                        vendorsGrid.RowDefinitions.Add(new RowDefinition());
+                        Label itemNumberLabel = new Label();
+                        itemNumberLabel.Content = rfp.rfpItems[i].rfp_item_number + "-";
+                        itemNumberLabel.Style = (Style)FindResource("miniLabelStyle");
 
-                        Grid innerGrid = new Grid();
-                        innerGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                        innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
-                        innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+                        subGrid.Children.Add(itemNumberLabel);
+                        Grid.SetColumn(itemNumberLabel, 0);
 
-                        ComboBox vendorComboBox = new ComboBox();
-                        vendorComboBox.Style = (Style)FindResource("miniComboBoxStyle");
+                        Button editButton = new Button();
+                        TextBlock description = new TextBlock();
+                        //description.Text = rfp.rfpItems[index].item_description;
+                        description.Text = rfp.rfpItems[i].item_description;
+                        description.TextWrapping = TextWrapping.Wrap;
+                        description.FontSize = 16;
+
+                        editButton.Style = (Style)FindResource("buttonStyle2");
+                        editButton.Content = description;
+                        editButton.Click += OnBtnClickAddDescriptionn;
+                        editButton.Tag = rfp.rfpItems[i].rfp_item_number;
+                        editButton.FontSize = 16;
+
+                        TextBox descriptionTextBox = new TextBox();
+                        descriptionTextBox.Style = (Style)FindResource("miniTextBoxStyle");
+                        descriptionTextBox.TextWrapping = TextWrapping.Wrap;
+                        descriptionTextBox.Visibility = Visibility.Collapsed;
 
                         if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                            vendorComboBox.IsEnabled = false;
+                            descriptionTextBox.IsReadOnly = true;
                         else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
                         {
-                            vendorComboBox.IsEnabled = false;
-                        }
-                        FillVendorsCombo(ref vendorComboBox);
-                        //vendorComboBox.SelectedIndex = genericBrands.FindIndex(x1 => x1.vendor_id == rfp.rfpItems[i].item_vendors[k].vendor_id);
-                        vendorComboBox.SelectedItem = rfp.rfpItems[i].item_vendors[k].vendor_name;
-
-                        innerGrid.Children.Add(vendorComboBox);
-                        Grid.SetColumn(vendorComboBox, 0);
-
-                        if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && k == rfp.rfpItems[i].item_vendors.Count - 1)
-                        {
-                            // if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
-                            // {
-                            Image addVendorImage = new Image();
-                            addVendorImage.Source = new BitmapImage(new Uri(@"Icons\plus_icon.jpg", UriKind.Relative));
-                            addVendorImage.Height = 20;
-                            addVendorImage.Width = 20;
-                            addVendorImage.MouseLeftButtonDown += OnClickAddVendor;
-
-                            innerGrid.Children.Add(addVendorImage);
-                            Grid.SetColumn(addVendorImage, 2);
-                            // }
+                            descriptionTextBox.IsReadOnly = true;
                         }
 
-                        if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                        //descriptionTextBox.Text = rfp.rfpItems[i].item_description;
+                        subGrid.Children.Add(editButton);
+                        Grid.SetColumn(editButton, 1);
+
+                        //subGrid.Children.Add(descriptionTextBox);
+                        Grid.SetColumn(descriptionTextBox, 1);
+
+                        Grid vendorsGrid = new Grid();
+
+                        for (int k = 0; k < rfp.rfpItems[i].item_vendors.Count; k++)
                         {
-                            if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+
+                            //VENDOR_MIN_STRUCT oldBrand = new VENDOR_MIN_STRUCT();
+                            //oldBrand.vendor_id = rfp.rfpItems[i].item_vendors[k].vendor_id;
+                            //oldBrand.vendor_name = rfp.rfpItems[i].item_vendors[k].vendor_name;
+                            //oldRFPsItemsList[i].item_vendors.Add(oldBrand);
+
+                            vendorsGrid.RowDefinitions.Add(new RowDefinition());
+
+                            Grid innerGrid = new Grid();
+                            innerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                            innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+                            innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+
+                            ComboBox vendorComboBox = new ComboBox();
+                            vendorComboBox.Style = (Style)FindResource("miniComboBoxStyle");
+
+                            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                                vendorComboBox.IsEnabled = false;
+                            else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID||loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID))
                             {
-                                Image removeVendorImage = new Image();
-                                removeVendorImage.Source = new BitmapImage(new Uri(@"Icons\red_cross_icon.jpg", UriKind.Relative));
-                                removeVendorImage.Height = 20;
-                                removeVendorImage.Width = 20;
-                                removeVendorImage.MouseLeftButtonDown += OnClickRemoveVendor;
-
-                                innerGrid.Children.Add(removeVendorImage);
-                                Grid.SetColumn(removeVendorImage, 1);
+                                vendorComboBox.IsEnabled = false;
                             }
+                            FillVendorsCombo(ref vendorComboBox);
+                            //vendorComboBox.SelectedIndex = genericBrands.FindIndex(x1 => x1.vendor_id == rfp.rfpItems[i].item_vendors[k].vendor_id);
+                            vendorComboBox.SelectedItem = rfp.rfpItems[i].item_vendors[k].vendor_name;
+
+                            innerGrid.Children.Add(vendorComboBox);
+                            Grid.SetColumn(vendorComboBox, 0);
+
+                            if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && k == rfp.rfpItems[i].item_vendors.Count - 1 || viewAddCondition != COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                            {
+                                // if (loggedinUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+                                // {
+                                Image addVendorImage = new Image();
+                                addVendorImage.Source = new BitmapImage(new Uri(@"Icons\plus_icon.jpg", UriKind.Relative));
+                                addVendorImage.Height = 20;
+                                addVendorImage.Width = 20;
+                                addVendorImage.MouseLeftButtonDown += OnClickAddVendor;
+
+                                innerGrid.Children.Add(addVendorImage);
+                                Grid.SetColumn(addVendorImage, 2);
+                                // }
+                            }
+
+                            if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition != COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                            {
+                                if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+                                {
+                                    Image removeVendorImage = new Image();
+                                    removeVendorImage.Source = new BitmapImage(new Uri(@"Icons\red_cross_icon.jpg", UriKind.Relative));
+                                    removeVendorImage.Height = 20;
+                                    removeVendorImage.Width = 20;
+                                    removeVendorImage.MouseLeftButtonDown += OnClickRemoveVendor;
+
+                                    innerGrid.Children.Add(removeVendorImage);
+                                    Grid.SetColumn(removeVendorImage, 1);
+                                }
+                            }
+
+                            vendorsGrid.Children.Add(innerGrid);
+                            Grid.SetRow(innerGrid, k);
                         }
-
-                        vendorsGrid.Children.Add(innerGrid);
-                        Grid.SetRow(innerGrid, k);
-                    }
-
-                    if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && rfp.rfpItems[i].item_vendors.Count == 0)
-                    {
-                        //if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+                    
+                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                        {
+                        //if (loggedinUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
                         //{
                         vendorsGrid.RowDefinitions.Add(new RowDefinition());
 
@@ -348,155 +365,183 @@ namespace _01electronics_inventory
                         Grid.SetColumn(addVendorImage, 2);
 
                         vendorsGrid.Children.Add(innerGrid);
-                        //}
-                    }
+                        addVendorImage.Visibility = Visibility.Collapsed;
+                        vendorComboBox.IsEnabled = false;
+                          
+                            //}
+                        }
 
-                    subGrid.Children.Add(vendorsGrid);
-                    Grid.SetColumn(vendorsGrid, 2);
+                        subGrid.Children.Add(vendorsGrid);
+                        Grid.SetColumn(vendorsGrid, 2);
 
-                    WrapPanel quantityWrapPanel = new WrapPanel();
-                    quantityWrapPanel.HorizontalAlignment = HorizontalAlignment.Center;
-                    quantityWrapPanel.VerticalAlignment = VerticalAlignment.Center;
+                        WrapPanel quantityWrapPanel = new WrapPanel();
+                        quantityWrapPanel.HorizontalAlignment = HorizontalAlignment.Center;
+                        quantityWrapPanel.VerticalAlignment = VerticalAlignment.Center;
 
-                    TextBox quantityTextBox = new TextBox();
-                    quantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                        TextBox quantityTextBox = new TextBox();
+                        quantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
 
-                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                        quantityTextBox.IsReadOnly = true;
-                    else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
-                    {
-                        quantityTextBox.IsReadOnly = true;
-                    }
-
-                    quantityTextBox.Text = rfp.rfpItems[i].item_quantity.ToString();
-
-                    ComboBox unitComboBox = new ComboBox();
-                    unitComboBox.Style = (Style)FindResource("filterComboBoxStyle");
-
-                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                        unitComboBox.IsEnabled = false;
-                    else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
-                    {
-                        unitComboBox.IsEnabled = false;
-                    }
-
-                    FillMeasureUnitsCombo(ref unitComboBox);
-                    //unitComboBox.SelectedIndex = measureUnits.FindIndex(x1 => x1.measure_unit_id == rfp.rfpItems[i].item_measure_unit_id);
-                    unitComboBox.SelectedItem = rfp.rfpItems[i].measure_unit;
-
-                    quantityWrapPanel.Children.Add(quantityTextBox);
-                    quantityWrapPanel.Children.Add(unitComboBox);
-
-                    subGrid.Children.Add(quantityWrapPanel);
-                    Grid.SetColumn(quantityWrapPanel, 3);
-
-                    ComboBox statusComboBox = new ComboBox();
-                    statusComboBox.Style = (Style)FindResource("miniComboBoxStyle");
-                    FillRFPsItemsStatusCombo(ref statusComboBox);
-
-                    statusComboBox.SelectedItem = rfp.rfpItems[i].item_status.status_name;
-                    statusComboBox.IsEnabled = false;
-
-                    subGrid.Children.Add(statusComboBox);
-                    Grid.SetColumn(statusComboBox, 4);
-
-                    TextBox notesTextBox = new TextBox();
-                    notesTextBox.Height = 70;
-                    notesTextBox.Style = (Style)FindResource("miniTextBoxStyle");
-                    notesTextBox.TextWrapping = TextWrapping.Wrap;
-                    notesTextBox.Text = rfp.rfpItems[i].item_notes;
-
-                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                        notesTextBox.IsReadOnly = true;
-                    else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
-                    {
-                        notesTextBox.IsReadOnly = true;
-                    }
-
-                    subGrid.Children.Add(notesTextBox);
-                    Grid.SetColumn(notesTextBox, 5);
-
-                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                    {
-                        if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
+                        if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                            quantityTextBox.IsReadOnly = true;
+                        else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION))
                         {
+                            quantityTextBox.IsReadOnly = true;
+                        }
+
+                        quantityTextBox.Text = rfp.rfpItems[i].item_quantity.ToString();
+
+                        ComboBox unitComboBox = new ComboBox();
+                        unitComboBox.Style = (Style)FindResource("filterComboBoxStyle");
+
+                        if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                            unitComboBox.IsEnabled = false;
+                        else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION))
+                        {
+                            unitComboBox.IsEnabled = false;
+                        }
+
+                        FillMeasureUnitsCombo(ref unitComboBox);
+                        //unitComboBox.SelectedIndex = measureUnits.FindIndex(x1 => x1.measure_unit_id == rfp.rfpItems[i].item_measure_unit_id);
+                        unitComboBox.SelectedItem = rfp.rfpItems[i].measure_unit;
+
+                        quantityWrapPanel.Children.Add(quantityTextBox);
+                        quantityWrapPanel.Children.Add(unitComboBox);
+
+                        subGrid.Children.Add(quantityWrapPanel);
+                        Grid.SetColumn(quantityWrapPanel, 3);
+
+                        ComboBox statusComboBox = new ComboBox();
+                        statusComboBox.Style = (Style)FindResource("miniComboBoxStyle");
+                        FillRFPsItemsStatusCombo(ref statusComboBox);
+
+                        statusComboBox.SelectedItem = rfp.rfpItems[i].item_status.status_name;
+                        statusComboBox.IsEnabled = false;
+
+                        subGrid.Children.Add(statusComboBox);
+                        Grid.SetColumn(statusComboBox, 7);
+
+                        TextBox notesTextBox = new TextBox();
+                        notesTextBox.Height = 70;
+                        notesTextBox.Style = (Style)FindResource("miniTextBoxStyle");
+                        notesTextBox.TextWrapping = TextWrapping.Wrap;
+                        notesTextBox.Text = rfp.rfpItems[i].item_notes;
+
+                        if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                            notesTextBox.IsReadOnly = true;
+                        else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
+                        {
+                            notesTextBox.IsReadOnly = true;
+                        }
+
+                        subGrid.Children.Add(notesTextBox);
+                        Grid.SetColumn(notesTextBox, 8);
+
+                        if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                        {
+                            // if (loggedinUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedinUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedinUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
+                            // {
                             CheckBox currentCheckBox = new CheckBox();
                             currentCheckBox.Style = (Style)FindResource("miniCheckBoxStyle");
                             currentCheckBox.Checked += OnCheckItemCheckBox;
                             currentCheckBox.Unchecked += OnUncheckItemCheckBox;
 
                             subGrid.Children.Add(currentCheckBox);
-                            Grid.SetColumn(currentCheckBox, subGrid.ColumnDefinitions.Count - 1);
-                        }
-                    }
+                            Grid.SetColumn(currentCheckBox, 9);
 
-                    if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                    {
-                        //if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
-                        //{
-                        if (i == 0)
+
+
+                            //  }
+                        }
+                        int availableQantity = 0;
+                        if (rfp.rfpItems[i].is_company_product)
                         {
-                            Image deleteIcon = new Image { Source = new BitmapImage(new Uri(@"Icons\red_cross_icon.jpg", UriKind.Relative)) };
-                            deleteIcon.Height = 40;
-                            deleteIcon.Width = 40;
-                            deleteIcon.Margin = new Thickness(10);
-                            deleteIcon.MouseLeftButtonDown += OnClickRemoveItem;
-                            deleteIcon.Visibility = Visibility.Collapsed;
-                            subGrid.Children.Add(deleteIcon);
-                            Grid.SetColumn(deleteIcon, 6);
+                            if (!stock.GetAvailableQuantityItem(rfp.rfpItems[i].product_category.category_id, rfp.rfpItems[i].product_type.type_id, rfp.rfpItems[i].product_brand.brand_id, rfp.rfpItems[i].product_model.model_id, rfp.rfpItems[i].product_specs.spec_id, false, ref availableQantity))
+                                return;
+                        }
+                        else if (rfp.rfpItems[i].product_category.category_id == 0 && rfp.rfpItems[i].product_category.category_name != null || rfp.rfpItems[i].product_category.category_id != 0)
+                        {
+                            if (!stock.GetAvailableQuantityItem(rfp.rfpItems[i].product_category.category_id, rfp.rfpItems[i].product_type.type_id, rfp.rfpItems[i].product_brand.brand_id, rfp.rfpItems[i].product_model.model_id, rfp.rfpItems[i].product_specs.spec_id, false, ref availableQantity))
+                                return;
+                        }
+                       
+                        TextBox availableQuantityLabel = new TextBox();
+                        availableQuantityLabel.Style = (Style)FindResource("microTextBoxStyle");
+                        availableQuantityLabel.Text = availableQantity.ToString();
+                        availableQuantityLabel.IsEnabled = false;
+                        subGrid.Children.Add(availableQuantityLabel);
+                        Grid.SetColumn(availableQuantityLabel, 4);
+
+                        TextBox reservredQuantity = new TextBox();
+                        reservredQuantity.Style = (Style)FindResource("miniTextBoxStyle");
+                        //reservredQuantity.TextChanged += OnTextChangedReservedQuantity;
+                        reservredQuantity.IsEnabled = false;
+                        subGrid.Children.Add(reservredQuantity);
+                        Grid.SetColumn(reservredQuantity, 5);
+                        InitializeRFPReserevedSerial(rfp.rfpItems[i].rfp_item_number);
+                        Button serialButton = new Button();
+                        serialButton.Tag = i;
+                        TextBlock viewSerial = new TextBlock();
+                        //description.Text = rfp.rfpItems[index].item_description;
+
+                        viewSerial.TextWrapping = TextWrapping.Wrap;
+                        viewSerial.FontSize = 16;
+                        if (reservedRFPSerialNumber.Count != 0)
+                        {
+                            for (int k = 0; k < reservedRFPSerialNumber.Count; k++)
+                            {
+                                viewSerial.Text += reservedRFPSerialNumber[k].serial_number + '\n';
+                            }
                         }
                         else
                         {
-                            Image deleteIcon = new Image { Source = new BitmapImage(new Uri(@"Icons\red_cross_icon.jpg", UriKind.Relative)) };
-                            deleteIcon.Height = 40;
-                            deleteIcon.Width = 40;
-                            deleteIcon.Margin = new Thickness(10);
-                            deleteIcon.MouseLeftButtonDown += OnClickRemoveItem;
-                            subGrid.Children.Add(deleteIcon);
-                            Grid.SetColumn(deleteIcon, 6);
+                            viewSerial.Text = "View Serials";
                         }
+                        reservredQuantity.Text = reservedRFPSerialNumber.Count.ToString();
+
+
+                        serialButton.Style = (Style)FindResource("buttonStyle2");
+                        serialButton.Content = viewSerial;
+                        serialButton.IsEnabled = false;
+                        serialButton.Click += OnBtnClickViewsSerials;
+                        subGrid.Children.Add(serialButton);
+                        Grid.SetColumn(serialButton, 6);
+
+
+                        if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                        {
+                            serialButton.IsEnabled = false;
+
+                        }
+
+                        // if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && i == rfp.rfpItems.Count() - 1)
+                        // {
+                        //
+                        //     Grid tempGrid = new Grid();
+                        //     Image addRowImage = new Image();
+                        //     addRowImage.Source = new BitmapImage(new Uri(@"Icons\add_row_icon.jpg", UriKind.Relative));
+                        //     addRowImage.HorizontalAlignment = HorizontalAlignment.Center;
+                        //     addRowImage.VerticalAlignment = VerticalAlignment.Center;
+                        //     addRowImage.Height = 40;
+                        //     addRowImage.Width = 40;
+                        //     addRowImage.MouseLeftButtonDown += OnClickAddRowImage;
+                        //
+                        //     tempGrid.Children.Add(addRowImage);
+                        //
+                        //     itemsGrid.Children.Add(tempGrid);
+                        //     itemsGrid.RowDefinitions.Add(new RowDefinition());
+                        //     Grid.SetRow(tempGrid, rfp.rfpItems[i].item_number + 1);
+                        //
                         // }
 
-                    }
-
-                    if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && i == rfp.rfpItems.Count() - 1)
-                    {
-
-                        Grid tempGrid = new Grid();
-                        Image addRowImage = new Image();
-                        addRowImage.Source = new BitmapImage(new Uri(@"Icons\add_row_icon.jpg", UriKind.Relative));
-                        addRowImage.HorizontalAlignment = HorizontalAlignment.Center;
-                        addRowImage.VerticalAlignment = VerticalAlignment.Center;
-                        addRowImage.Height = 40;
-                        addRowImage.Width = 40;
-                        addRowImage.MouseLeftButtonDown += OnClickAddRowImage;
-
-                        tempGrid.Children.Add(addRowImage);
-
-                        itemsGrid.Children.Add(tempGrid);
-                        itemsGrid.RowDefinitions.Add(new RowDefinition());
-                        Grid.SetRow(tempGrid, rfp.rfpItems[i].rfp_item_number + 1);
+                        itemsGrid.Children.Add(subGrid);
+                        Grid.SetRow(subGrid, rfp.rfpItems[i].rfp_item_number);
 
                     }
-
-                    itemsGrid.Children.Add(subGrid);
-                    Grid.SetRow(subGrid, rfp.rfpItems[i].rfp_item_number);
-
                 }
             }
-        }
-        private bool InitializeVendors()
-        {
-            if (!commonQueries.GetGenericBrands(ref genericBrands))
-                return false;
 
-            vendorsCombo.Items.Clear();
+        
 
-            for (int i = 0; i < genericBrands.Count; i++)
-                vendorsCombo.Items.Add(genericBrands[i].brand_name);
-
-            return true;
-        }
         private void FillVendorsCombo(ref ComboBox currentCombo)
         {
             currentCombo.Items.Clear();
@@ -587,7 +632,7 @@ namespace _01electronics_inventory
                             }
                             tempItem.item_description = textBlock.Text;
 
-                            Grid vendorsGrid = (Grid)currentGrid.Children[3];
+                            Grid vendorsGrid = (Grid)currentGrid.Children[2];
 
                             for (int i = 0; i < vendorsGrid.Children.Count; i++)
                             {
@@ -613,7 +658,7 @@ namespace _01electronics_inventory
 
                             }
 
-                            WrapPanel quantityUnitWrapPanel = (WrapPanel)currentGrid.Children[4];
+                            WrapPanel quantityUnitWrapPanel = (WrapPanel)currentGrid.Children[3];
                             TextBox quantityTextBox = (TextBox)quantityUnitWrapPanel.Children[0];
                             ComboBox unitCombo = (ComboBox)quantityUnitWrapPanel.Children[1];
 
@@ -635,11 +680,11 @@ namespace _01electronics_inventory
                             tempItem.measure_unit_id = measureUnits[unitCombo.SelectedIndex].measure_unit_id;
                             tempItem.measure_unit = measureUnits[unitCombo.SelectedIndex].measure_unit;
 
-                            ComboBox itemStatusCombo = (ComboBox)currentGrid.Children[5];
+                            ComboBox itemStatusCombo = (ComboBox)currentGrid.Children[4];
                             tempItem.item_status.status_id = rfpItemsStatus[itemStatusCombo.SelectedIndex].status_id;
                             tempItem.item_status.status_name = rfpItemsStatus[itemStatusCombo.SelectedIndex].status_name;
 
-                            TextBox notes = (TextBox)currentGrid.Children[6];
+                            TextBox notes = (TextBox)currentGrid.Children[5];
                             tempItem.item_notes = notes.Text;
                             tempItem.rfp_item_number = Int32.Parse(description.Tag.ToString());
                             rfp.rfpItems[j] = tempItem;
@@ -653,7 +698,11 @@ namespace _01electronics_inventory
             }
             return true;
         }
-
+        private void InitializeRFPReserevedSerial(int rfpItemNo)
+        {
+            if (!rfp.GetReservedSerialNumberRFP(rfpItemNo, ref reservedRFPSerialNumber))
+                return;
+        }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// BUTTON CLICKED HANDLERS
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1238,11 +1287,26 @@ namespace _01electronics_inventory
                 }
                 else if (viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
                 {
+                    rfpInfo.rfpSerial = rfp.GetRFPSerial();
+                    rfpInfo.rfpVersion = rfp.GetRFPVersion();
+                    rfpInfo.rfpRequestorTeam = rfp.GetRFPRequestorTeamId();
+                   
+
+                    reservation.SetRFPInfo(rfpInfo);
+                    reservation.SetReservationStatusId(COMPANY_WORK_MACROS.PENDING_RESERVATION);
+                    reservation.SetReservationDate(DateTime.Now);
+                    reservation.SetReservedBy(loggedInUser.GetEmployeeId());
                     if (!rfp.EditRfp())
                         return;
 
                     if (!rfp.EditRFPItems(ref oldRFPsItemsList))
                         return;
+
+                    for (int i = 0; i < stockAvailableItemsListOfList.Count; i++)
+                    {
+                        if (!reservation.IssueMultipleReservations(stockAvailableItemsListOfList[i]))
+                            return;
+                    }
 
                     emailTo.Clear();
                     emailCC.Clear();
@@ -1397,62 +1461,68 @@ namespace _01electronics_inventory
             parentWindow.Close();
         }
 
-        private void OnBtnClickAddDescription(object sender, RoutedEventArgs e)
-        {
-            Button addButtonn = (Button)sender;
-            int itemNo = Int32.Parse(addButtonn.Tag.ToString());
+        //private void OnBtnClickAddDescription(object sender, RoutedEventArgs e)
+        //{
+        //    Button addButtonn = (Button)sender;
+        //    int itemNo = Int32.Parse(addButtonn.Tag.ToString());
 
-            bool edit = false;
-            mailObject = null;
-            mailObject = (Object)addButtonn;
+        //    bool edit = false;
+        //    mailObject = null;
+        //    mailObject = (Object)addButtonn;
 
-            for (int i = 0; i < rfp.rfpItems.Count; i++)
-            {
-                if (rfp.rfpItems[i].rfp_item_number == itemNo)
-                {
-                    edit = true;
-                    break;
-                }
-            }
-            if (edit)
-            {
+        //    for (int i = 0; i < rfp.rfpItems.Count; i++)
+        //    {
+        //        if (rfp.rfpItems[i].rfp_item_number == itemNo)
+        //        {
+        //            edit = true;
+        //            break;
+        //        }
+        //    }
+        //    if (edit)
+        //    {
 
-                rfpItem = rfp.rfpItems[index];
-                rfpItem.rfp_item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
-                rfpItemWindow.Show();
-                rfpItemWindow.Closed += OnCloseRFPItemWindow;
-            }
-            else
-            {
-                rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
-                rfpItem.rfp_item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
-                rfpItemWindow.Show();
-                rfpItemWindow.Closed += OnCloseRFPItemWindow;
-            }
-        }
+        //        rfpItem = rfp.rfpItems[itemNo-1];
+        //        rfpItem.rfp_item_number = itemNo;
+        //        RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem,viewAddCondition);
+        //        rfpItemWindow.Show();
+        //        rfpItemWindow.Closed += OnCloseRFPItemWindow;
+        //    }
+        //    else
+        //    {
+        //        rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
+        //        rfpItem.rfp_item_number = itemNo;
+        //        RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem , viewAddCondition);
+        //        rfpItemWindow.Show();
+        //        rfpItemWindow.Closed += OnCloseRFPItemWindow;
+        //    }
+        //}
 
         private void OnBtnClickAddDescriptionn(object sender, RoutedEventArgs e)
         {
             Button addButtonn = (Button)sender;
             int itemNo = Int32.Parse(addButtonn.Tag.ToString());
-
+            Grid parent = (Grid)addButtonn.Parent;
+            Button viewSerialButton = parent.Children[8] as Button;
+            viewSerialButton.IsEnabled = true;
+        
             mailObject = new object();
             mailObject = (Object)addButtonn;
             for (int i = 0; i < rfp.rfpItems.Count; i++)
             {
                 if (rfp.rfpItems[i].rfp_item_number == itemNo)
                 {
+                    itemNo = i+1;
+                    addButtonn.Tag = itemNo;
+                    viewAddCondition = COMPANY_WORK_MACROS.RFP_EDIT_CONDITION;
                     break;
                 }
             }
-            if (edit)
+            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
             {
 
-                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = rfp.rfpItems[index];
+                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = rfp.rfpItems[itemNo - 1];
                 rfpItem.rfp_item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
+                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem, viewAddCondition);
                 rfpItemWindow.Show();
                 rfpItemWindow.Closed += OnCloseRFPItemWindow;
             }
@@ -1460,23 +1530,66 @@ namespace _01electronics_inventory
             {
                 PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = new PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT();
                 rfpItem.rfp_item_number = itemNo;
-                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem);
+                RFPItemDescriptionWindow rfpItemWindow = new RFPItemDescriptionWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, ref rfp, ref rfpItem, viewAddCondition);
                 rfpItemWindow.Show();
                 rfpItemWindow.Closed += OnCloseRFPItemWindow;
-                if (itemNo > 1)
-                    index++;
+              
             }
         }
+        private void OnBtnClickViewsSerials(object sender, RoutedEventArgs e)
+        {
+            Button viewSerialButton = (Button)sender;
+            TextBlock serialsTextBlock = viewSerialButton.Content as TextBlock;
+            viewSerialsButton = viewSerialButton as Object;
+            selectedSerials.Clear();
+            bool edit = false;
+            if (serialsTextBlock.Text != "View Serials")
+            {
+                String[] serials = serialsTextBlock.Text.Split('\n');
+                for (int i = 0; i < serials.Length; i++)
+                    selectedSerials.Add(serials[i]);
+                edit = true;
+            }
+            PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem = rfp.rfpItems[Int32.Parse(viewSerialButton.Tag.ToString())];
+            RFPItemSerialsWindow rFPItemSerials = new RFPItemSerialsWindow(ref rfp, ref stock, ref stockAvailableItemsListOfList, ref rfpItem, ref selectedSerials, ref serialCounter, ref loggedInUser, ref edit);
+            rFPItemSerials.Closed += OnCloseRFPItemSerialsWindow;
+            rFPItemSerials.Show();
 
+        }
+
+        private void OnCloseRFPItemSerialsWindow(object sender, EventArgs e)
+        {
+            Button addButton = (Button)mailObject;
+
+            Button viewSerialButton = viewSerialsButton as Button;
+            Grid viewSerialsButtonParent = viewSerialButton.Parent as Grid;
+            TextBlock serialsTextBlock = viewSerialButton.Content as TextBlock;
+            if (selectedSerials.Count != 0)
+                serialsTextBlock.Text = string.Empty;
+            else
+                serialsTextBlock.Text = "View Serials";
+            for (int i = 0; i < selectedSerials.Count; i++)
+            {
+                serialsTextBlock.Text += selectedSerials[i] + '\n';
+
+            }
+            TextBox reservedQuantityTextBox = viewSerialsButtonParent.Children[7] as TextBox;
+            reservedQuantityTextBox.Text = selectedSerials.Count.ToString();
+
+            TextBox availableQuantityTextBox = viewSerialsButtonParent.Children[6] as TextBox;
+            availableQuantityTextBox.Text =(int.Parse(availableQuantityTextBox.Text)- selectedSerials.Count).ToString();
+        }
         private void OnCloseRFPItemWindow(object sender, EventArgs e)
         {
             if (viewAddCondition==COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                 saveChangesButton.IsEnabled = true;
 
             Button addButton = (Button)mailObject;
-
+            Grid addButtonParent = addButton.Parent as Grid;
+            TextBox availableQuantityTextBox = addButtonParent.Children[6] as TextBox;
             TextBlock description = addButton.Content as TextBlock;
-            if (index >= rfp.rfpItems.Count || rfp.rfpItems.Count == 0)
+            int itemNo = Int32.Parse(addButton.Tag.ToString());
+            if (oldRFPsItemsList.Count < rfp.rfpItems.Count || rfp.rfpItems.Count == 0)
             {
                 description.Text = "ADD";
                 description.TextWrapping = TextWrapping.Wrap;
@@ -1484,9 +1597,23 @@ namespace _01electronics_inventory
             }
             else
             {
-                description.Text = rfp.rfpItems[index].item_description;
+
+                description.Text = rfp.rfpItems[itemNo - 1].item_description;
                 description.TextWrapping = TextWrapping.Wrap;
                 addButton.Content = description;
+                int availbleQuanity = 0;
+                if (rfp.rfpItems[itemNo - 1].is_company_product)
+                {
+                    if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_brand.brand_id, rfp.rfpItems[itemNo - 1].product_model.model_id, rfp.rfpItems[itemNo - 1].product_specs.spec_id, false, ref availbleQuanity))
+                        return;
+                }
+                else
+                {
+                    if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_type.type_id, 0, true, ref availbleQuanity))
+                        return;
+
+                }
+                availableQuantityTextBox.Text = availbleQuanity.ToString();
             }
         }
         private void SubjectMaker(ref string subject, int state)
@@ -1523,7 +1650,12 @@ namespace _01electronics_inventory
 
             }
         }
-        
+      
+
+        private void OnTextChangedReservedQuantity(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 
 }

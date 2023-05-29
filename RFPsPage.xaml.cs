@@ -203,7 +203,7 @@ namespace _01electronics_inventory
         }
         private bool GetRFPs()
         {
-            if (!GetRFPs())
+            if (!commonQueries.GetRFPs(ref rfps))
                 return false;
 
             return true;
@@ -318,16 +318,22 @@ namespace _01electronics_inventory
 
             for (int i = 0; i < tmpRequestorsTeamsList.Count; i++)
             {
-                if (i != 0 && tmpRequestorsTeamsList[i].requestor_team.team_name != tmpRequestorsTeamsList[i - 1].requestor_team.team_name)
+                //if (i != 0 && tmpRequestorsTeamsList[i].requestor_team.team_name != tmpRequestorsTeamsList[i - 1].requestor_team.team_name)
+                //{
+                //teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
+                //rfpRequestors.Add(tmpRequestorsTeamsList[i]);
+                //}
+                //else if (i == 0)
+                //{
+                //teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
+                //rfpRequestors.Add(tmpRequestorsTeamsList[i]);
+                //}
+                if (!teamComboBox.Items.Contains(tmpRequestorsTeamsList[i].requestor_team.team_name))
                 {
                     teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
                     rfpRequestors.Add(tmpRequestorsTeamsList[i]);
                 }
-                else if (i == 0)
-                {
-                    teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
-                    rfpRequestors.Add(tmpRequestorsTeamsList[i]);
-                }
+
             }
         }
 
@@ -952,7 +958,7 @@ namespace _01electronics_inventory
 
                     Label rfpItemStatusLabel = new Label();
                     rfpItemStatusLabel.Style = (Style)FindResource("BorderIconItemTextLabel");
-                    rfpItemStatusLabel.Content = rfps[i].rfps_items[j].item_status.status_id;
+                    rfpItemStatusLabel.Content = rfps[i].rfps_items[j].item_status.status_name;
                     rfpItemStatusLabel.FontSize = 13;
 
                     Border itemBorderIcon = new Border();
@@ -1115,11 +1121,11 @@ namespace _01electronics_inventory
                 viewButton.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
                 viewButton.Content = "View";
 
-                Button reviseButton = new Button();
-                reviseButton.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
-                reviseButton.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
-                reviseButton.Click += OnBtnClickRevise;
-                reviseButton.Content = "Revise";
+                //Button reviseButton = new Button();
+                //reviseButton.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
+                //reviseButton.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
+                //reviseButton.Click += OnBtnClickRevise;
+                //reviseButton.Content = "Revise";
 
 
 
@@ -1127,44 +1133,44 @@ namespace _01electronics_inventory
                 editButton.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
                 editButton.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
                 editButton.Click += OnBtnClickEdit;
-                editButton.Content = "Edit";
+                editButton.Content = "Map RFP";
 
-                Button cancelButton = new Button();
-                cancelButton.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
-                cancelButton.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
-                cancelButton.Click += OnBtnClickCancel;
-                cancelButton.Content = "Cancel";
+                //Button cancelButton = new Button();
+                //cancelButton.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
+                //cancelButton.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
+                //cancelButton.Click += OnBtnClickCancel;
+                //cancelButton.Content = "Cancel";
 
-                Button viewQuotaition = new Button();
-                viewQuotaition.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
-                viewQuotaition.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
-                viewQuotaition.Click += OnBtnClickviewQuotaition;
-                viewQuotaition.Content = "View Quotaition";
+                //Button viewQuotaition = new Button();
+                //viewQuotaition.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
+                //viewQuotaition.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
+                //viewQuotaition.Click += OnBtnClickviewQuotaition;
+                //viewQuotaition.Content = "View Quotaition";
 
-                Button viewPO = new Button();
-                viewPO.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
-                viewPO.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
-                viewPO.Click += OnBtnClickviewPO;
-                viewPO.Content = "View PO";
+                //Button viewPO = new Button();
+                //viewPO.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
+                //viewPO.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
+                //viewPO.Click += OnBtnClickviewPO;
+                //viewPO.Content = "View PO";
 
-                Button changeAssigne = new Button();
-                changeAssigne.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
-                changeAssigne.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
-                changeAssigne.Click += OnBtnClickChangeAssignee;
-                changeAssigne.Content = "Change Assignee";
+                //Button changeAssigne = new Button();
+                //changeAssigne.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
+                //changeAssigne.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
+                //changeAssigne.Click += OnBtnClickChangeAssignee;
+                //changeAssigne.Content = "Change Assignee";
 
 
-                Button ApproveButton = new Button();
-                ApproveButton.Background = (Brush)Brushes.Green;
-                ApproveButton.Foreground = (Brush)brushConverter.ConvertFrom("#FFF");
-                ApproveButton.Click += OnBtnClickApprove;
-                ApproveButton.Content = "Approve";
+                //Button ApproveButton = new Button();
+                //ApproveButton.Background = (Brush)Brushes.Green;
+                //ApproveButton.Foreground = (Brush)brushConverter.ConvertFrom("#FFF");
+                //ApproveButton.Click += OnBtnClickApprove;
+                //ApproveButton.Content = "Approve";
 
-                Button deleteRFP = new Button();
-                deleteRFP.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
-                deleteRFP.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
-                deleteRFP.Click += OnButtonClickDeleteRFP;
-                deleteRFP.Content = "Delete RFP";
+                //Button deleteRFP = new Button();
+                //deleteRFP.Background = (Brush)brushConverter.ConvertFrom("#FFFFFF");
+                //deleteRFP.Foreground = (Brush)brushConverter.ConvertFrom("#105A97");
+                //deleteRFP.Click += OnButtonClickDeleteRFP;
+                //deleteRFP.Content = "Delete RFP";
 
                 //if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID && rfps[i].rfps_items.FindIndex(x1 => x1.item_availablilty_status.status_id == COMPANY_WORK_MACROS.RFP_PENDING_STOCK_RECEIVAL) != -1)
                 //   expanderStackPanel.Children.Add(ApproveButton);
@@ -1176,13 +1182,13 @@ namespace _01electronics_inventory
                 //expanderStackPanel.Children.Add(viewQuotaition);
                 //expanderStackPanel.Children.Add(viewPO);
 
-                if (rfpRequestors.FindIndex(x1 => x1.employee_id == loggedInUser.GetEmployeeId()) != -1)
-                    expanderStackPanel.Children.Add(reviseButton);
+                //if (rfpRequestors.FindIndex(x1 => x1.employee_id == loggedInUser.GetEmployeeId()) != -1)
+                    //expanderStackPanel.Children.Add(reviseButton);
 
-                if ((loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID && loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.TEAM_LEAD_POSTION) || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
-                {
-                    expanderStackPanel.Children.Add(changeAssigne);
-                }
+                //if ((loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID && loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.TEAM_LEAD_POSTION) || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
+                //{
+                    //expanderStackPanel.Children.Add(changeAssigne);
+                //}
 
 
                 // if (loggedInUser.GetEmployeeId() != rfps[i].requestor_id && rfps[i].rfps_items.FindIndex(x1 => x1.status_name.status_id != 1) == -1 && rfps[i].rfps_items.FindIndex(x1 => x1.item_availablilty_status.status_id != 1) == -1)
@@ -1190,13 +1196,13 @@ namespace _01electronics_inventory
                 {
                     expanderStackPanel.Children.Add(editButton);
                 }
-                if (canDelete)
-                {
-                    expanderStackPanel.Children.Add(deleteRFP);
-                }
+                //if (canDelete)
+                //{
+                //    expanderStackPanel.Children.Add(deleteRFP);
+                //}
 
-                if (!loggedInUser.GetEmployeeTeamId().ToString().Contains(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID.ToString()))
-                    expanderStackPanel.Children.Add(cancelButton);
+                //if (!loggedInUser.GetEmployeeTeamId().ToString().Contains(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID.ToString()))
+                //    expanderStackPanel.Children.Add(cancelButton);
                 expander.Content = expanderStackPanel;
 
                 mainGrid.Children.Add(mainStackPanel);
@@ -1964,24 +1970,26 @@ namespace _01electronics_inventory
         private void CheckLoggedInUser()
         {
 
-            if (loggedInUser.GetEmployeeTeamId().ToString().Contains(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID.ToString()) == false && loggedInUser.GetEmployeeDepartmentId() != COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID)
+            if (loggedInUser.GetEmployeeTeamId().ToString().Contains(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID.ToString()) == false && loggedInUser.GetEmployeeDepartmentId() != COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID && loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
             {
                 int index = -1;
 
                 for (int i = 0; i < tmpRequestorsTeamsList.Count; i++)
                 {
-                    if (loggedInUser.GetEmployeeId() == tmpRequestorsTeamsList[i].employee_id)
-                    {
+                    //if (loggedInUser.GetEmployeeId() == tmpRequestorsTeamsList[i].employee_id)
+                   // {
                         index = i;
                         teamComboBox.Items.Add(tmpRequestorsTeamsList[i].requestor_team.team_name);
                         rfpRequestors.Add(tmpRequestorsTeamsList[i]);
-                    }
+                        requestorComboBox.Items.Add(tmpRequestorsTeamsList[index].employee_name);
+
+                    // }
                 }
-                if (index != -1)
-                {
-                    requestorComboBox.Items.Add(tmpRequestorsTeamsList[index].employee_name);
-                    tmpRequestors.Add(tmpRequestorsTeamsList[index]);
-                }
+                //if (index != -1)
+                //{
+                //    requestorComboBox.Items.Add(tmpRequestorsTeamsList[index].employee_name);
+                //    tmpRequestors.Add(tmpRequestorsTeamsList[index]);
+                //}
                 if (teamComboBox.Items.Count == 1)
                 {
                     teamCheckBox.IsChecked = true;
@@ -1994,7 +2002,7 @@ namespace _01electronics_inventory
                     teamCheckBox.IsChecked = true;
                     teamCheckBox.IsEnabled = false;
                     teamComboBox.SelectedIndex = 0;
-
+                    requestorComboBox.IsEnabled = false;
                 }
                 //requestorComboBox.SelectedIndex = 0;
                 //requestorCheckBox.IsChecked = true;
@@ -2056,12 +2064,15 @@ namespace _01electronics_inventory
                 //
                 //AvabilityStatusCheckBox.IsEnabled = false;
                 //AvabilityStatusComboBox.IsEnabled = false;
-               // AddRFPBtn.IsEnabled = false;
+                // AddRFPBtn.IsEnabled = false;
+                InitializeTeamCombo();
+                InitializeRequestorCombo();
                 teamCheckBox.IsEnabled = true;
                 teamComboBox.IsEnabled = true;
                 requestorCheckBox.IsEnabled = true;
-                requestorComboBox.IsEnabled = true;
-                teamCheckBox.IsChecked = false;
+                requestorComboBox.IsEnabled = false;
+                teamCheckBox.IsChecked = true;
+                teamComboBox.SelectedIndex = 0;
                 requestorCheckBox.IsChecked = false;
             }
 
@@ -2372,6 +2383,7 @@ namespace _01electronics_inventory
 
         private void OnSelChangedTeamCombo(object sender, SelectionChangedEventArgs e)
         {
+
             InitializeRFPsStackPanel();
             InitializeRFPsGrid();
             InitializeRFPsFolderView();

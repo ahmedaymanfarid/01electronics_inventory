@@ -1,0 +1,81 @@
+﻿<Window x:Class="_01electronics_inventory.RFPItemSerialsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_01electronics_inventory"
+        mc:Ignorable="d"
+        Title="RFPItemSerialsWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        <Label Content="RFP ITEM SERIALS" Style="{StaticResource secondaryHeaderTextStyle}" Background="#105A97" Grid.Row="0"/>
+        <ScrollViewer Grid.Row="1">
+            <WrapPanel >
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <Label Style="{StaticResource labelStyleCard}" Content="Category *"/>
+                        <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="categoryComboBox" IsEnabled="False"/>
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <Label Style="{StaticResource labelStyleCard}" Content="Type *"/>
+                        <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="typeComboBox" IsEnabled="False" />
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <Label Style="{StaticResource labelStyleCard}" Content="Brand *"/>
+                        <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="brandComboBox" IsEnabled="False" />
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <Label Style="{StaticResource labelStyleCard}" Content="Model *"/>
+                        <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="modelTextBlock" IsEnabled="False"/>
+                    </WrapPanel>
+                </Border>
+                <Border Style="{StaticResource borderCard}" Visibility="Collapsed" Name="specsContainer">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+                    </Border.Effect>
+                    <WrapPanel Background="White" >
+                        <Label Style="{StaticResource labelStyleCard}" Content="Specs *"/>
+                        <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="specsTextBlock" IsEnabled="False"/>
+                    </WrapPanel>
+                </Border>
+            </WrapPanel>
+        </ScrollViewer>
+        <Border Style="{StaticResource borderCard}" Grid.Row="2" Width="1000" Height="300">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Color="LightGray"/>
+            </Border.Effect>
+            <ScrollViewer>
+                <StackPanel x:Name="serialsStackPanel" />
+            </ScrollViewer>
+
+
+
+
+
+        </Border>
+        <Button Grid.Row="3" Style="{StaticResource buttonStyle}" Content="Save" Click="OnButtonClickSave"/>
+    </Grid>
+</Window>
