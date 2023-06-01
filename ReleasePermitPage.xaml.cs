@@ -45,6 +45,7 @@ namespace _01electronics_inventory
 
         List<int> checkedReleasePermititemSerials;
 
+        int viewAddCondition;
 
         public ReleasePermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser)
         {
@@ -52,7 +53,6 @@ namespace _01electronics_inventory
             commonQueries = mCommonQueries;
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
-
             InitializeComponent();
 
             InitializeUiElements();
@@ -1243,7 +1243,7 @@ namespace _01electronics_inventory
         }
         private void OnButtonClickedEntryPermits(object sender, MouseButtonEventArgs e)
         {
-            EntryPermitPage entryPermitPage = new EntryPermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            EntryPermitPage entryPermitPage = new EntryPermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser );
             this.NavigationService.Navigate(entryPermitPage);
 
         }

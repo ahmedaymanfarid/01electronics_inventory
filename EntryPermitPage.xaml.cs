@@ -27,7 +27,7 @@ namespace _01electronics_inventory
         private CommonFunctions commonFunctions;
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
-
+        int viewAddCondition;
         Grid previousGrid=null;
 
         Expander previousExpander = null;
@@ -249,7 +249,7 @@ namespace _01electronics_inventory
             entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_permit_serial);
             entryPermit.InitializeMaterialEntryPermit();
 
-            AddEntryPermitWindow addEntryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, true, ref entryPermit,this);
+            AddEntryPermitWindow addEntryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION, ref entryPermit,this);
 
 
             addEntryPermitWindow.EntryPermitPage.TransactionDatePicker.Text = materialEntryPermit.transaction_date.ToString();
@@ -465,38 +465,38 @@ namespace _01electronics_inventory
 
                         Grid itemCard = addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.Home.Children[m] as Grid;
 
-                        WrapPanel quantityPanel = itemCard.Children[15] as WrapPanel;
+                        WrapPanel quantityPanel = itemCard.Children[16] as WrapPanel;
 
                         TextBox quantityTextBox = quantityPanel.Children[1] as TextBox;
 
 
 
-                        WrapPanel startSerialPanel = itemCard.Children[13] as WrapPanel;
+                        WrapPanel startSerialPanel = itemCard.Children[14] as WrapPanel;
 
                         TextBox startSerialTextBox = startSerialPanel.Children[1] as TextBox;
 
 
 
-                        WrapPanel endSerialPanel = itemCard.Children[14] as WrapPanel;
+                        WrapPanel endSerialPanel = itemCard.Children[15] as WrapPanel;
 
                         TextBox endSerialTextBox = endSerialPanel.Children[1] as TextBox;
 
 
 
-                        ScrollViewer scroll = itemCard.Children[19] as ScrollViewer;
+                        ScrollViewer scroll = itemCard.Children[22] as ScrollViewer;
 
-                        Button generateButton = itemCard.Children[18] as Button;
+                        Button generateButton = itemCard.Children[21] as Button;
 
                         Grid serialsGrid = scroll.Content as Grid;
 
 
 
-                        WrapPanel pricePanel = itemCard.Children[17] as WrapPanel;
+                        WrapPanel pricePanel = itemCard.Children[18] as WrapPanel;
 
                         TextBox priceTextBox = pricePanel.Children[1] as TextBox;
 
 
-                        WrapPanel currencyPanel = itemCard.Children[16] as WrapPanel;
+                        WrapPanel currencyPanel = itemCard.Children[17] as WrapPanel;
 
                         ComboBox currencyComboBox = currencyPanel.Children[1] as ComboBox;
 
@@ -757,7 +757,7 @@ namespace _01electronics_inventory
             entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_permit_serial);
             entryPermit.InitializeMaterialEntryPermit();
 
-                        AddEntryPermitWindow addEntryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,false,ref entryPermit);
+            AddEntryPermitWindow addEntryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION,ref entryPermit);
             addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.AddNewItemButton.Visibility = Visibility.Collapsed;
             addEntryPermitWindow.EntryPermitPage.addEntryPermitItem.EntryPermitUploadFilesPage = new EntryPermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addEntryPermitWindow.EntryPermitPage.addEntryPermitItem, addEntryPermitWindow.EntryPermitPage, addEntryPermitWindow,ref entryPermit);
 
@@ -1828,7 +1828,7 @@ namespace _01electronics_inventory
         private void AddButtonClick(object sender, RoutedEventArgs e)
         {
             MaterialEntryPermit material = null;
-            AddEntryPermitWindow entryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,false,ref material,this);
+            AddEntryPermitWindow entryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,viewAddCondition,ref material,this);
 
             entryPermitWindow.Show();
         }
@@ -1875,7 +1875,7 @@ namespace _01electronics_inventory
         }
         private void OnButtonClickedEntryPermits(object sender, MouseButtonEventArgs e)
         {
-            EntryPermitPage entryPermitPage = new EntryPermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            EntryPermitPage entryPermitPage = new EntryPermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser );
             this.NavigationService.Navigate(entryPermitPage);
 
         }

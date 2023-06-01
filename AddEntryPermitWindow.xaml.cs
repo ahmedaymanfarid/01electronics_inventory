@@ -29,10 +29,10 @@ namespace _01electronics_inventory
 
         EntryPermitPage page = null;
 
-        bool editable = false;
+     
         public  AddEntryPermitPage EntryPermitPage;
 
-        public AddEntryPermitWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, bool isedit, ref MaterialEntryPermit oldMaterialEntryPermit, EntryPermitPage mpage=null)
+        public AddEntryPermitWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, int mViewAddCondition, ref MaterialEntryPermit oldMaterialEntryPermit, EntryPermitPage mpage=null)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
@@ -41,10 +41,10 @@ namespace _01electronics_inventory
 
             InitializeComponent();
 
-            editable = isedit;
+            
             page=mpage;
 
-            EntryPermitPage = new AddEntryPermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, isedit, ref oldMaterialEntryPermit);
+            EntryPermitPage = new AddEntryPermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, mViewAddCondition, ref oldMaterialEntryPermit);
 
 
             frame.Content = EntryPermitPage;

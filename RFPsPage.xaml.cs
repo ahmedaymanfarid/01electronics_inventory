@@ -79,7 +79,7 @@ namespace _01electronics_inventory
         private List<StackPanel> teamsPageStackPanel;
         private List<StackPanel> rfpFoldersPageStackPanel;
         private List<StackPanel> quotationPOFoldersPageStackPanel;
-
+        private int viewAddCondition;
 
 
         private String errorMessage;
@@ -143,7 +143,7 @@ namespace _01electronics_inventory
             quotationPOFoldersPageStackPanel = new List<StackPanel>();
             canEdit = false;
             canDelete = false;
-            
+            viewAddCondition = COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION;
             GetRFPStatuses();
             GetRFPs();
             GetRFPsFolders();

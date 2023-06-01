@@ -26,7 +26,7 @@ namespace _01electronics_inventory
         private CommonFunctions commonFunctions;
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
-
+        private int viewAddCondition;
         public  AddEntryPermitItemPage addEntryPermitItem ;
 
         List<INVENTORY_STRUCTS.WARE_HOUSE_LOCATION_STRUCT> Locations = new List<INVENTORY_STRUCTS.WARE_HOUSE_LOCATION_STRUCT>();
@@ -35,13 +35,13 @@ namespace _01electronics_inventory
 
         public MaterialEntryPermit materialEntryPermit = new MaterialEntryPermit();
 
-        public AddEntryPermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser,  AddEntryPermitWindow w, bool isedit, ref MaterialEntryPermit noldMaterialEntryPermit)
+        public AddEntryPermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser,  AddEntryPermitWindow w, int mViewAddCondition, ref MaterialEntryPermit noldMaterialEntryPermit)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
-
+            viewAddCondition = mViewAddCondition;
             InitializeComponent();
             
             entryPermitWindow = w;
@@ -50,15 +50,21 @@ namespace _01electronics_inventory
             Locations.ForEach(a => WareHouseCombo.Items.Add(a.location_nick_name));
 
 
-            if (isedit == true) {
+            if (viewAddCondition == COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION) {
 
                 materialEntryPermit.SetEntryPermitSerialid(noldMaterialEntryPermit.GetEntryPermitSerial());
 
                 materialEntryPermit.InitializeMaterialEntryPermit();
 
             }
+            else if (viewAddCondition == COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
+            {
+                materialEntryPermit.SetEntryPermitSerialid(noldMaterialEntryPermit.GetEntryPermitSerial());
 
-                addEntryPermitItem = new AddEntryPermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, entryPermitWindow, isedit, ref noldMaterialEntryPermit);
+                materialEntryPermit.InitializeMaterialEntryPermit();
+            }
+
+                addEntryPermitItem = new AddEntryPermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, entryPermitWindow, viewAddCondition, ref noldMaterialEntryPermit);
 
 
         }

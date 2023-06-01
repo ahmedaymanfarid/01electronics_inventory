@@ -33,7 +33,7 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        bool editable = false;
+        int viewAddCondition;
         private AddEntryPermitWindow entryPermitWindow;
         public AddEntryPermitPage addEntryPermitPage;
 
@@ -65,14 +65,13 @@ namespace _01electronics_inventory
         List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> materialReservations;
 
 
-        public AddEntryPermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddEntryPermitWindow mEntryPermitWindow,bool isedit, ref MaterialEntryPermit moldMaterialEntryPermit) 
+        public AddEntryPermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddEntryPermitWindow mEntryPermitWindow,int mViewAddCondition, ref MaterialEntryPermit moldMaterialEntryPermit) 
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
-
-            editable = isedit;
+            viewAddCondition = mViewAddCondition;
 
             entryPermitWindow = mEntryPermitWindow;
             
@@ -102,13 +101,284 @@ namespace _01electronics_inventory
             materialReservations = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
 
             InitializeComponent();
-            InitializeNewCard();
+            CheckViewOrEditOrAdd();
 
 
             commonQueries.GetStockCategories(ref stockTypes);
         }
 
+        public void CheckViewOrEditOrAdd()
+        {
+            if (viewAddCondition == COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
+            {
+                if (oldMaterialEntryPermit.GetItems().Count != 0)
+                {
+                    for (int i=0;i<oldMaterialEntryPermit.GetItems().Count;i++)
+                    {
+                        InitializeNewCard();
+                    }
+                    for(int i =0; i<Home.Children.Count; i++)
+                    {
+                        Grid card = Home.Children[i] as Grid;
 
+                        for (int j=0;j< oldMaterialEntryPermit.GetItems().Count;j++)
+                        {
+                            
+                            if (oldMaterialEntryPermit.GetItems()[i].rfp_info.rfpSerial!=0)
+                            {
+                               
+                                
+                                WrapPanel rfpCheckPanel = card.Children[1] as WrapPanel;
+                                CheckBox rfpCheckBox = rfpCheckPanel.Children[1] as CheckBox;
+                                rfpCheckBox.IsChecked = true;
+                                rfpCheckBox.IsEnabled = false;
+
+                                WrapPanel rfpRequestorsWrapPanel = card.Children[2] as WrapPanel;
+                                ComboBox rfpRequestorsComboBox = rfpRequestorsWrapPanel.Children[1] as ComboBox;
+                                rfpRequestorsComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].rfp_info.rfp_requestor_team_name;
+                                rfpRequestorsComboBox.IsEnabled = false;
+
+                                ComboBox rfpIDComboBox = rfpRequestorsWrapPanel.Children[2] as ComboBox;
+                                rfpIDComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].rfp_info.rfpID;
+                                rfpIDComboBox.IsEnabled = false;
+                                
+                                WrapPanel rfpItemDiscriptionWrapPanel = card.Children[3] as WrapPanel;
+                                ComboBox rfpItemDiscriptionComboBox = rfpItemDiscriptionWrapPanel.Children[1] as ComboBox;
+                                rfpItemDiscriptionComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].rfp_info.rfp_items[0].item_description;
+                                rfpItemDiscriptionComboBox.IsEnabled = false;
+
+
+                            }
+                            WrapPanel companyOrGenericChoiceWrapPanel = card.Children[4] as WrapPanel;
+                            ComboBox choiceComboBox = companyOrGenericChoiceWrapPanel.Children[1] as ComboBox;
+                            choiceComboBox.IsEnabled = false;
+                            if (oldMaterialEntryPermit.GetItems()[i].is_company_product)
+                            {
+                                choiceComboBox.SelectedIndex = 1;
+                                WrapPanel companyCategoryWrapPanel = card.Children[9] as WrapPanel;
+                                ComboBox companyCategoryComboBox = companyCategoryWrapPanel.Children[1] as ComboBox;
+                                companyCategoryComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_category.category_name;
+                                companyCategoryComboBox.IsEnabled = false;
+
+                                WrapPanel companyTypeWrapPanel = card.Children[10] as WrapPanel;
+                                ComboBox companyTypeComboBox = companyTypeWrapPanel.Children[1] as ComboBox;
+                                companyTypeComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_type.product_name;
+                                companyTypeComboBox.IsEnabled = false;
+
+                                WrapPanel companyBrandWrapPanel = card.Children[11] as WrapPanel;
+                                ComboBox companyBrandComboBox = companyBrandWrapPanel.Children[1] as ComboBox;
+                                companyBrandComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_brand.brand_name;
+                                companyBrandComboBox.IsEnabled = false;
+
+                                WrapPanel companyModelWrapPanel = card.Children[12] as WrapPanel;
+                                ComboBox companyModelComboBox = companyModelWrapPanel.Children[1] as ComboBox;
+                                companyModelComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_model.model_name;
+                                companyModelComboBox.IsEnabled = false;
+
+                                WrapPanel companySpecsWrapPanel = card.Children[13] as WrapPanel;
+                                ComboBox companySpecsComboBox = companySpecsWrapPanel.Children[1] as ComboBox;
+                                companySpecsComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_specs.spec_name;
+                                companySpecsWrapPanel.Visibility = Visibility.Visible;
+                                companySpecsComboBox.IsEnabled = false;
+
+                            }
+                            else
+                            {
+                                choiceComboBox.SelectedIndex = 0;
+                                WrapPanel genericCategoryWrapPanel = card.Children[5] as WrapPanel;
+                                ComboBox genericCategoryComboBox = genericCategoryWrapPanel.Children[1] as ComboBox;
+                                genericCategoryComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_category.category_name;
+                                genericCategoryComboBox.IsEnabled = false;
+
+                                WrapPanel genericTypeWrapPanel = card.Children[6] as WrapPanel;
+                                ComboBox genericTypeComboBox = genericTypeWrapPanel.Children[1] as ComboBox;
+                                genericTypeComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_type.product_name;
+                                genericTypeComboBox.IsEnabled = false;
+
+                                WrapPanel genericBrandWrapPanel = card.Children[7] as WrapPanel;
+                                ComboBox genericBrandComboBox = genericBrandWrapPanel.Children[1] as ComboBox;
+                                genericBrandComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_brand.brand_name;
+                                genericBrandComboBox.IsEnabled = false;
+
+                                WrapPanel genericModelWrapPanel = card.Children[8] as WrapPanel;
+                                ComboBox geenricModelComboBox = genericModelWrapPanel.Children[1] as ComboBox;
+                                geenricModelComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_model.model_name;
+                                geenricModelComboBox.IsEnabled = false;
+
+
+                            }
+                            WrapPanel startSerialsWrapPanel = card.Children[14] as WrapPanel;
+                            TextBox startSerialsTextBox = startSerialsWrapPanel.Children[1] as TextBox;
+                            startSerialsTextBox.IsEnabled = false;
+
+                            WrapPanel endSerialsWrapPanel = card.Children[15] as WrapPanel;
+                            TextBox endSerialsTextBox = endSerialsWrapPanel.Children[1] as TextBox;
+                            endSerialsTextBox.IsEnabled = false;
+                            if (oldMaterialEntryPermit.GetItems()[i].product_model.has_serial_number)
+                            {
+                                startSerialsTextBox.Text = oldMaterialEntryPermit.GetItems()[i].product_serial_number;
+
+                            }
+                            
+                            WrapPanel itemQuantityWrapPanel = card.Children[16] as WrapPanel;
+                            TextBox itemQuantityTextBox = itemQuantityWrapPanel.Children[1] as TextBox;
+                            itemQuantityTextBox.Text = oldMaterialEntryPermit.GetItems()[i].quantity.ToString();
+                            itemQuantityTextBox.IsEnabled = false;
+
+                            WrapPanel currencyWrapPanel = card.Children[17] as WrapPanel;
+                            ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
+                            currencyComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].item_currency.currencyName;
+                            currencyComboBox.IsEnabled = false;
+
+                            WrapPanel priceWrapPanel = card.Children[18] as WrapPanel;
+                            TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
+                            priceTextBox.Text = oldMaterialEntryPermit.GetItems()[i].item_price.ToString();
+                            priceTextBox.IsEnabled = false;
+
+                            WrapPanel stockTypeWrapPanel = card.Children[19] as WrapPanel;
+                            ComboBox stockTypeComboBox = stockTypeWrapPanel.Children[1] as ComboBox;
+                            //priceTextBox.Text = oldMaterialEntryPermit.GetItems()[i].item_price.ToString();
+                            stockTypeComboBox.IsEnabled = false;
+
+                        }
+                    }
+                }
+
+            }
+            else if(viewAddCondition == COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION)
+            {
+                if (oldMaterialEntryPermit.GetItems().Count != 0)
+                {
+                    for (int i = 0; i < oldMaterialEntryPermit.GetItems().Count; i++)
+                    {
+                        InitializeNewCard();
+                    }
+                    for (int i = 0; i < Home.Children.Count; i++)
+                    {
+                        Grid card = Home.Children[i] as Grid;
+
+                        for (int j = 0; j < oldMaterialEntryPermit.GetItems().Count; j++)
+                        {
+                            if (oldMaterialEntryPermit.GetItems()[i].rfp_info.rfpSerial != 0)
+                            {
+
+
+                                WrapPanel rfpCheckPanel = card.Children[1] as WrapPanel;
+                                CheckBox rfpCheckBox = rfpCheckPanel.Children[1] as CheckBox;
+                                rfpCheckBox.IsChecked = true;
+                           
+
+                                WrapPanel rfpRequestorsWrapPanel = card.Children[2] as WrapPanel;
+                                ComboBox rfpRequestorsComboBox = rfpRequestorsWrapPanel.Children[1] as ComboBox;
+                                rfpRequestorsComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].rfp_info.rfp_requestor_team_name;
+                               
+
+                                ComboBox rfpIDComboBox = rfpRequestorsWrapPanel.Children[2] as ComboBox;
+                                rfpIDComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].rfp_info.rfpID;
+                               
+
+                                WrapPanel rfpItemDiscriptionWrapPanel = card.Children[3] as WrapPanel;
+                                ComboBox rfpItemDiscriptionComboBox = rfpItemDiscriptionWrapPanel.Children[1] as ComboBox;
+                                rfpItemDiscriptionComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].rfp_info.rfp_items[0].item_description;
+                               
+
+
+                            }
+                            WrapPanel companyOrGenericChoiceWrapPanel = card.Children[4] as WrapPanel;
+                            ComboBox choiceComboBox = companyOrGenericChoiceWrapPanel.Children[1] as ComboBox;
+                          
+                            if (oldMaterialEntryPermit.GetItems()[i].is_company_product)
+                            {
+                                choiceComboBox.SelectedIndex = 1;
+                                WrapPanel companyCategoryWrapPanel = card.Children[9] as WrapPanel;
+                                ComboBox companyCategoryComboBox = companyCategoryWrapPanel.Children[1] as ComboBox;
+                                companyCategoryComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_category.category_name;
+                           
+
+                                WrapPanel companyTypeWrapPanel = card.Children[10] as WrapPanel;
+                                ComboBox companyTypeComboBox = companyTypeWrapPanel.Children[1] as ComboBox;
+                                companyTypeComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_type.product_name;
+                             
+
+                                WrapPanel companyBrandWrapPanel = card.Children[11] as WrapPanel;
+                                ComboBox companyBrandComboBox = companyBrandWrapPanel.Children[1] as ComboBox;
+                                companyBrandComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_brand.brand_name;
+                             
+
+                                WrapPanel companyModelWrapPanel = card.Children[12] as WrapPanel;
+                                ComboBox companyModelComboBox = companyModelWrapPanel.Children[1] as ComboBox;
+                                companyModelComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_model.model_name;
+                              
+
+                                WrapPanel companySpecsWrapPanel = card.Children[13] as WrapPanel;
+                                ComboBox companySpecsComboBox = companySpecsWrapPanel.Children[1] as ComboBox;
+                                companySpecsComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_specs.spec_name;
+                                companySpecsWrapPanel.Visibility = Visibility.Visible;
+                              
+
+                            }
+                            else
+                            {
+                                choiceComboBox.SelectedIndex = 0;
+                                WrapPanel genericCategoryWrapPanel = card.Children[5] as WrapPanel;
+                                ComboBox genericCategoryComboBox = genericCategoryWrapPanel.Children[1] as ComboBox;
+                                genericCategoryComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_category.category_name;
+                             
+
+                                WrapPanel genericTypeWrapPanel = card.Children[6] as WrapPanel;
+                                ComboBox genericTypeComboBox = genericTypeWrapPanel.Children[1] as ComboBox;
+                                genericTypeComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_type.product_name;
+                              
+
+                                WrapPanel genericBrandWrapPanel = card.Children[7] as WrapPanel;
+                                ComboBox genericBrandComboBox = genericBrandWrapPanel.Children[1] as ComboBox;
+                                genericBrandComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_brand.brand_name;
+                          
+
+                                WrapPanel genericModelWrapPanel = card.Children[8] as WrapPanel;
+                                ComboBox geenricModelComboBox = genericModelWrapPanel.Children[1] as ComboBox;
+                                geenricModelComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].product_model.model_name;
+                           
+
+
+                            }
+                            WrapPanel startSerialsWrapPanel = card.Children[14] as WrapPanel;
+                            TextBox startSerialsTextBox = startSerialsWrapPanel.Children[1] as TextBox;
+                         
+
+                            WrapPanel endSerialsWrapPanel = card.Children[15] as WrapPanel;
+                            TextBox endSerialsTextBox = endSerialsWrapPanel.Children[1] as TextBox;
+                       
+                            if (oldMaterialEntryPermit.GetItems()[i].product_model.has_serial_number)
+                            {
+                                startSerialsTextBox.Text = oldMaterialEntryPermit.GetItems()[i].product_serial_number;
+
+                            }
+
+                            WrapPanel itemQuantityWrapPanel = card.Children[16] as WrapPanel;
+                            TextBox itemQuantityTextBox = itemQuantityWrapPanel.Children[1] as TextBox;
+                            itemQuantityTextBox.Text = oldMaterialEntryPermit.GetItems()[i].quantity.ToString();
+                          
+
+                            WrapPanel currencyWrapPanel = card.Children[17] as WrapPanel;
+                            ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
+                            currencyComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[i].item_currency.currencyName;
+                         
+
+                            WrapPanel priceWrapPanel = card.Children[18] as WrapPanel;
+                            TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
+                            priceTextBox.Text = oldMaterialEntryPermit.GetItems()[i].item_price.ToString();
+                           
+
+                        }
+                    }
+                }
+            }
+            else
+            {
+                InitializeNewCard();
+            }
+        }
         public List<BASIC_STRUCTS.CURRENCY_STRUCT> GetCurrencies()
         {
             return currencies;
@@ -192,7 +462,7 @@ namespace _01electronics_inventory
 
             Label numberLabel = new Label();
 
-            numberLabel.Content = $"{"Item "+Home.RowDefinitions.Count}";
+            numberLabel.Content = $"{"Item "+Home.Children.Count}";
             numberLabel.Style = (Style)FindResource("tableHeaderItem");
 
             header.Background = (Brush)converter.ConvertFrom("#105A97");
@@ -262,10 +532,6 @@ namespace _01electronics_inventory
 
             rfpRequstorPanel.Children.Add(rfpRequstorComboBox);
 
-
-            Grid.SetRow(rfpRequstorPanel, 2);
-            card.Children.Add(rfpRequstorPanel);
-
             ComboBox rfpSerialComboBox = new ComboBox();
 
 
@@ -278,6 +544,11 @@ namespace _01electronics_inventory
             rfpSerialComboBox.Margin = new Thickness(73, 0, 0, 0);
 
             rfpRequstorPanel.Children.Add(rfpSerialComboBox);
+
+            Grid.SetRow(rfpRequstorPanel, 2);
+            card.Children.Add(rfpRequstorPanel);
+
+          
 
 
 
@@ -706,7 +977,7 @@ namespace _01electronics_inventory
             card.Children.Add(wrapPanel15);
 
             Grid.SetRow(wrapPanel15, 19);
-            wrapPanel15.Visibility = Visibility.Collapsed;
+          //  wrapPanel15.Visibility = Visibility.Collapsed;
 
 
 
@@ -2088,7 +2359,8 @@ namespace _01electronics_inventory
                 Grid serialGrid= scroll.Content as Grid;
 
                 //if the checkbox is unchecked
-
+                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                materialEntryItem.entry_permit_item_serial = i + 1;
                 if (rfpCheckBox.IsChecked == false)
                 {
 
@@ -2114,7 +2386,7 @@ namespace _01electronics_inventory
 
 
 
-                                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                               // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
                                 materialEntryItem.product_category.category_id = genericCategories[genericCategoryComboBox.SelectedIndex].category_id;
 
@@ -2181,7 +2453,7 @@ namespace _01electronics_inventory
                                 {
                                    
 
-                                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                                  //  INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
                                     materialEntryItem.product_category.category_id = genericCategories[genericCategoryComboBox.SelectedIndex].category_id;
 
@@ -2274,14 +2546,14 @@ namespace _01electronics_inventory
 
 
                         else {
-
+                           
                             if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "")
                             {
 
-                                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                                ///INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
 
-
+                                materialEntryItem.is_company_product = true;
                                 materialEntryItem.product_category.category_id = companyCategories[companyCategoryComboBox.SelectedIndex].category_id;
                                 companyProducts.Clear();
 
@@ -2301,6 +2573,9 @@ namespace _01electronics_inventory
 
 
                                 materialEntryItem.product_model.model_id = companyModels[companyModelComboBox.SelectedIndex].model_id;
+
+                                specs.Clear();
+                               
 
                                 if(priceTextBox.Text!="")
                                 materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
@@ -2343,8 +2618,8 @@ namespace _01electronics_inventory
                                 for (int j = 0; j < serialGrid.Children.Count; j++)
                                 {
 
-                                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-
+                                   // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                                    materialEntryItem.is_company_product = true;
                                     materialEntryItem.product_category.category_id = companyCategories[companyCategoryComboBox.SelectedIndex].category_id;
 
                                     companyProducts.Clear();
@@ -2436,7 +2711,7 @@ namespace _01electronics_inventory
                     if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "")
                     {
 
-                        INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                       // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
                         materialEntryItem.rfp_info.rfpRequestorTeam = requesters[requesterComboBox.SelectedIndex].requestor_team.team_id;
 
@@ -2484,7 +2759,7 @@ namespace _01electronics_inventory
                         materialReservations.Add(materialReservation);
 
 
-                        if (rfpItems[itemDescriptionComboBox.SelectedIndex].product_category.category_id == 0)
+                        if (rfpItems[itemDescriptionComboBox.SelectedIndex].is_company_product == true)
                         {
 
 
@@ -2535,7 +2810,7 @@ namespace _01electronics_inventory
                         {
 
 
-                            INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                           // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
 
                             materialEntryItem.rfp_info.rfpRequestorTeam = requesters[requesterComboBox.SelectedIndex].requestor_team.team_id;
 
@@ -2646,7 +2921,7 @@ namespace _01electronics_inventory
             }
 
 
-            if (editable == false) {
+            if (viewAddCondition != COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION) {
                 if (!addEntryPermitPage.materialEntryPermit.IssueNewEntryPermit())
                     return;
 
