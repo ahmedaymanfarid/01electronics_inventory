@@ -2397,6 +2397,9 @@ namespace _01electronics_inventory
 
             int status = 0;
 
+            ///////////////////////////////////////////////////////////////////////
+            ///YOU NEED TO SET ORDER / RFP STATUS, AND SET RELEASE PERMIT STATUS
+            ///////////////////////////////////////////////////////////////////////
             if (addReleasePermitPage.orderChecked.IsChecked == true)
             {
                 if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
