@@ -2405,7 +2405,7 @@ namespace _01electronics_inventory
                 if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
                     status = COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL;
                 else
-                    status = COMPANY_WORK_MACROS.ORDER_EMPLOYEE_CUSTODY;
+                    status = COMPANY_WORK_MACROS.ORDER_RECEIVED_BY_CLIENT;
             }
             else
                 status = COMPANY_WORK_MACROS.RFP_PENDING_SITE_RECEIVAL;
@@ -2419,7 +2419,7 @@ namespace _01electronics_inventory
                 if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
                     addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL);
                 else
-                    addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.ORDER_EMPLOYEE_CUSTODY);
+                    addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.ORDER_RECEIVED_BY_CLIENT);
             }
 
             else

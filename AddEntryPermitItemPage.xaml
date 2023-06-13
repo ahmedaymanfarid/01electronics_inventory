@@ -5,7 +5,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:_01electronics_inventory"
       mc:Ignorable="d" 
-      Title="Add Item">
+      Title="Add Item"
+      Background="#EDEDED">
 
     <Grid Background="#EDEDED">
 
@@ -17,7 +18,6 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="50"/>
             <RowDefinition />
-            <RowDefinition Height="50"/>
             <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
 
@@ -58,60 +58,14 @@
 
         </Grid>
 
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="2" x:Name="itemsScrollViewer">
 
-            <Grid x:Name="Home" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="24">
+            <WrapPanel x:Name="itemsWrapPanel" Margin="24">
+               
+                
 
-
-                <!--<Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-
-                </Grid.ColumnDefinitions>
-
-                <Label Grid.Row="0" Grid.Column="0" Content="Generic Category" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />
-
-
-                <Label Grid.Row="1" Grid.Column="0" Content="Generic Brand" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />
-
-
-                <Label Grid.Row="2" Grid.Column="0" Content="Generic Model" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="2" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />
-
-
-                <Label Grid.Row="3" Grid.Column="0" Content="Generic Product" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />
-
-
-                <Label Grid.Row="4" Grid.Column="0" Content="Company Product" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />
-
-
-                <Label Grid.Row="5" Grid.Column="0" Content="Company Brand" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />
-
-
-                <Label Grid.Row="6" Grid.Column="0" Content="Company Model" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
-                <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource comboBoxStyle}" />-->
-
-
-            </Grid>
+               
+            </WrapPanel>
 
 
         </ScrollViewer>
@@ -120,13 +74,13 @@
 
 
 
-        <Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+        <!--<Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
 
             <Button x:Name="AddNewItemButton" Content="Add Item" Margin="0,0,24,0" Click="AddNewItemButtonClick" Style="{StaticResource buttonBrowseStyle}"></Button>
 
-        </Grid>
+        </Grid>-->
 
-        <Grid Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+        <Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>

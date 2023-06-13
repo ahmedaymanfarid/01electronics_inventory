@@ -747,7 +747,7 @@ namespace _01electronics_inventory
                                          currentModelSerial.serial_status == COMPANY_WORK_MACROS.COMMISSIONED_WORK_ORDER_ITEM ||
                                          currentModelSerial.serial_status == COMPANY_WORK_MACROS.SURVEY_DONE_WORK_ORDER ||
                                          currentModelSerial.serial_status == COMPANY_WORK_MACROS.REPAIRED_WORK_ORDER ||
-                                         currentModelSerial.serial_status == COMPANY_WORK_MACROS.CHECKUP_DONE_WORK_ORDER ||
+                                         currentModelSerial.serial_status == COMPANY_WORK_MACROS.INSPECTION_DONE_WORK_ORDER ||
                                          currentModelSerial.serial_status == COMPANY_WORK_MACROS.CLOSED_WORK_ORDER)
                                 {
                                     borderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#008000"));
