@@ -8,7 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="AddEntryPermitPage">
 
-    <Grid Background="White">
+    <Grid Background="#EDEDED">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -70,7 +70,7 @@
 
                 <WrapPanel Grid.Row="0">
                     <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}" Content="Transaction &#x0a;Date"/>
+                        <Label Style="{StaticResource labelStyle}" Content="Transaction Date" Width="200"/>
                         <DatePicker Style="{StaticResource datePickerStyle}" Name="TransactionDatePicker" IsEnabled="True" SelectedDateChanged="TransactionDatePickerSelectedDateChanged"/>
                     </WrapPanel>
 
@@ -78,7 +78,7 @@
 
                 <WrapPanel Grid.Row="1">
                     <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}" Content="WareHouse"/>
+                        <Label Style="{StaticResource labelStyle}" Content="WareHouse" Width="200"/>
                         <ComboBox Style="{StaticResource comboBoxStyle}" Name="WareHouseCombo" SelectionChanged="WareHouseComboSelectionChanged"/>
                     </WrapPanel>
                 </WrapPanel>
@@ -86,7 +86,7 @@
 
                 <WrapPanel Grid.Row="2">
                     <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}" Content="Location"/>
+                        <Label Style="{StaticResource labelStyle}" Content="Ware House Location" Width="200"/>
                         <TextBox Style="{StaticResource textBoxStyle}" Name="LocationTextBox" IsReadOnly="True"/>
                     </WrapPanel>
                 </WrapPanel>
@@ -94,7 +94,7 @@
 
                 <WrapPanel Grid.Row="3">
                     <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}"  Content="EntryPermitId"/>
+                        <Label Style="{StaticResource labelStyle}"  Content="Entry Permit Id" Width="200"/>
                         <TextBox Style="{StaticResource textBoxStyle}" Name="entryPermitIdTextBox" />
                     </WrapPanel>
                 </WrapPanel>

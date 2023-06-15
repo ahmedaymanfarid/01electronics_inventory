@@ -44,7 +44,7 @@
 
             
             <Border Grid.Column="0" Style="{StaticResource unselectedSecondaryTabBorder}" >
-                <Label Content="Basic Info" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="BasicInfoLabelMouseLeftButtonDown"/>
+                <Label Content="Basic Info" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnMouseLeftButtonDownBasicInfoLabel"/>
             </Border>
             <Border Grid.Column="1" Style="{StaticResource selectedSecondaryTabBorder}" >
                 <Label Content="Items Info" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
@@ -52,7 +52,7 @@
 
 
             <Border Grid.Column="2" Style="{StaticResource unselectedSecondaryTabBorder}" >
-                <Label Content="Entry permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="LabelMouseLeftButtonDown" />
+                <Label Content="Entry permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnMouseLeftButtonDownFileLabel" />
             </Border>
 
 
@@ -88,10 +88,10 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" Click="BackButtonClick" IsEnabled="true" Margin="24"/>
-            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="NextButtonOnClick" Content="Next" IsEnabled="False"  Margin="24"/>
-            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="FinishButtonClick" IsEnabled="True" Margin="24"/>
-            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Click="CancelButtonClick" Content="Cancel"  Margin="24"/>
+            <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" Click="OnButtonClickBack" IsEnabled="true" Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnButtonClickNext" Content="Next" IsEnabled="False"  Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnButtonClickFinish" IsEnabled="True" Margin="24"/>
+            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Click="OnButtonClickCancel" Content="Cancel"  Margin="24"/>
 
         </Grid>
 
