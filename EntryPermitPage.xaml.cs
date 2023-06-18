@@ -129,13 +129,22 @@ namespace _01electronics_inventory
                     Grid.SetColumn(rfpIdLabel, 0);
                     card.Children.Add(rfpIdLabel);
                 }
+                int itemNo = 0;
                 for (int j = 0; j < materialEntryPermits[i].items.Count; j++)
                 {
+                    if (j>0 && materialEntryPermits[i].items[j].product_category.category_id == materialEntryPermits[i].items[j-1].product_category.category_id
+                        && materialEntryPermits[i].items[j].product_type.type_id == materialEntryPermits[i].items[j-1].product_type.type_id
+                        && materialEntryPermits[i].items[j].product_brand.brand_id== materialEntryPermits[i].items[j - 1].product_brand.brand_id
+                        && materialEntryPermits[i].items[j].product_model.model_id == materialEntryPermits[i].items[j - 1].product_model.model_id
+                        && materialEntryPermits[i].items[j].product_specs.spec_id == materialEntryPermits[i].items[j - 1].product_specs.spec_id)
+                    {
+                        continue;
+                    }
                     card.RowDefinitions.Add(new RowDefinition());
                     Label itemsLabel = new Label();
                     itemsLabel.Margin = new Thickness(0,0,0,10);
                     itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
-                    itemsLabel.Content = $@"Item {j+1}: "+materialEntryPermits[i].items[j].product_category.category_name+"-"+
+                    itemsLabel.Content = $@"Item {itemNo += 1}: "+materialEntryPermits[i].items[j].product_category.category_name+"-"+
                                           materialEntryPermits[i].items[j].product_type.product_name+"-"+
                                           materialEntryPermits[i].items[j].product_brand.brand_name+"-"+
                                           materialEntryPermits[i].items[j].product_model.model_name+"-"+

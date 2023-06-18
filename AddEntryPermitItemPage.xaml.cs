@@ -466,7 +466,7 @@ namespace _01electronics_inventory
             var itemsStackPanel = new StackPanel();
             itemsStackPanel.Background = Brushes.Transparent;
             itemsStackPanel.Margin = new Thickness(10);
-            itemsStackPanel.Height = 480;
+            itemsStackPanel.Height = 560;
             scrollViewer.Content= itemsStackPanel;
 
             var rfpcheckBox = new CheckBox();
@@ -691,6 +691,7 @@ namespace _01electronics_inventory
             generateButton.Width = 50;
             generateButton.Content = "generate";
             generateButton.FontSize = 10;
+            generateButton.Margin = new Thickness(10,0,0,0);
             generateButton.Background = new SolidColorBrush(Color.FromRgb(16, 90, 151));
             generateButton.Foreground = Brushes.White;
             generateButton.Click += OnButtonClickGenenrateSerials;
@@ -783,7 +784,7 @@ namespace _01electronics_inventory
              var generatedSerialsScrollViewer = new ScrollViewer();
              generatedSerialsScrollViewer.Content = generatedSerialsStackPanel;
              generatedSerialsScrollViewer.Height = 100;
-          // generatedSerialsScrollViewer.Visibility = Visibility.Collapsed;
+             generatedSerialsScrollViewer.Visibility = Visibility.Collapsed;
              generatedSerialsScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 
             itemsWrapPanel.Children.Add(border);
@@ -804,72 +805,90 @@ namespace _01electronics_inventory
             itemsStackPanel.Children.Add(currencyWrapPanel);
             itemsStackPanel.Children.Add(stockTypeWrapPanel);
             itemsStackPanel.Children.Add(generatedSerialsScrollViewer);
+            if (itemsWrapPanel.Children.Count > 1 && viewAddCondition != COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
+            {
+                RemoveItemButton(ref itemsStackPanel);
+            }
+
 
         }
         private void addNewItemButton()
         {
             var addNewItemButton = new Button();
-            addNewItemButton.Style = (Style)FindResource("buttonStyle");
-            addNewItemButton.VerticalAlignment = VerticalAlignment.Center;
-            addNewItemButton.HorizontalAlignment = HorizontalAlignment.Center;
-            addNewItemButton.Name = "AddNewItemButton";
-            addNewItemButton.Content = "Add Item";
+            addNewItemButton.Content = "ADD NEW ITEM";
+            addNewItemButton.Width = 200;
+            addNewItemButton.Style = (Style)FindResource("buttonBrowseStyle");
             addNewItemButton.Click += OnButtonClickAddNewCard;
             addNewItemButton.Margin = new Thickness(10);
 
             itemsWrapPanel.Children.Add(addNewItemButton);
         }
-        private void OnTextChangedQuantityTextBox(object sender, TextChangedEventArgs e)
+        private void RemoveItemButton(ref StackPanel itemsStackPanel)
         {
+            var removeItemButton = new Button();
+            removeItemButton.Content = "REMOVE";
+            removeItemButton.Width = 100;
+            removeItemButton.Style = (Style)FindResource("buttonBrowseStyle");
+            removeItemButton.Click += OnButtonClickRemoveItem; 
+            removeItemButton.Margin = new Thickness(0,40,0,0);
+            removeItemButton.Background = Brushes.Red;
+
+            itemsStackPanel.Children.Add(removeItemButton);
+        }
+
+      
+
+        //private void OnTextChangedQuantityTextBox(object sender, TextChangedEventArgs e)
+        //{
 
 
-           TextBox quantityTextBox=sender as TextBox;
+        //   TextBox quantityTextBox=sender as TextBox;
 
-           WrapPanel quantityPanel= quantityTextBox.Parent as WrapPanel;
+        //   WrapPanel quantityPanel= quantityTextBox.Parent as WrapPanel;
 
-           Grid card= quantityPanel.Parent as Grid;
+        //   Grid card= quantityPanel.Parent as Grid;
 
-           WrapPanel itemsPanel=  card.Children[3] as WrapPanel;
-
-
-            WrapPanel rfpPanel = card.Children[1] as WrapPanel;
-
-            CheckBox rfpCheckBox = rfpPanel.Children[1] as CheckBox;
+        //   WrapPanel itemsPanel=  card.Children[3] as WrapPanel;
 
 
+        //    WrapPanel rfpPanel = card.Children[1] as WrapPanel;
 
-            ComboBox itemsComboBox = itemsPanel.Children[1] as ComboBox;
+        //    CheckBox rfpCheckBox = rfpPanel.Children[1] as CheckBox;
 
-            if (quantityTextBox.Text == "")
-                return;
 
-            if (quantityTextBox.Text == "0") 
-            {
-                System.Windows.Forms.MessageBox.Show("quantity cannot be 0 !", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                quantityTextBox.Text = "";
-                quantityTextBox.Focusable = true;
-                return;
-            }
+
+        //    ComboBox itemsComboBox = itemsPanel.Children[1] as ComboBox;
+
+        //    if (quantityTextBox.Text == "")
+        //        return;
+
+        //    if (quantityTextBox.Text == "0") 
+        //    {
+        //        System.Windows.Forms.MessageBox.Show("quantity cannot be 0 !", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+        //        quantityTextBox.Text = "";
+        //        quantityTextBox.Focusable = true;
+        //        return;
+        //    }
                 
 
-               bool isLetter  =  quantityTextBox.Text.ToList().Exists(a=>char.IsLetter(a));
+        //       bool isLetter  =  quantityTextBox.Text.ToList().Exists(a=>char.IsLetter(a));
 
-            if (isLetter == true) {
-                quantityTextBox.Text = "";
+        //    if (isLetter == true) {
+        //        quantityTextBox.Text = "";
 
-                return;
-            }
+        //        return;
+        //    }
 
-            if (int.Parse(quantityTextBox.Text) > Convert.ToInt32(itemsComboBox.Tag)&& rfpCheckBox.IsChecked==true) {
+        //    if (int.Parse(quantityTextBox.Text) > Convert.ToInt32(itemsComboBox.Tag)&& rfpCheckBox.IsChecked==true) {
 
 
-                System.Windows.Forms.MessageBox.Show("quantity cannot be more than rfp items quantity!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+        //        System.Windows.Forms.MessageBox.Show("quantity cannot be more than rfp items quantity!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
-                quantityTextBox.Text = "";
-                return;
+        //        quantityTextBox.Text = "";
+        //        return;
             
-            }
-        }
+        //    }
+        //}
 
        
 
@@ -1805,6 +1824,7 @@ namespace _01electronics_inventory
                 //serialsGrid.Children.Clear();
 
                 ScrollViewer serialsGeneratedScrollViewer = itemsStackPanel.Children[16] as ScrollViewer;
+                serialsGeneratedScrollViewer.Visibility = Visibility.Visible;
                 StackPanel generatedSerialsStackPanel = serialsGeneratedScrollViewer.Content as StackPanel;
                 generatedSerialsStackPanel.Children.Clear();
 
@@ -2799,7 +2819,28 @@ namespace _01electronics_inventory
             if (EntryPermitUploadFilesPage != null)
                 this.NavigationService.Navigate(EntryPermitUploadFilesPage);
         }
+        private void OnButtonClickRemoveItem(object sender, RoutedEventArgs e)
+        {
+            Button removeButton = sender as Button;
+            StackPanel itemsStackPanel = removeButton.Parent as StackPanel;
+            ScrollViewer itemsScrollViewer = itemsStackPanel.Parent as ScrollViewer;
+            StackPanel mainStackPanel = itemsScrollViewer.Parent as StackPanel;
+            Border mainBorder = mainStackPanel.Parent as Border;
+            itemsWrapPanel.Children.Remove(mainBorder);
 
+            for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i++)
+            {
+                Border itemsBorder = itemsWrapPanel.Children[i] as Border;
+                StackPanel maxItemsStackPanel = itemsBorder.Child as StackPanel;
+                Label header = maxItemsStackPanel.Children[0] as Label;
+                header.Content = $"Item {i + 1}";
+            }
+        }
+        /// <summary>
+        /// ///////////////////////////////////////////// ON MOUSE LEFT BUTTON DOWN /////////////////////
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnMouseLeftButtonDownFileLabel(object sender, MouseButtonEventArgs e)
         {
             if (EntryPermitUploadFilesPage != null)
@@ -2812,11 +2853,21 @@ namespace _01electronics_inventory
 
             this.NavigationService.Navigate(addEntryPermitPage);
         }
+        /// <summary>
+        /// ////////////////////////////////////////////// GET / FILL FUNCTIONS////////////////////////////
+        /// </summary>
         private void GetCurrency()
         {
             currencies.Clear();
             if (!commonQueries.GetCurrencyTypes(ref currencies))
                 return;
+            BASIC_STRUCTS.CURRENCY_STRUCT currencyItem = new CURRENCY_STRUCT();
+            currencyItem.currencyName = "Other";
+            currencyItem.currencyId = 0;
+            if (!currencies.Contains(currencyItem))
+            {
+                currencies.Add(currencyItem);
+            }
         }
         private void GetStockTypes()
         {
