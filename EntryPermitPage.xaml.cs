@@ -89,7 +89,7 @@ namespace _01electronics_inventory
                 Grid card = new Grid() { Margin = new Thickness(0, 0, 0, 10) };
                 card.RowDefinitions.Add(new RowDefinition());
                 card.ColumnDefinitions.Add(new ColumnDefinition());
-                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(50) });
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(300) });
 
                 Label header = new Label();
                 header.Content = $"Entry Permit - {materialEntryPermits[i].entry_permit_id}";
@@ -148,11 +148,35 @@ namespace _01electronics_inventory
                                           materialEntryPermits[i].items[j].product_type.product_name+"-"+
                                           materialEntryPermits[i].items[j].product_brand.brand_name+"-"+
                                           materialEntryPermits[i].items[j].product_model.model_name+"-"+
-                                          materialEntryPermits[i].items[j].product_specs.spec_name;
+                                          materialEntryPermits[i].items[j].product_specs.spec_name ;
+
+                    card.RowDefinitions.Add(new RowDefinition());
+
+                    Border quantity = new Border();
+                    quantity.Margin = new Thickness(5);
+                    quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                    quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                    quantity.BorderThickness = new Thickness(1);
+                    quantity.CornerRadius = new CornerRadius(10);
+                    quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                    quantity.Width = 210;
+
+                    Label quantityLabel = new Label();
+                    quantityLabel.Content = "Item Quantity: " + materialEntryPermits[i].items[j].quantity;
+                    quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                    quantityLabel.Foreground = Brushes.White;
+                    quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                    quantity.Child = quantityLabel;
 
                     Grid.SetRow(itemsLabel,card.Children.Count);
                     Grid.SetColumn(itemsLabel, 0);
+
+                    Grid.SetRow(quantity,card.Children.Count);
+                    Grid.SetColumn(quantity,1);
+                 
                     card.Children.Add(itemsLabel);
+                    card.Children.Add(quantity);
                 }
 
                 StackPanel expand = new StackPanel();
@@ -171,7 +195,7 @@ namespace _01electronics_inventory
                 Expander expander = new Expander();
                 expander.Expanded += ExpanderExpanded;
                 expander.Content = expand;
-
+                expander.HorizontalAlignment = HorizontalAlignment.Right;
 
                 Grid.SetRow(expander, 0);
                 Grid.SetColumn(expander, 1);

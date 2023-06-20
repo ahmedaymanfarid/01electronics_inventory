@@ -2154,7 +2154,14 @@ namespace _01electronics_inventory
 
                                 materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
+                                if(currencyComboBox.SelectedIndex !=-1)
                                 materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                                else
+                                {
+                                    System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                                    return;
+                                }
 
                                 materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
 
@@ -2222,8 +2229,16 @@ namespace _01electronics_inventory
 
                                     materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
-                                    materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                                    if (currencyComboBox.SelectedIndex != -1)
+                                    {
+                                        materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
+                                        return;
+                                    }
 
                                     commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typeComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
 
@@ -2252,6 +2267,8 @@ namespace _01electronics_inventory
                                     }
 
                                     materialEntryItem.product_serial_number = serialText.Text;
+
+
 
                                     materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
                                     materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
@@ -2324,8 +2341,14 @@ namespace _01electronics_inventory
 
                                 if (priceTextBox.Text != "")
                                     materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-
+                                if(currencyComboBox.SelectedIndex != -1)
                                 materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                                else
+                                {
+                                    System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                                    return;
+                                }
 
                                 materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
 
@@ -2340,14 +2363,18 @@ namespace _01electronics_inventory
                                 if (stockComboBox.SelectedIndex == -1)
                                 {
 
-                                    System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                    System.Windows.Forms.MessageBox.Show("You have to choose the stock Type ", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                                     return;
 
                                 }
 
-                                materialEntryItem.stock_type.stock_type_id = stockTypes[stockComboBox.SelectedIndex].stock_type_id;
-                                materialEntryItem.stock_type.stock_type_name = stockTypes[stockComboBox.SelectedIndex].stock_type_name;
+                                if(stockComboBox.SelectedIndex !=-1)
+                                {
+                                    materialEntryItem.stock_type.stock_type_id = stockTypes[stockComboBox.SelectedIndex].stock_type_id;
+                                    materialEntryItem.stock_type.stock_type_name = stockTypes[stockComboBox.SelectedIndex].stock_type_name;
+                                }
+                                
                                 //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
 
 
@@ -2388,8 +2415,14 @@ namespace _01electronics_inventory
 
                                     materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
+                                    if(currencyComboBox.SelectedIndex != -1)
                                     materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
+                                        return;
+                                    }
 
                                     commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typeComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
 
@@ -2418,9 +2451,12 @@ namespace _01electronics_inventory
                                         return;
 
                                     }
-
-                                    materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_id;
-                                    materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_name;
+                                     if(stockComboBox.SelectedIndex != -1)
+                                    {
+                                        materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_id;
+                                        materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_name;
+                                    }
+                                    
                                     //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
 
                                     materialEntryItem.product_serial_number = serialText.Text;
@@ -2479,7 +2515,14 @@ namespace _01electronics_inventory
                         if (priceTextBox.Text != "")
                             materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
+                        if(currencyComboBox.SelectedIndex != -1)
                         materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                            return;
+                        }
 
                         materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
 
@@ -2539,8 +2582,12 @@ namespace _01electronics_inventory
 
                         }
 
-                        materialEntryItem.stock_type.stock_type_id = stockTypes[stockComboBox.SelectedIndex].stock_type_id;
-                        materialEntryItem.stock_type.stock_type_name = stockTypes[stockComboBox.SelectedIndex].stock_type_name;
+                        if(stockComboBox.SelectedIndex !=-1)
+                        {
+                            materialEntryItem.stock_type.stock_type_id = stockTypes[stockComboBox.SelectedIndex].stock_type_id;
+                            materialEntryItem.stock_type.stock_type_name = stockTypes[stockComboBox.SelectedIndex].stock_type_name;
+                        }
+                       
 
 
                         addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
@@ -2578,8 +2625,14 @@ namespace _01electronics_inventory
                             if (priceTextBox.Text != "")
                                 materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
 
+                            if(currencyComboBox.SelectedIndex !=-1)
                             materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                            else
+                            {
+                                System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
+                                return;
+                            }
                             materialEntryItem.quantity = 1;
 
 

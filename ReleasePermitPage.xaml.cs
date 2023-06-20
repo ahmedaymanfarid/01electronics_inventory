@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -27,7 +28,7 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT> materialReleasePermits = new List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT>();
+        List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT> materialReleasePermits;
 
         Grid previousGrid = null;
 
@@ -54,7 +55,7 @@ namespace _01electronics_inventory
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
             InitializeComponent();
-
+            materialReleasePermits = new List<INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_MIN_STRUCT>();
             InitializeUiElements();
             ReEntry = new List<string>();
             recievalNote = new List<string>();
@@ -72,102 +73,414 @@ namespace _01electronics_inventory
 
             commonQueries.GetReleasePermits(ref materialReleasePermits);
 
-
-
-            for (int i = 0; i < materialReleasePermits.Count; i++)
+            for(int i =0; i<materialReleasePermits.Count; i++)
             {
+                Border cardBorder = new Border();
+                cardBorder.Margin = new Thickness(10);
+                cardBorder.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFFFF"));
+                cardBorder.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFFFF"));
+                cardBorder.BorderThickness = new Thickness(1);
+                cardBorder.CornerRadius = new CornerRadius(20);
 
+                DropShadowEffect shadow = new DropShadowEffect();
+                shadow.BlurRadius = 20;
+                shadow.Color = Color.FromRgb(211, 211, 211);
+                cardBorder.Effect = shadow;
 
                 Grid card = new Grid() { Margin = new Thickness(0, 0, 0, 10) };
-                card.MouseEnter += CardMouseEnter;
-                card.MouseLeave += CardMouseLeave;
+                card.RowDefinitions.Add(new RowDefinition());
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(510) });
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100) });
+                card.ColumnDefinitions.Add(new ColumnDefinition());
 
+                Label header = new Label();
+                header.Content = $"Release Permit - {materialReleasePermits[i].release_Permit_Id}";
+                header.Style = (Style)FindResource("stackPanelItemHeader");
+
+                Grid.SetRow(header, 0);
+                Grid.SetColumn(header, 0);
+                card.Children.Add(header);
                 card.Tag = materialReleasePermits[i].release_Permit_Serial;
 
                 card.RowDefinitions.Add(new RowDefinition());
-                card.RowDefinitions.Add(new RowDefinition());
-                card.RowDefinitions.Add(new RowDefinition());
+                Label releaseDate = new Label();
+                releaseDate.Content ="Release Date: " + materialReleasePermits[i].release_date.ToString("yyyy-MM-dd");
+                releaseDate.Style = (Style)FindResource("stackPanelItemHeader");
 
-                card.ColumnDefinitions.Add(new ColumnDefinition());
-                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(50) });
+                Grid.SetRow(releaseDate, card.Children.Count);
+                Grid.SetColumn(releaseDate, 0);
+                card.Children.Add(releaseDate);
+
+                int itemNo = 0;
+                for (int j=0; j < materialReleasePermits[i].material_release_items.Count; j++)
+                {
+                    if (materialReleasePermits[i].material_release_items[j].rfp_info.rfpSerial != 0)
+                    {
+                        
+
+                        if (materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_id != null)
+                        {
+                            if(j>0 && materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_id == materialReleasePermits[i].material_release_items[j-1].materialItemcompanyCategory.category_id
+                                   && materialReleasePermits[i].material_release_items[j].materialitemCompanyproduct.type_id == materialReleasePermits[i].material_release_items[j-1].materialitemCompanyproduct.type_id
+                                   && materialReleasePermits[i].material_release_items[j].materialItemCompanyBrand.brand_id == materialReleasePermits[i].material_release_items[j-1].materialItemCompanyBrand.brand_id
+                                   && materialReleasePermits[i].material_release_items[j].materialItemCompanyModel.model_id == materialReleasePermits[i].material_release_items[j-1].materialItemCompanyModel.model_id
+                                   && materialReleasePermits[i].material_release_items[j].materialItemCompanySpecs.spec_name == materialReleasePermits[i].material_release_items[j-1].materialItemCompanySpecs.spec_name)
+                            {
+                                continue;
+                            }
+
+                            if (materialReleasePermits[i].material_release_items[j].rfp_info.rfpID == "")
+                            {
+                                continue;
+                            }
+                            if (materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_name == "")
+                                continue;
+                            if (j==0)
+                            {
+                                card.RowDefinitions.Add(new RowDefinition());
+                                Label rfpIdLabel = new Label();
+                                rfpIdLabel.Margin = new Thickness(0, 0, 0, 10);
+                                rfpIdLabel.Style = (Style)FindResource("stackPanelItemBody");
+                                rfpIdLabel.Content = materialReleasePermits[i].material_release_items[j].rfp_info.rfpID + "-" + materialReleasePermits[i].material_release_items[j].rfp_info.work_form;
+                                Grid.SetRow(rfpIdLabel, card.Children.Count);
+                                Grid.SetColumn(rfpIdLabel, 0);
+                                card.Children.Add(rfpIdLabel);
+                            }
+                            
+
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Label itemsLabel = new Label();
+                            itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                            itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                            itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_name} - "
+                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialitemCompanyproduct.product_name} - "
+                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyBrand.brand_name} - "
+                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyModel.model_name} - "
+                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialItemCompanySpecs.spec_name}";
+
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Border status = new Border();
+                            status.Margin = new Thickness(5);
+                            status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                            status.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                            status.BorderThickness = new Thickness(1);
+                            status.CornerRadius = new CornerRadius(20);
+                            status.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            Label statusLabel = new Label();
+                            statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                            statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            statusLabel.Foreground = Brushes.White;
+                            statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            status.Child = statusLabel;
+
+                            Grid.SetRow(itemsLabel, card.Children.Count);
+                            Grid.SetColumn(itemsLabel, 0);
+
+                            Grid.SetRow(status, card.Children.Count);
+                            Grid.SetColumn(status, 1);
+
+                            card.Children.Add(itemsLabel);
+                            card.Children.Add(status);
+                        }
+                        else if(materialReleasePermits[i].material_release_items[j].materialItemGenericCategory.category_id != null)
+                        {
+                            if (j > 0 && materialReleasePermits[i].material_release_items[j].materialItemGenericCategory.category_id == materialReleasePermits[i].material_release_items[j - 1].materialItemGenericCategory.category_id
+                                   && materialReleasePermits[i].material_release_items[j].materialitemGenericproduct.type_id == materialReleasePermits[i].material_release_items[j - 1].materialitemGenericproduct.type_id
+                                   && materialReleasePermits[i].material_release_items[j].materialItemGenericBrand.brand_id == materialReleasePermits[i].material_release_items[j - 1].materialItemGenericBrand.brand_id
+                                   && materialReleasePermits[i].material_release_items[j].materialItemGenericModel.model_id == materialReleasePermits[i].material_release_items[j - 1].materialItemGenericModel.model_id
+                                  )
+                            {
+                                continue;
+                            }
+                            if (materialReleasePermits[i].material_release_items[j].rfp_info.rfpID == "")
+                            {
+                                continue;
+                            }
+                            if (materialReleasePermits[i].material_release_items[j].materialItemGenericCategory.category_name == "")
+                                continue;
+                            if (j==0)
+                            {
+                                card.RowDefinitions.Add(new RowDefinition());
+                                Label rfpIdLabel = new Label();
+                                rfpIdLabel.Margin = new Thickness(0, 0, 0, 10);
+                                rfpIdLabel.Style = (Style)FindResource("stackPanelItemBody");
+                                rfpIdLabel.Content = materialReleasePermits[i].material_release_items[j].rfp_info.rfpID + "-" + materialReleasePermits[i].material_release_items[j].rfp_info.work_form;
+                                Grid.SetRow(rfpIdLabel, card.Children.Count);
+                                Grid.SetColumn(rfpIdLabel, 0);
+                                card.Children.Add(rfpIdLabel);
+                            }
+                           
+
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Label itemsLabel = new Label();
+                            itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                            itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                            itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].materialItemGenericCategory.category_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].materialitemGenericproduct.product_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].materialItemGenericBrand.brand_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].materialItemGenericModel.model_name}";
+
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Border status = new Border();
+                            status.Margin = new Thickness(5);
+                            status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                            status.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                            status.BorderThickness = new Thickness(1);
+                            status.CornerRadius = new CornerRadius(20);
+                            status.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            Label statusLabel = new Label();
+                            statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                            statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            statusLabel.Foreground = Brushes.White;
+                            statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            status.Child = statusLabel;
+
+                            Grid.SetRow(itemsLabel, card.Children.Count);
+                            Grid.SetColumn(itemsLabel, 0);
+
+                            Grid.SetRow(status, card.Children.Count);
+                            Grid.SetColumn(status, 1);
+
+                            card.Children.Add(itemsLabel);
+                            card.Children.Add(status);
+                        }
+                    }
+                    else
+                    {
+
+                        
+
+                        if(j>0 && materialReleasePermits[i].material_release_items[j].orderCategory.category_id == materialReleasePermits[i].material_release_items[j-1].orderCategory.category_id
+                               && materialReleasePermits[i].material_release_items[j].orderproduct.type_id == materialReleasePermits[i].material_release_items[j-1].orderproduct.type_id
+                               && materialReleasePermits[i].material_release_items[j].orderBrand.brand_id == materialReleasePermits[i].material_release_items[j-1].orderBrand.brand_id
+                               && materialReleasePermits[i].material_release_items[j].orderModel.model_id == materialReleasePermits[i].material_release_items[j-1].orderModel.model_id
+                               && materialReleasePermits[i].material_release_items[j].orderSpecs.spec_id == materialReleasePermits[i].material_release_items[j-1].orderSpecs.spec_id)
+                        {
+                            continue;
+
+                        }
+                       
+                        if (materialReleasePermits[i].material_release_items[j].work_order_id == "")
+                        {
+                            continue;
+                        }
+                        if (materialReleasePermits[i].material_release_items[j].orderCategory.category_name == "")
+                            continue;
+                        if (j==0)
+                        {
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Label workOrderLabel = new Label();
+                            workOrderLabel.Margin = new Thickness(0, 0, 0, 10);
+                            workOrderLabel.Style = (Style)FindResource("stackPanelItemBody");
+                            workOrderLabel.Content = $@"Order: {materialReleasePermits[i].material_release_items[j].work_order_id}";
+
+                         
+
+                            Border quantity = new Border();
+                            quantity.Margin = new Thickness(5);
+                            quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                            quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                            quantity.BorderThickness = new Thickness(1);
+                            quantity.CornerRadius = new CornerRadius(10);
+                            quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                            quantity.Width = 210;
+
+                            Label quantityLabel = new Label();
+                            quantityLabel.Content ="Items Quantity: "+ materialReleasePermits[i].material_release_items.Count;
+                            quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            quantityLabel.Foreground = Brushes.White;
+                            quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            quantity.Child = quantityLabel;
+
+                            Grid.SetRow(workOrderLabel, card.Children.Count);
+                            Grid.SetColumn(workOrderLabel, 0);
+                            card.Children.Add(workOrderLabel);
+
+                            Grid.SetRow(quantity, card.Children.Count-1);
+                            Grid.SetColumn(quantity, 2);
+                            card.Children.Add(quantity);
+                        }
+                       
 
 
+                        card.RowDefinitions.Add(new RowDefinition());
+                        Label itemsLabel = new Label();
+                        itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                        itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                        itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].orderCategory.category_name} - "
+                                               + $@"{materialReleasePermits[i].material_release_items[j].orderproduct.product_name} - "
+                                               + $@"{materialReleasePermits[i].material_release_items[j].orderBrand.brand_name} - "
+                                               + $@"{materialReleasePermits[i].material_release_items[j].orderModel.model_name} - "
+                                               + $@"{materialReleasePermits[i].material_release_items[j].orderSpecs.spec_name}";
 
-                Label header = new Label();
-                header.Content = $"{materialReleasePermits[i].release_Permit_Id}";
+                        card.RowDefinitions.Add(new RowDefinition());
 
-                header.Style = (Style)FindResource("stackPanelItemHeader");
+                       
+                        
+                        Border status = new Border();
+                        status.Margin = new Thickness(5);
+                        status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
+                        status.Background = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
+                        status.BorderThickness = new Thickness(1);
+                        status.CornerRadius = new CornerRadius(10);
+                        status.HorizontalAlignment = HorizontalAlignment.Right;
 
-                card.Children.Add(header);
+                        Label statusLabel = new Label();
+                        statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                        statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                        statusLabel.Foreground = Brushes.White;
+                        statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
 
-                Grid.SetRow(header, 0);
+                        status.Child = statusLabel;
 
-                Grid.SetColumn(header, 0);
+                     
+                       
 
+                        Grid.SetRow(itemsLabel, card.Children.Count);
+                        Grid.SetColumn(itemsLabel, 0);
 
+                        Grid.SetRow(status, card.Children.Count);
+                        Grid.SetColumn(status, 2);
 
-                Label transactionDate = new Label() { Margin = new Thickness(0, 0, 0, 5) };
-                transactionDate.Content = $"{materialReleasePermits[i].release_date.ToString("yyyy-MM-dd")}";
+                        //Grid.SetRow(quantity, card.Children.Count);
+                        //Grid.SetColumn(quantity, 2);
 
-                transactionDate.Style = (Style)FindResource("stackPanelItemBody");
+                        card.Children.Add(itemsLabel);
+                        card.Children.Add(status);
+                        //card.Children.Add(quantity);
+                    }
+                    
 
-                card.Children.Add(transactionDate);
-
-                Grid.SetRow(transactionDate, 1);
-
-                Grid.SetColumn(transactionDate, 0);
-
-
-                Label warehouseNiceName = new Label();
-                warehouseNiceName.Content = $"{materialReleasePermits[i].releaseByName}";
-
-                warehouseNiceName.Style = (Style)FindResource("stackPanelItemBody");
-                warehouseNiceName.HorizontalAlignment = HorizontalAlignment.Left;
-
-                card.Children.Add(warehouseNiceName);
-
-                Grid.SetRow(warehouseNiceName, 2);
-
-                Grid.SetColumn(warehouseNiceName, 0);
-
-
+                }
                 StackPanel expand = new StackPanel();
 
-
-
                 Button editButton = new Button();
-
                 editButton.Content = "EDIT";
-
                 editButton.Click += EditButtonClick;
-
                 editButton.Tag = materialReleasePermits[i].release_Permit_Serial;
 
 
                 Button viewButton = new Button();
-
                 viewButton.Click += ViewButton_Click;
                 viewButton.Tag = materialReleasePermits[i].release_Permit_Serial;
-
                 viewButton.Content = "VIEW";
 
                 expand.Children.Add(viewButton);
                 expand.Children.Add(editButton);
 
                 Expander expander = new Expander();
-
                 expander.Expanded += ExpanderExpanded;
-
                 expander.Content = expand;
-
+                expander.HorizontalAlignment = HorizontalAlignment.Right;
 
                 Grid.SetRow(expander, 0);
-                Grid.SetColumn(expander, 1);
+                Grid.SetColumn(expander, 2);
 
                 card.Children.Add(expander);
 
-                ReleasePermitStackPanel.Children.Add(card);
+                cardBorder.Child = card;
+                ReleasePermitStackPanel.Children.Add(cardBorder);
             }
+
+            //for (int i = 0; i < materialReleasePermits.Count; i++)
+            //{
+
+
+            //    Grid card = new Grid() { Margin = new Thickness(0, 0, 0, 10) };
+            //    card.MouseEnter += CardMouseEnter;
+            //    card.MouseLeave += CardMouseLeave;
+
+            //    card.Tag = materialReleasePermits[i].release_Permit_Serial;
+
+            //    card.RowDefinitions.Add(new RowDefinition());
+            //    card.RowDefinitions.Add(new RowDefinition());
+            //    card.RowDefinitions.Add(new RowDefinition());
+
+            //    card.ColumnDefinitions.Add(new ColumnDefinition());
+            //    card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(50) });
+
+
+
+            //    Label header = new Label();
+            //    header.Content = $@"Release Permit - {materialReleasePermits[i].release_Permit_Id}";
+
+            //    header.Style = (Style)FindResource("stackPanelItemHeader");
+
+            //    card.Children.Add(header);
+
+            //    Grid.SetRow(header, 0);
+
+            //    Grid.SetColumn(header, 0);
+
+
+
+            //    Label transactionDate = new Label() { Margin = new Thickness(0, 0, 0, 5) };
+            //    transactionDate.Content = $"Transaction Date : {materialReleasePermits[i].release_date.ToString("yyyy-MM-dd")}";
+
+            //    transactionDate.Style = (Style)FindResource("stackPanelItemBody");
+
+            //    card.Children.Add(transactionDate);
+
+            //    Grid.SetRow(transactionDate, 1);
+
+            //    Grid.SetColumn(transactionDate, 0);
+
+            //    if (materialReleasePermits[i].)
+            //    Label workFrom = new Label();
+            //    workFrom.Content = $"Work Form : {materialReleasePermits[i].}";
+
+            //    workFrom.Style = (Style)FindResource("stackPanelItemBody");
+            //    workFrom.HorizontalAlignment = HorizontalAlignment.Left;
+
+            //    card.Children.Add(workFrom);
+
+            //    Grid.SetRow(workFrom, 2);
+
+            //    Grid.SetColumn(workFrom, 0);
+
+
+            //    StackPanel expand = new StackPanel();
+
+
+
+            //    Button editButton = new Button();
+
+            //    editButton.Content = "EDIT";
+
+            //    editButton.Click += EditButtonClick;
+
+            //    editButton.Tag = materialReleasePermits[i].release_Permit_Serial;
+
+
+            //    Button viewButton = new Button();
+
+            //    viewButton.Click += ViewButton_Click;
+            //    viewButton.Tag = materialReleasePermits[i].release_Permit_Serial;
+
+            //    viewButton.Content = "VIEW";
+
+            //    expand.Children.Add(viewButton);
+            //    expand.Children.Add(editButton);
+
+            //    Expander expander = new Expander();
+
+            //    expander.Expanded += ExpanderExpanded;
+
+            //    expander.Content = expand;
+
+
+            //    Grid.SetRow(expander, 0);
+            //    Grid.SetColumn(expander, 1);
+
+            //    card.Children.Add(expander);
+
+            //    ReleasePermitStackPanel.Children.Add(card);
+            //}
 
 
 
