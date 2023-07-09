@@ -89,8 +89,8 @@ namespace _01electronics_inventory
 
                 Grid card = new Grid() { Margin = new Thickness(0, 0, 0, 10) };
                 card.RowDefinitions.Add(new RowDefinition());
-                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(510) });
-                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100) });
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(470) });
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
                 card.ColumnDefinitions.Add(new ColumnDefinition());
 
                 Label header = new Label();
@@ -280,30 +280,15 @@ namespace _01electronics_inventory
 
                          
 
-                            Border quantity = new Border();
-                            quantity.Margin = new Thickness(5);
-                            quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
-                            quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
-                            quantity.BorderThickness = new Thickness(1);
-                            quantity.CornerRadius = new CornerRadius(10);
-                            quantity.HorizontalAlignment = HorizontalAlignment.Right;
-                            quantity.Width = 210;
-
-                            Label quantityLabel = new Label();
-                            quantityLabel.Content ="Items Quantity: "+ materialReleasePermits[i].material_release_items.Count;
-                            quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
-                            quantityLabel.Foreground = Brushes.White;
-                            quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
-
-                            quantity.Child = quantityLabel;
+                            
 
                             Grid.SetRow(workOrderLabel, card.Children.Count);
                             Grid.SetColumn(workOrderLabel, 0);
                             card.Children.Add(workOrderLabel);
 
-                            Grid.SetRow(quantity, card.Children.Count-1);
-                            Grid.SetColumn(quantity, 2);
-                            card.Children.Add(quantity);
+                            //Grid.SetRow(quantity, card.Children.Count-1);
+                            //Grid.SetColumn(quantity, 2);
+                            //card.Children.Add(quantity);
                         }
                        
 
@@ -320,8 +305,24 @@ namespace _01electronics_inventory
 
                         card.RowDefinitions.Add(new RowDefinition());
 
-                       
-                        
+                        Border quantity = new Border();
+                        quantity.Margin = new Thickness(5);
+                        quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                        quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                        quantity.BorderThickness = new Thickness(1);
+                        quantity.CornerRadius = new CornerRadius(10);
+                        quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                        quantity.Width = 190;
+
+                        Label quantityLabel = new Label();
+                        quantityLabel.Content = "Released Quantity: " + materialReleasePermits[i].material_release_items[j].released_quantity_release;
+                        quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                        quantityLabel.Foreground = Brushes.White;
+                        quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                        quantity.Child = quantityLabel;
+
+
                         Border status = new Border();
                         status.Margin = new Thickness(5);
                         status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
@@ -347,12 +348,12 @@ namespace _01electronics_inventory
                         Grid.SetRow(status, card.Children.Count);
                         Grid.SetColumn(status, 2);
 
-                        //Grid.SetRow(quantity, card.Children.Count);
-                        //Grid.SetColumn(quantity, 2);
+                        Grid.SetRow(quantity, card.Children.Count);
+                        Grid.SetColumn(quantity, 1);
 
                         card.Children.Add(itemsLabel);
                         card.Children.Add(status);
-                        //card.Children.Add(quantity);
+                        card.Children.Add(quantity);
                     }
                     
 
@@ -623,23 +624,23 @@ namespace _01electronics_inventory
             }
 
 
-            addReleasePermitWindow.releasePermitPage.addReleasePermitItem.addRecieval.Click += OnAddRecievalClick;
-            addReleasePermitWindow.releasePermitPage.addReleasePermitItem.addReEntry.Click += OnAddReEntryClick;
+            addReleasePermitWindow.releasePermitItemPage.addRecieval.Click += OnAddRecievalClick;
+            addReleasePermitWindow.releasePermitItemPage.addReEntry.Click += OnAddReEntryClick;
 
 
-            WrapPanel choicePanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[0] as WrapPanel;
+            WrapPanel choicePanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[0] as WrapPanel;
             ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
             choiceComboBox.IsEnabled = false;
             choicePanel.Visibility = Visibility.Collapsed;
 
 
-            WrapPanel genericCategoryPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[1] as WrapPanel;
+            WrapPanel genericCategoryPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[1] as WrapPanel;
             ComboBox genericCategoryComboBox = genericCategoryPanel.Children[1] as ComboBox;
             genericCategoryComboBox.IsEnabled = false;
             genericCategoryPanel.Visibility = Visibility.Collapsed;
 
 
-            WrapPanel genericProductanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[2] as WrapPanel;
+            WrapPanel genericProductanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[2] as WrapPanel;
             ComboBox genericProductComboBox = genericProductanel.Children[1] as ComboBox;
             genericProductComboBox.IsEnabled = false;
 
@@ -647,7 +648,7 @@ namespace _01electronics_inventory
 
 
 
-            WrapPanel genericBrandPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[3] as WrapPanel;
+            WrapPanel genericBrandPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[3] as WrapPanel;
             ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
             genericBrandComboBox.IsEnabled = false;
 
@@ -655,7 +656,7 @@ namespace _01electronics_inventory
 
 
 
-            WrapPanel genericModelPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[4] as WrapPanel;
+            WrapPanel genericModelPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[4] as WrapPanel;
             ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
             genericModelComboBox.IsEnabled = false;
 
@@ -664,54 +665,54 @@ namespace _01electronics_inventory
 
 
 
-            WrapPanel companyCategoryPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[5] as WrapPanel;
-            ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
-            companyCategoryComboBox.IsEnabled = false;
+            //WrapPanel companyCategoryPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[5] as WrapPanel;
+            //ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
+            //companyCategoryComboBox.IsEnabled = false;
 
-            companyCategoryPanel.Visibility = Visibility.Collapsed;
+            //companyCategoryPanel.Visibility = Visibility.Collapsed;
 
-
-
-            WrapPanel companyProductPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[6] as WrapPanel;
-            ComboBox companyProductComboBox = companyProductPanel.Children[1] as ComboBox;
-            companyProductComboBox.IsEnabled = false;
-
-            companyProductPanel.Visibility = Visibility.Collapsed;
-
-
-
-
-
-            WrapPanel companyBrandPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[7] as WrapPanel;
-            ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
-            companyBrandComboBox.IsEnabled = false;
-
-            companyBrandPanel.Visibility = Visibility.Collapsed;
-
-
-
-            WrapPanel companyModelPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[8] as WrapPanel;
-            ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
-            companyModelComboBox.IsEnabled = false;
-
-            companyModelPanel.Visibility = Visibility.Collapsed;
-
-
-            WrapPanel companySpecsPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[9] as WrapPanel;
+            WrapPanel companySpecsPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[5] as WrapPanel;
             ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
-            companyModelComboBox.IsEnabled = false;
-
+            companySpecsComboBox.IsEnabled = false;
             companySpecsPanel.Visibility = Visibility.Collapsed;
+            //WrapPanel companyProductPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[6] as WrapPanel;
+            //ComboBox companyProductComboBox = companyProductPanel.Children[1] as ComboBox;
+            //companyProductComboBox.IsEnabled = false;
+
+            //companyProductPanel.Visibility = Visibility.Collapsed;
 
 
 
-            WrapPanel selectedItemsPanel = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[10] as WrapPanel;
+
+
+            //WrapPanel companyBrandPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[7] as WrapPanel;
+            //ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
+            //companyBrandComboBox.IsEnabled = false;
+
+            //companyBrandPanel.Visibility = Visibility.Collapsed;
+
+
+
+            //WrapPanel companyModelPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[8] as WrapPanel;
+            //ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
+            //companyModelComboBox.IsEnabled = false;
+
+            //companyModelPanel.Visibility = Visibility.Collapsed;
+
+
+
+
+            //
+
+
+
+            WrapPanel selectedItemsPanel = addReleasePermitWindow.releasePermitItemPage.Home.Children[6] as WrapPanel;
             Label selectedItemslabel = selectedItemsPanel.Children[1] as Label;
 
             if (releaseItems.Count != 0)
                 selectedItemslabel.Content = $"{releaseItems.Count}";
 
-            Grid items = addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children[addReleasePermitWindow.releasePermitPage.addReleasePermitItem.Home.Children.Count - 1] as Grid;
+            Grid items = addReleasePermitWindow.releasePermitItemPage.Home.Children[addReleasePermitWindow.releasePermitItemPage.Home.Children.Count - 1] as Grid;
             items.Background = Brushes.White;
 
             items.Children.Clear();
@@ -1296,7 +1297,7 @@ namespace _01electronics_inventory
 
                 }
 
-                addReleasePermitWindow.releasePermitPage.addReleasePermitItem.LocationsWrapPanel.Children.Add(card);
+                addReleasePermitWindow.releasePermitItemPage.LocationsWrapPanel.Children.Add(card);
 
             }
 

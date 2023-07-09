@@ -30,98 +30,115 @@ namespace _01electronics_inventory
         public AddReleasePermitItemPage addReleasePermitItem;
 
         AddReleasePermitWindow parentWindow;
-        public WorkOrder workOrder = new WorkOrder();
+        public WorkOrder workOrder;
 
-        public RFP rfp = new RFP();
-
-        public MaterialReleasePermits materialReleasePermit = new MaterialReleasePermits();
-        public List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> employees = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
-
-        public List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders = new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
-
-         List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requsters = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
-        public List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requstersFiltered = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
-
-        public List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> rfps = new List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>();
-        List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT> companyContacts=new List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT>();
-
-        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+        public RFP rfp;
 
 
-        public List<int> serialProducts = new List<int>();
+        public MaterialReleasePermits materialReleasePermit;
+        public List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT> employees;
+
+        public List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT> workOrders;
+
+         List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requsters;
+        public List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT> requstersFiltered;
+
+        public List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT> rfps;
+        List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT> companyContacts;
+
+        public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems;
 
 
-        public AddReleasePermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddReleasePermitWindow w)
+        public List<int> serialProducts;
+
+
+        public AddReleasePermitPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddReleasePermitWindow mParentWindow)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries;
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
 
-            commonQueries.GetWorkOrders(ref workOrders);
-
-            commonQueries.GetRFPRequestors(ref requsters);
-
-
-            for (int i = 0; i < requsters.Count; i++)
-            {
-                if (i != 0 && requsters[i].requestor_team.team_name != requsters[i - 1].requestor_team.team_name)
-                {
-                    requstersFiltered.Add(requsters[i]);
-                }
-                else if (i == 0)
-                {
-                    requstersFiltered.Add(requsters[i]);
-                }
-            }
+            employees = new List<COMPANY_ORGANISATION_MACROS.EMPLOYEE_STRUCT>();
+            workOrders =new List<SALES_STRUCTS.WORK_ORDER_MAX_STRUCT>();
+            requsters = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
+            requstersFiltered = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
+            rfps = new List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>();
+            companyContacts = new List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT>();
+            rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+            serialProducts = new List<int>();
+            parentWindow = mParentWindow;
+            materialReleasePermit = new MaterialReleasePermits();
+            rfp = parentWindow.rfps;
+            workOrder = parentWindow.workOrder;
+            //addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
 
             InitializeComponent();
 
-            parentWindow = w;
+            GetOrderIDs();
+            GetRFPsRequestorTeams();
+            GetCurrentEnrolledEmployees();
+            GetNewEntrySerial();
+            FillRFPRequestorTeamComboBox();
+            FillOrderIDsComboBox();
+          
+        }
 
-            addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
+        private void GetOrderIDs()
+        {
+            if (!commonQueries.GetWorkOrders(ref workOrders))
+                return;
+        }
+        private void GetRFPsRequestorTeams()
+        {
+            if (!commonQueries.GetRFPRequestors(ref requsters))
+                return;
 
+            for (int i = 0; i < requsters.Count; i++)
+            {
+                PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT rfpRequestorFound = requstersFiltered.Find(f => f.requestor_team.team_id == requsters[i].requestor_team.team_id);
+                if(rfpRequestorFound.requestor_team.team_id == 0)
+                {
+                    requstersFiltered.Add(requsters[i]);
+                }
+                //if (i != 0 && requsters[i].requestor_team.team_id != requsters[i - 1].requestor_team.team_id)
+                //{
+                //    requstersFiltered.Add(requsters[i]);
+                //}
+                //else if (i == 0)
+                //{
+                //    requstersFiltered.Add(requsters[i]);
+                //}
+            }
+        }
+        private void GetCurrentEnrolledEmployees()
+        {
             employees.Clear();
-            commonQueries.GetCurrentlyEnrolledEmployees(ref employees);
+            if (!commonQueries.GetCurrentlyEnrolledEmployees(ref employees))
+                return;
 
             employees.ForEach(a => MaterialRecieverComboBox.Items.Add(a.employee_name));
-
-
+        }
+        private void GetNewEntrySerial()
+        {
             materialReleasePermit.SetReleaseBy(loggedInUser.GetEmployeeId());
-
-            materialReleasePermit.GetNewEntrySerial();
-
-
-
-            WrapPanel orderPanel = mainPanel.Children[1] as WrapPanel;
-            ComboBox orderSerialsComboBox= orderPanel.Children[0] as ComboBox;
-
-
+            if(!materialReleasePermit.GetNewEntrySerial())
+                return;
+        }
+        private void FillRFPRequestorTeamComboBox()
+        {
             WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
-            ComboBox rfpRequstersComboBox = rfpPanel.Children[0] as ComboBox;
+            ComboBox rfpRequstersComboBox = rfpPanel.Children[1] as ComboBox;
 
             requstersFiltered.ForEach(a => rfpRequstersComboBox.Items.Add(a.requestor_team.team_name));
-
-            workOrders.ForEach(a => orderSerialsComboBox.Items.Add(a.order_id));  
-
         }
-
-
-        private void CancelButtonClick(object sender, RoutedEventArgs e)
+        private void FillOrderIDsComboBox()
         {
-            parentWindow.Close();
+            WrapPanel orderPanel = mainPanel.Children[2] as WrapPanel;
+            ComboBox orderSerialsComboBox = orderPanel.Children[1] as ComboBox;
+            workOrders.ForEach(a => orderSerialsComboBox.Items.Add(a.order_id));
         }
-
-        private void NextButtonClick(object sender, RoutedEventArgs e)
-        {
-
-            materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
-           // addReleasePermitItem.addReleasePermitPage = this;
-
-            this.NavigationService.Navigate(addReleasePermitItem);
-
-
-        }
+      
 
         private void BasicInfoLableMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -138,7 +155,7 @@ namespace _01electronics_inventory
 
             materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
            // addReleasePermitItem.addReleasePermitPage = this;
-            this.NavigationService.Navigate(addReleasePermitItem);
+            this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
 
         }
 
@@ -162,15 +179,22 @@ namespace _01electronics_inventory
         {
             orderChecked.IsChecked = false;
 
-            WrapPanel rfpPanel=mainPanel.Children[0] as WrapPanel;
-            rfpPanel.Visibility = Visibility.Visible;
+            WrapPanel rfpRequestorTeamWrapPanel=mainPanel.Children[0] as WrapPanel;
+            rfpRequestorTeamWrapPanel.Visibility = Visibility.Visible;
 
+            WrapPanel rfpIDWrapPanel = mainPanel.Children[1] as WrapPanel;
+            rfpIDWrapPanel.Visibility = Visibility.Visible;
 
-            WrapPanel orderPanel = mainPanel.Children[1] as WrapPanel;
-            orderPanel.Visibility = Visibility.Collapsed;
+            WrapPanel orderIdWrapPanel = mainPanel.Children[2] as WrapPanel;
+            orderIdWrapPanel.Visibility = Visibility.Collapsed;
 
-           ComboBox orderSerialsComboBox= orderPanel.Children[0] as ComboBox;
+            WrapPanel orderContactWrapPanel = mainPanel.Children[3] as WrapPanel;
+            orderContactWrapPanel.Visibility = Visibility.Collapsed;
 
+            WrapPanel orderEndingChoice = mainPanel.Children[4] as WrapPanel;
+            orderEndingChoice.Visibility = Visibility.Collapsed;
+
+            ComboBox orderSerialsComboBox = orderIdWrapPanel.Children[1] as ComboBox;
             orderSerialsComboBox.SelectedIndex = -1;
 
 
@@ -189,15 +213,23 @@ namespace _01electronics_inventory
             rfpChecked.IsChecked = false;
 
 
-            WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
-            rfpPanel.Visibility = Visibility.Collapsed;
+            WrapPanel rfpRequestorPanel = mainPanel.Children[0] as WrapPanel;
+            rfpRequestorPanel.Visibility = Visibility.Collapsed;
+
+            WrapPanel rfpIDPanel = mainPanel.Children[1] as WrapPanel;
+            rfpIDPanel.Visibility = Visibility.Collapsed;
+
+            WrapPanel orderSerialPanel = mainPanel.Children[2] as WrapPanel;
+            orderSerialPanel.Visibility = Visibility.Visible;
+
+            WrapPanel orderContactPanel = mainPanel.Children[3] as WrapPanel;
+            orderContactPanel.Visibility = Visibility.Visible;
+
+            WrapPanel chooseToBeClosedWith = mainPanel.Children[4] as WrapPanel;
+            chooseToBeClosedWith.Visibility = Visibility.Visible;
 
 
-            WrapPanel orderPanel = mainPanel.Children[1] as WrapPanel;
-            orderPanel.Visibility = Visibility.Visible;
-
-
-            addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
+            //addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
 
             if (parentWindow.isView == true) {
                 //addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
@@ -206,26 +238,28 @@ namespace _01electronics_inventory
 
         private void rfpRequestersSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
+            WrapPanel rfpRequestorTeamWrapPanel = mainPanel.Children[0] as WrapPanel;
+            ComboBox rfpsRequstersTeamComboBox= rfpRequestorTeamWrapPanel.Children[1] as ComboBox;
 
-           ComboBox rfpsRequsters= rfpPanel.Children[0] as ComboBox;
+            WrapPanel rfpIDWrapPanel = mainPanel.Children[1] as WrapPanel;
+            ComboBox rfpIDComboBox = rfpIDWrapPanel.Children[1] as ComboBox;
 
-            ComboBox rfpComboBox = rfpPanel.Children[1] as ComboBox;
-            commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpsRequsters.SelectedIndex].requestor_team.team_id);
-            rfpComboBox.Items.Clear();
+            if (!commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpsRequstersTeamComboBox.SelectedIndex].requestor_team.team_id))
+                return;
+            rfpIDComboBox.Items.Clear();
 
-            rfps.ForEach(a => rfpComboBox.Items.Add(a.rfpID));
+            rfps.ForEach(a => rfpIDComboBox.Items.Add(a.rfpID));
 
 
         }
 
         private bool InitializeCompanyContacts()
         {
-            WrapPanel orderPanel = mainPanel.Children[1] as WrapPanel;
+            WrapPanel orderPanel = mainPanel.Children[2] as WrapPanel;
+            WrapPanel orderContacts = mainPanel.Children[3] as WrapPanel;
 
-           ComboBox ordersComboBox= orderPanel.Children[0] as ComboBox;
-
-            ComboBox companyContactsComboBox = orderPanel.Children[1] as ComboBox;
+            ComboBox ordersComboBox= orderPanel.Children[1] as ComboBox;
+            ComboBox companyContactsComboBox = orderContacts.Children[1] as ComboBox;
 
 
             workOrder.InitializeWorkOrderInfo(workOrders[ordersComboBox.SelectedIndex].order_serial);
@@ -246,14 +280,14 @@ namespace _01electronics_inventory
             return true;
         }
 
-        private void orderSerialsSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnSelectionChangedOrderSerial(object sender, SelectionChangedEventArgs e)
         {
             serialProducts.Clear();
             workOrder.SetOrderIssueDateToToday();
 
-            WrapPanel orderPanel = mainPanel.Children[1] as WrapPanel;
+            WrapPanel orderPanel = mainPanel.Children[2] as WrapPanel;
 
-            ComboBox ordersComboBox = orderPanel.Children[0] as ComboBox;
+            ComboBox ordersComboBox = orderPanel.Children[1] as ComboBox;
 
             if (ordersComboBox.SelectedIndex != -1)
             {
@@ -288,48 +322,70 @@ namespace _01electronics_inventory
 
         }
 
-        private void OnBtnClickAddContact(object sender, RoutedEventArgs e)
-        {
-            //AddContactWindow currentWindow = new AddContactWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, workOrder.GetCompanySerial(), workOrder.GetCompanyName());
-            //currentWindow.Closed += OnClosedAddContactWindow;
-            //currentWindow.Show();
-
-        }
-
+      
         private void OnClosedAddContactWindow(object sender, EventArgs e)
         {
             if (!InitializeCompanyContacts())
                 return;
         }
 
-        private void rfpSerialsSelectionChanged(object sender, SelectionChangedEventArgs e)
+        
+        /// <summary>
+        /// ////////////////////////////////// ON SELECTION CHANGED /////////////////////////
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnSelectionChangedContactsComboBox(object sender, SelectionChangedEventArgs e)
+        {
+
+           ComboBox contactsComboBox =sender as ComboBox;
+
+            if (contactsComboBox.SelectedIndex != -1)
+            {
+                materialReleasePermit.SetContactId(workOrder.GetContactId());
+                materialReleasePermit.SetBranchSerialId(workOrder.GetAddressSerial());
+
+                materialReleasePermit.SetSalesPersonId(workOrder.GetSalesPersonId());
+            }
+            else {
+
+
+                materialReleasePermit.SetContactId(0);
+            }
+        }
+        private void OnSelectionChangedRfpIdComboBox(object sender, SelectionChangedEventArgs e)
         {
             WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
             ComboBox rfpSerialsComboBox = rfpPanel.Children[1] as ComboBox;
 
             serialProducts.Clear();
 
+            
+
+            if (rfpSerialsComboBox.SelectedIndex != -1)
+                if (!rfp.InitializeRFP(rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion))
+                    return;
 
 
-            if(rfpSerialsComboBox.SelectedIndex!=-1)
-            rfp.InitializeRFP(rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion);
+            if (!commonQueries.GetRfpItemsMapping(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
+                return;
 
+            for (int i = 0; i < rfpItems.Count; i++)
+            {
 
-            commonQueries.GetRfpItemsMapping(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems);
-
-            for (int i = 0; i < rfpItems.Count; i++) {
-
-                if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK) {
+                if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                {
 
                     rfpItems.Remove(rfpItems[i]);
                     i--;
                 }
 
-            
+
             }
 
 
-            for (int i = 0; i < rfpItems.Count; i++) {
+            for (int i = 0; i < rfpItems.Count; i++)
+            {
 
                 if (rfpItems[i].product_model.model_name != "")
                 {
@@ -343,11 +399,11 @@ namespace _01electronics_inventory
 
                     }
 
-                    else 
+                    else
                     {
 
                         serialProducts.Add(0);
-                    
+
                     }
 
 
@@ -375,7 +431,7 @@ namespace _01electronics_inventory
                     }
 
                 }
-            
+
             }
 
             materialReleasePermit.SetRfp(rfp);
@@ -384,38 +440,79 @@ namespace _01electronics_inventory
 
 
         }
-
-        private void OnContactsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-           ComboBox contactsComboBox =sender as ComboBox;
-
-            if (contactsComboBox.SelectedIndex != -1)
-            {
-                materialReleasePermit.SetContactId(workOrder.GetContactId());
-                materialReleasePermit.SetBranchSerialId(workOrder.GetAddressSerial());
-
-                materialReleasePermit.SetSalesPersonId(workOrder.GetSalesPersonId());
-            }
-            else {
-
-
-                materialReleasePermit.SetContactId(0);
-            }
-        }
-
-        private void OnRfpUnChecked(object sender, RoutedEventArgs e) {
+        /// <summary>
+        /// /////////////////////////////////// ON UNCHECK CKECKBOX ///////////////////////////
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnUnCheckRFPCheckBox(object sender, RoutedEventArgs e) {
 
             rfpPanel.Visibility = Visibility.Collapsed;
-
+            rfpIdPanel.Visibility = Visibility.Collapsed;   
         }
 
-        private void OnOrderUnChecked(object sender, RoutedEventArgs e)
+        private void OnUncheckOrderCheckBox(object sender, RoutedEventArgs e)
         {
 
             orderPanel.Visibility = Visibility.Collapsed;
+            orderContactPanel.Visibility=Visibility.Collapsed;
+            chooseToBeClosedWith.Visibility=Visibility.Collapsed;
+            serviceReportCheckBox.IsChecked=false;
+            receivalNoteCheckBox.IsChecked=false;
+        }
+
+        /// <summary>
+        /// ///////////////////////////////////// ON BUTTON CLICK //////////////////
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+        private void OnButtonClickCancel(object sender, RoutedEventArgs e)
+        {
+            parentWindow.Close();
+        }
+
+        private void OnButtonClickNext(object sender, RoutedEventArgs e)
+        {
+            if (orderChecked.IsChecked != true && rfpChecked.IsChecked != true)
+            {
+
+                System.Windows.Forms.MessageBox.Show("You have to choose rfp or order", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+            if(orderChecked.IsChecked == true && serviceReportCheckBox.IsChecked==false && receivalNoteCheckBox.IsChecked == false )
+            {
+                System.Windows.Forms.MessageBox.Show("Please choose ending it with receival note or service report", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
+            // addReleasePermitItem.addReleasePermitPage = this;
+
+            this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
 
 
+        }
+        private void OnButtonClickAddContact(object sender, RoutedEventArgs e)
+        {
+            //AddContactWindow currentWindow = new AddContactWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, workOrder.GetCompanySerial(), workOrder.GetCompanyName());
+            //currentWindow.Closed += OnClosedAddContactWindow;
+            //currentWindow.Show();
+
+        }
+
+        private void OnCheckServiceReportCheckBox(object sender, RoutedEventArgs e)
+        {
+            parentWindow.serviceReport = true;
+            parentWindow.rfp = false;
+            receivalNoteCheckBox.IsChecked = false;
+        }
+
+        private void OnCheckReceivalNoteCheckBox(object sender, RoutedEventArgs e)
+        {
+            parentWindow.serviceReport = false;
+            parentWindow.rfp = false;
+            serviceReportCheckBox.IsChecked = false;
         }
     }
 }

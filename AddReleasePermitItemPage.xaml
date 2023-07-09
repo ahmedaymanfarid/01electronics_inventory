@@ -61,12 +61,12 @@
                     <RowDefinition/>
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0" x:Name="Home" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="24">
+                <StackPanel Grid.Row="0" x:Name="Home" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="24">
 
 
-            </Grid>
+                </StackPanel>
 
-                <WrapPanel Grid.Row="1" x:Name="LocationsWrapPanel">
+                <WrapPanel Grid.Row="1" x:Name="LocationsWrapPanel" Margin="0,15,0,0">
 
 
                 </WrapPanel>

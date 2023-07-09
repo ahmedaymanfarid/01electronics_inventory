@@ -127,7 +127,7 @@ namespace _01electronics_inventory
         private void FillStockAvailability()
         {
             if (!stock.GetAllEntryPermitsItems())
-                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+               return;
             else
             {
                 FillStockStackPanel();

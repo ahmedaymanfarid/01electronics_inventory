@@ -63,6 +63,9 @@ namespace _01electronics_inventory
 
         private List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT> specs;
 
+        private WorkOrder workOrder;
+        private RFP rfp;
+        int orderItemNumber;
 
         public AddReleasePermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddReleasePermitWindow mReleasePermitWindow)
         {
@@ -98,405 +101,354 @@ namespace _01electronics_inventory
             serials = new List<string>();
             entryPermits= new List<INVENTORY_STRUCTS.ENTRY_PERMIT_MIN_STRUCT>();
             maintenanceContract = new MaintenanceContract();
+            parentWindow = mReleasePermitWindow;
+            workOrder = parentWindow.workOrder;
+            rfp = parentWindow.rfps;
+            orderItemNumber = 0;
+            GetAllEntryPermits();
+            InitializeStock();
+            GetGenericItems();
+            GetAllWorkOrders();
+            CheckAddOrView();
+            //LocationsWrapPanel.Margin = new Thickness(0,15,0,0);
+           
+        }
+        public void GetAllEntryPermits()
+        {
             if (!commonQueries.GetEntryPermits(ref entryPermits))
                 return;
-            
-            parentWindow = mReleasePermitWindow;
-
-            InitializeStock();
-
-            commonQueries.GetWorkOrders(ref workOrders);
-
-            LocationsWrapPanel.Margin = new Thickness(0,15,0,0);
-
-
-            if (parentWindow.isView == true) {
+        }
+        public void GetAllWorkOrders()
+        {
+            if (!commonQueries.GetWorkOrders(ref workOrders))
+                return;
+        }
+        public void CheckAddOrView()
+        {
+            if (parentWindow.isView == true)
+            {
                 finishButton.IsEnabled = false;
                 addRecieval.Visibility = Visibility.Visible;
                 addReEntry.Visibility = Visibility.Visible;
 
-
-
             }
         }
-
+        public void GetGenericItems()
+        {
+            genericCategories.Clear();
+            if (!commonQueries.GetGenericProductCategories(ref genericCategories))
+                return;
+        }
         public void InitializeStock() {
 
             Home.Children.Clear();
-            Home.RowDefinitions.Clear();
+            //Home.RowDefinitions.Clear();
 
             WrapPanel choicePanel = new WrapPanel();
-
             Label choice = new Label();
-
             choice.Style = (Style)FindResource("tableItemLabel");
-
-
             choice.Content = "Choose type";
-            
-
             choice.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
-
             ComboBox choiceComboBox = new ComboBox();
-
-
             choiceComboBox.Style = (Style)FindResource("comboBoxStyle");
-
             choiceComboBox.Items.Add("Generic");
             choiceComboBox.Items.Add("Company");
             choiceComboBox.SelectionChanged += OnChoiceComboBoxSelectionChanged;
 
-            Home.RowDefinitions.Add(new RowDefinition());
+           // Home.RowDefinitions.Add(new RowDefinition());
             choicePanel.Children.Add(choice);
             choicePanel.Children.Add(choiceComboBox);
             Home.Children.Add(choicePanel);
 
-            Grid.SetRow(choicePanel, Home.RowDefinitions.Count-1);
+           // Grid.SetRow(choicePanel, Home.RowDefinitions.Count-1);
+
+            //WrapPanel GenericCategoryPanel = new WrapPanel();
+            //Label genericCategoryLabel = new Label();
+            //genericCategoryLabel.Content = "Generic Category";
+            //genericCategoryLabel.Style = (Style)FindResource("tableItemLabel");
+            //genericCategoryLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
+          //  ComboBox genericCategoryComboBox = new ComboBox();
 
-
-            WrapPanel GenericCategoryPanel = new WrapPanel();
-
-            Label genericCategoryLabel = new Label();
-
-            genericCategoryLabel.Content = "Generic Category";
-
-            genericCategoryLabel.Style = (Style)FindResource("tableItemLabel");
-
-            genericCategoryLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            ComboBox genericCategoryComboBox = new ComboBox();
-
-            genericCategoryComboBox.IsEnabled = false;
+          //  genericCategoryComboBox.IsEnabled = false;
               
-            genericCategories.Clear();
-            commonQueries.GetGenericProductCategories(ref genericCategories);
+             
 
-            genericCategories.ForEach(a => genericCategoryComboBox.Items.Add(a.category_name));
-            genericCategoryComboBox.Style = (Style)FindResource("comboBoxStyle");
+          //  genericCategories.ForEach(a => genericCategoryComboBox.Items.Add(a.category_name));
+          //  genericCategoryComboBox.Style = (Style)FindResource("comboBoxStyle");
 
-            genericCategoryComboBox.SelectionChanged += OnGenericCategoryComboBoxSelectionChanged;
-
-
-            GenericCategoryPanel.Children.Add(genericCategoryLabel);
-            GenericCategoryPanel.Children.Add(genericCategoryComboBox);
-            Home.Children.Add(GenericCategoryPanel);
-            Home.RowDefinitions.Add(new RowDefinition());
-
-            Grid.SetRow(GenericCategoryPanel, Home.RowDefinitions.Count - 1);
+          //  genericCategoryComboBox.SelectionChanged += OnGenericCategoryComboBoxSelectionChanged;
 
 
+          //  GenericCategoryPanel.Children.Add(genericCategoryLabel);
+          //  GenericCategoryPanel.Children.Add(genericCategoryComboBox);
+          //  Home.Children.Add(GenericCategoryPanel);
+          ////  Home.RowDefinitions.Add(new RowDefinition());
 
-
-
-            WrapPanel GenericProductPanel = new WrapPanel();
-
-            Label genericProductLabel = new Label();
-
-            genericProductLabel.Content = "Generic Product";
-
-            genericProductLabel.Style = (Style)FindResource("tableItemLabel");
-
-            genericProductLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            ComboBox genericProductComboBox = new ComboBox();
-
-            genericProductComboBox.IsEnabled = false;
-
-            genericProductComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            genericProductComboBox.SelectionChanged += OnGenericProductComboBoxSelectionChanged;
-
-
-            GenericProductPanel.Children.Add(genericProductLabel);
-            GenericProductPanel.Children.Add(genericProductComboBox);
-            Home.Children.Add(GenericProductPanel);
-
-            Home.RowDefinitions.Add(new RowDefinition());
-
-            Grid.SetRow(GenericProductPanel, Home.RowDefinitions.Count - 1);
+          ////  Grid.SetRow(GenericCategoryPanel, Home.RowDefinitions.Count - 1);
 
 
 
 
 
+          //  WrapPanel GenericProductPanel = new WrapPanel();
 
-            WrapPanel GenericBrandPanel = new WrapPanel();
+          //  Label genericProductLabel = new Label();
 
-            Label genericBrandLabel = new Label();
+          //  genericProductLabel.Content = "Generic Product";
 
-            genericBrandLabel.Content = "Generic Brand";
+          //  genericProductLabel.Style = (Style)FindResource("tableItemLabel");
 
-            genericBrandLabel.Style = (Style)FindResource("tableItemLabel");
-
-            genericBrandLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            ComboBox genericBrandComboBox = new ComboBox();
-
-            genericBrandComboBox.IsEnabled = false;
-
-            genericBrandComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            genericBrandComboBox.SelectionChanged += OnGenericBrandComboBoxSelectionChanged;
+          //  genericProductLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
-            GenericBrandPanel.Children.Add(genericBrandLabel);
-            GenericBrandPanel.Children.Add(genericBrandComboBox);
-            Home.Children.Add(GenericBrandPanel);
+          //  ComboBox genericProductComboBox = new ComboBox();
 
-            Home.RowDefinitions.Add(new RowDefinition());
+          //  genericProductComboBox.IsEnabled = false;
 
-            Grid.SetRow(GenericBrandPanel, Home.RowDefinitions.Count - 1);
+          //  genericProductComboBox.Style = (Style)FindResource("comboBoxStyle");
 
+          //  genericProductComboBox.SelectionChanged += OnGenericProductComboBoxSelectionChanged;
+
+
+          //  GenericProductPanel.Children.Add(genericProductLabel);
+          //  GenericProductPanel.Children.Add(genericProductComboBox);
+          //  Home.Children.Add(GenericProductPanel);
+
+          // // Home.RowDefinitions.Add(new RowDefinition());
+
+          ////  Grid.SetRow(GenericProductPanel, Home.RowDefinitions.Count - 1);
 
 
 
-            WrapPanel GenericModelPanel = new WrapPanel();
-
-            Label genericModelLabel = new Label();
-
-            genericModelLabel.Content = "Generic Model";
-
-            genericModelLabel.Style = (Style)FindResource("tableItemLabel");
-
-            genericModelLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
-            ComboBox genericModelComboBox = new ComboBox();
 
-            genericModelComboBox.IsEnabled = false;
+          //  WrapPanel GenericBrandPanel = new WrapPanel();
 
-            genericModelComboBox.Style = (Style)FindResource("comboBoxStyle");
+          //  Label genericBrandLabel = new Label();
 
-            genericModelComboBox.SelectionChanged += OnGenericModelComboBoxSelectionChanged;
+          //  genericBrandLabel.Content = "Generic Brand";
+
+          //  genericBrandLabel.Style = (Style)FindResource("tableItemLabel");
+
+          //  genericBrandLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
-            GenericModelPanel.Children.Add(genericModelLabel);
-            GenericModelPanel.Children.Add(genericModelComboBox);
-            Home.Children.Add(GenericModelPanel);
+          //  ComboBox genericBrandComboBox = new ComboBox();
 
-            Home.RowDefinitions.Add(new RowDefinition());
+          //  genericBrandComboBox.IsEnabled = false;
 
-            Grid.SetRow(GenericModelPanel, Home.RowDefinitions.Count - 1);
+          //  genericBrandComboBox.Style = (Style)FindResource("comboBoxStyle");
+
+          //  genericBrandComboBox.SelectionChanged += OnGenericBrandComboBoxSelectionChanged;
+
+
+          //  GenericBrandPanel.Children.Add(genericBrandLabel);
+          //  GenericBrandPanel.Children.Add(genericBrandComboBox);
+          //  Home.Children.Add(GenericBrandPanel);
+
+          // // Home.RowDefinitions.Add(new RowDefinition());
+
+          // // Grid.SetRow(GenericBrandPanel, Home.RowDefinitions.Count - 1);
+
+
+
+
+          //  WrapPanel GenericModelPanel = new WrapPanel();
+
+          //  Label genericModelLabel = new Label();
+
+          //  genericModelLabel.Content = "Generic Model";
+
+          //  genericModelLabel.Style = (Style)FindResource("tableItemLabel");
+
+          //  genericModelLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
+
+
+          //  ComboBox genericModelComboBox = new ComboBox();
+
+          //  genericModelComboBox.IsEnabled = false;
+
+          //  genericModelComboBox.Style = (Style)FindResource("comboBoxStyle");
+
+          //  genericModelComboBox.SelectionChanged += OnGenericModelComboBoxSelectionChanged;
+
+
+          //  GenericModelPanel.Children.Add(genericModelLabel);
+          //  GenericModelPanel.Children.Add(genericModelComboBox);
+          //  Home.Children.Add(GenericModelPanel);
+
+          //  Home.RowDefinitions.Add(new RowDefinition());
+
+          //  Grid.SetRow(GenericModelPanel, Home.RowDefinitions.Count - 1);
 
 
             /////////////////////////////////////////////////////
-            ///
-
-
+            //
 
             WrapPanel companyCategoryPanel = new WrapPanel();
-
             Label companyCategoryLabel = new Label();
-
-            companyCategoryLabel.Content = "Company Category";
-
+            companyCategoryLabel.Content = "Category";
             companyCategoryLabel.Style = (Style)FindResource("tableItemLabel");
-
             companyCategoryLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
             ComboBox companyCategoryComboBox = new ComboBox();
-
             companyCategoryComboBox.IsEnabled = false;
-
             companyCategories.Clear();
             commonQueries.GetProductCategories(ref companyCategories);
-
             companyCategories.ForEach(a => companyCategoryComboBox.Items.Add(a.category_name));
             companyCategoryComboBox.Style = (Style)FindResource("comboBoxStyle");
-
             companyCategoryComboBox.SelectionChanged += OnCompanyCategoryComboBoxSelectionChanged;
-
-
             companyCategoryPanel.Children.Add(companyCategoryLabel);
             companyCategoryPanel.Children.Add(companyCategoryComboBox);
+
             Home.Children.Add(companyCategoryPanel);
-            Home.RowDefinitions.Add(new RowDefinition());
+          //  Home.RowDefinitions.Add(new RowDefinition());
 
 
-            Grid.SetRow(companyCategoryPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
+         //   Grid.SetRow(companyCategoryPanel, Home.RowDefinitions.Count - 1);
 
             WrapPanel companyProductPanel = new WrapPanel();
-
             Label companyProductLabel = new Label();
-
-            companyProductLabel.Content = "Company Product";
-
+            companyProductLabel.Content = "Product";
             companyProductLabel.Style = (Style)FindResource("tableItemLabel");
-
             companyProductLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
-
             ComboBox companyProductComboBox = new ComboBox();
-
             companyProductComboBox.IsEnabled = false;
-
             companyProductComboBox.Style = (Style)FindResource("comboBoxStyle");
-
             companyProductComboBox.SelectionChanged += OnCompanyProductComboBoxSelectionChanged;
-
-
             companyProductPanel.Children.Add(companyProductLabel);
             companyProductPanel.Children.Add(companyProductComboBox);
             Home.Children.Add(companyProductPanel);
 
-            Home.RowDefinitions.Add(new RowDefinition());
+        //    Home.RowDefinitions.Add(new RowDefinition());
 
-            Grid.SetRow(companyProductPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
-
+         //   Grid.SetRow(companyProductPanel, Home.RowDefinitions.Count - 1);
 
             WrapPanel companyBrandPanel = new WrapPanel();
-
             Label companyBrandLabel = new Label();
-
-            companyBrandLabel.Content = "Company Brand";
-
+            companyBrandLabel.Content = "Brand";
             companyBrandLabel.Style = (Style)FindResource("tableItemLabel");
-
             companyBrandLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
             ComboBox companyBrandComboBox = new ComboBox();
-
             companyBrandComboBox.IsEnabled = false;
-
             companyBrandComboBox.Style = (Style)FindResource("comboBoxStyle");
-
             companyBrandComboBox.SelectionChanged += OnCompanyBrandComboBoxSelectionChanged;
-
-
             companyBrandPanel.Children.Add(companyBrandLabel);
             companyBrandPanel.Children.Add(companyBrandComboBox);
             Home.Children.Add(companyBrandPanel);
 
-            Home.RowDefinitions.Add(new RowDefinition());
+         //   Home.RowDefinitions.Add(new RowDefinition());
 
-            Grid.SetRow(companyBrandPanel, Home.RowDefinitions.Count - 1);
-
+          //  Grid.SetRow(companyBrandPanel, Home.RowDefinitions.Count - 1);
 
             WrapPanel companyModelPanel = new WrapPanel();
-
             Label companyModelLabel = new Label();
-
-            companyModelLabel.Content = "Company Model";
-
+            companyModelLabel.Content = "Model";
             companyModelLabel.Style = (Style)FindResource("tableItemLabel");
-
-
             companyModelLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
 
             ComboBox companyModelComboBox = new ComboBox();
-
             companyModelComboBox.IsEnabled = false;
-
             companyModelComboBox.Style = (Style)FindResource("comboBoxStyle");
-
             companyModelComboBox.SelectionChanged += OnCompanyModelComboBoxSelectionChanged;
-
-
             companyModelPanel.Children.Add(companyModelLabel);
             companyModelPanel.Children.Add(companyModelComboBox);
             Home.Children.Add(companyModelPanel);
 
-            Home.RowDefinitions.Add(new RowDefinition());
+           // Home.RowDefinitions.Add(new RowDefinition());
 
-            Grid.SetRow(companyModelPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
+          //  Grid.SetRow(companyModelPanel, Home.RowDefinitions.Count - 1);
 
             WrapPanel companySpecsPanel = new WrapPanel();
-
             Label companySpecsLabel = new Label();
-
-            companySpecsLabel.Content = "Company Specs";
-
+            companySpecsLabel.Content = "Specs";
             companySpecsLabel.Style = (Style)FindResource("tableItemLabel");
-
-
             companySpecsLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
 
-
             ComboBox companySpecsComboBox = new ComboBox();
-
             companySpecsComboBox.IsEnabled = false;
-
             companySpecsComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            companySpecsComboBox.SelectionChanged += CompanySpecsComboBox_SelectionChanged;
-
-
+            companySpecsComboBox.SelectionChanged += OnSelChangedSpecsComboBox;
             companySpecsPanel.Children.Add(companySpecsLabel);
             companySpecsPanel.Children.Add(companySpecsComboBox);
             Home.Children.Add(companySpecsPanel);
 
-            Home.RowDefinitions.Add(new RowDefinition());
+           // Home.RowDefinitions.Add(new RowDefinition());
 
-            Grid.SetRow(companySpecsPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
+          //  Grid.SetRow(companySpecsPanel, Home.RowDefinitions.Count - 1);
 
             WrapPanel SelectedItemsPanel = new WrapPanel();
-
             Label selectedItemsLabel = new Label();
-
             selectedItemsLabel.Content = "Number of selected Items";
-
             selectedItemsLabel.Style = (Style)FindResource("tableItemLabel");
-
             selectedItemsLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
 
             Label NumberOfItemsSelected = new Label();
             NumberOfItemsSelected.Content = "0";
-
             NumberOfItemsSelected.Style = (Style)FindResource("tableItemLabel");
-
             NumberOfItemsSelected.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
             SelectedItemsPanel.Children.Add(selectedItemsLabel);
             SelectedItemsPanel.Children.Add(NumberOfItemsSelected);
             Home.Children.Add(SelectedItemsPanel);
 
-            Home.RowDefinitions.Add(new RowDefinition());
-
-            Grid.SetRow(SelectedItemsPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
+           // Home.RowDefinitions.Add(new RowDefinition());
+          //  Grid.SetRow(SelectedItemsPanel, Home.RowDefinitions.Count - 1);
             Grid items = new Grid();
-
             Home.Children.Add(items);
 
-            Home.RowDefinitions.Add(new RowDefinition());
+          //  Home.RowDefinitions.Add(new RowDefinition());
 
-            Grid.SetRow(items, Home.RowDefinitions.Count - 1);
+          //  Grid.SetRow(items, Home.RowDefinitions.Count - 1);
 
 
         }
 
-        private void CompanySpecsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnSelChangedSpecsComboBox(object sender, SelectionChangedEventArgs e)
         {
+            ComboBox specsComboBox = sender as ComboBox;
 
+            WrapPanel specsPanel = specsComboBox.Parent as WrapPanel;
+            StackPanel home = specsPanel.Parent as StackPanel;
+
+            WrapPanel choicePanel = home.Children[0] as WrapPanel;
+            ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
+
+            WrapPanel companyBrandPanel = home.Children[3] as WrapPanel;
+            ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
+
+            WrapPanel companyProductPanel = home.Children[2] as WrapPanel;
+            ComboBox companyProductComboBox = companyProductPanel.Children[1] as ComboBox;
+
+            WrapPanel companyCategoryPanel = home.Children[1] as WrapPanel;
+            ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
+
+            WrapPanel modelPanel = home.Children[4] as WrapPanel;
+            ComboBox modelComboBox = modelPanel.Children[1] as ComboBox;
+
+            if(specsComboBox.SelectedIndex !=-1)
+            {
+                ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem productItem = companyProductComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem brandItem = companyBrandComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem modelItem = modelComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem specsItem = specsComboBox.SelectedItem as ComboBoxItem;
+
+                PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT orderItem = workOrder.GetOrderProductsList().ToList().Find(f => f.product_category.category_id == Int32.Parse(categoryItem.Tag.ToString()) &&
+                                                                                                                    f.productType.type_id == Int32.Parse(productItem.Tag.ToString()) &&
+                                                                                                                    f.productBrand.brand_id == Int32.Parse(brandItem.Tag.ToString()) &&
+                                                                                                                    f.productModel.model_id == Int32.Parse(modelItem.Tag.ToString()) &&
+                                                                                                                    f.productSpec.spec_id == Int32.Parse(specsItem.Tag.ToString()));
+                orderItemNumber = orderItem.productNumber;
+            }
         }
 
         private void FilterItems() {
@@ -597,53 +549,42 @@ namespace _01electronics_inventory
             ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
 
 
-            WrapPanel genericCategoryPanel=Home.Children[1] as WrapPanel;
+            //WrapPanel genericCategoryPanel=Home.Children[1] as WrapPanel;
 
-            ComboBox genericCategoryComboBox=genericCategoryPanel.Children[1] as ComboBox;
-
-
-            WrapPanel genericProductPanel = Home.Children[2] as WrapPanel;
-
-            ComboBox genericProductComboBox = genericProductPanel.Children[1] as ComboBox;
+            //ComboBox genericCategoryComboBox=genericCategoryPanel.Children[1] as ComboBox;
 
 
+            //WrapPanel genericProductPanel = Home.Children[2] as WrapPanel;
 
-            WrapPanel genericBrandPanel = Home.Children[3] as WrapPanel;
-
-            ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
+            //ComboBox genericProductComboBox = genericProductPanel.Children[1] as ComboBox;
 
 
 
-            WrapPanel genericModelPanel = Home.Children[4] as WrapPanel;
+            //WrapPanel genericBrandPanel = Home.Children[3] as WrapPanel;
 
-            ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
+            //ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
 
 
 
-            WrapPanel companyCategoryPanel = Home.Children[5] as WrapPanel;
+            //WrapPanel genericModelPanel = Home.Children[4] as WrapPanel;
 
+            //ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
+
+
+
+            WrapPanel companyCategoryPanel = Home.Children[1] as WrapPanel;
             ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
 
-
-            WrapPanel companyProductPanel = Home.Children[6] as WrapPanel;
-
+            WrapPanel companyProductPanel = Home.Children[2] as WrapPanel;
             ComboBox companyProductComboBox = companyProductPanel.Children[1] as ComboBox;
 
-
-
-            WrapPanel companyBrandPanel = Home.Children[7] as WrapPanel;
-
+            WrapPanel companyBrandPanel = Home.Children[3] as WrapPanel;
             ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
-
-
-            WrapPanel companyModelPanel = Home.Children[8] as WrapPanel;
-
+            WrapPanel companyModelPanel = Home.Children[4] as WrapPanel;
             ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
 
-
-            WrapPanel companySpecsPanel = Home.Children[9] as WrapPanel;
-
+            WrapPanel companySpecsPanel = Home.Children[5] as WrapPanel;
             ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
 
 
@@ -669,34 +610,36 @@ namespace _01electronics_inventory
                     for (int j = 0; j < materialEntry.GetItems().Count; j++) {
 
                         
-                        if (genericCategoryComboBox.SelectedIndex != -1)
+                        if (companyCategoryComboBox.SelectedIndex != -1)
                         {
-
-                            if (genericCategories[genericCategoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].product_category.category_id)
+                            ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                            if (Int32.Parse(categoryItem.Tag.ToString()) != materialEntry.GetItems()[j].product_category.category_id)
                                 continue;
                         }
 
 
-                        if (genericProductComboBox.SelectedIndex != -1)
+                        if (companyProductComboBox.SelectedIndex != -1)
                         {
+                            ComboBoxItem productItem = companyProductComboBox.SelectedItem as ComboBoxItem;
 
-                            if (genericProducts[genericProductComboBox.SelectedIndex].type_id != materialEntry.GetItems()[j].product_type.type_id)
+                            if (Int32.Parse(productItem.Tag.ToString()) != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
                         }
 
 
-                        if (genericBrandComboBox.SelectedIndex != -1)
+                        if (companyBrandComboBox.SelectedIndex != -1)
                         {
+                            ComboBoxItem brandItem = companyBrandComboBox.SelectedItem as ComboBoxItem;
 
-                            if (genericBrands[genericBrandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].product_brand.brand_id)
+                            if (Int32.Parse(brandItem.Tag.ToString()) != materialEntry.GetItems()[j].product_brand.brand_id)
                                 continue;
                         }
 
 
-                        if (genericModelComboBox.SelectedIndex != -1)
+                        if (companyModelComboBox.SelectedIndex != -1)
                         {
-                            if(genericModelComboBox.SelectedIndex!=-1)
-                            if (genericModels[genericModelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].product_model.model_id)
+                            ComboBoxItem modelItem = companyModelComboBox.SelectedItem as ComboBoxItem;
+                            if (Int32.Parse(modelItem.Tag.ToString()) != materialEntry.GetItems()[j].product_model.model_id)
                                 continue;
                         }
 
@@ -896,34 +839,37 @@ namespace _01electronics_inventory
                     {
 
 
-                        if (companyCategoryComboBox.SelectedIndex != -1) {
 
-
-                            if (companyCategories[companyCategoryComboBox.SelectedIndex].category_id != materialEntry.GetItems()[j].product_category.category_id)
+                        if (companyCategoryComboBox.SelectedIndex != -1)
+                        {
+                            ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                            if (Int32.Parse(categoryItem.Tag.ToString()) != materialEntry.GetItems()[j].product_category.category_id)
                                 continue;
-
                         }
+
 
                         if (companyProductComboBox.SelectedIndex != -1)
                         {
+                            ComboBoxItem productItem = companyProductComboBox.SelectedItem as ComboBoxItem;
 
-                            if (companyProducts[companyProductComboBox.SelectedIndex].type_id != materialEntry.GetItems()[j].product_type.type_id)
+                            if (Int32.Parse(productItem.Tag.ToString()) != materialEntry.GetItems()[j].product_type.type_id)
                                 continue;
                         }
 
 
                         if (companyBrandComboBox.SelectedIndex != -1)
                         {
+                            ComboBoxItem brandItem = companyBrandComboBox.SelectedItem as ComboBoxItem;
 
-                            if (companyBrands[companyBrandComboBox.SelectedIndex].brand_id != materialEntry.GetItems()[j].product_brand.brand_id)
+                            if (Int32.Parse(brandItem.Tag.ToString()) != materialEntry.GetItems()[j].product_brand.brand_id)
                                 continue;
                         }
 
 
                         if (companyModelComboBox.SelectedIndex != -1)
                         {
-
-                            if (companyModels[companyModelComboBox.SelectedIndex].model_id != materialEntry.GetItems()[j].product_model.model_id)
+                            ComboBoxItem modelItem = companyModelComboBox.SelectedItem as ComboBoxItem;
+                            if (Int32.Parse(modelItem.Tag.ToString()) != materialEntry.GetItems()[j].product_model.model_id)
                                 continue;
                         }
 
@@ -1316,7 +1262,7 @@ namespace _01electronics_inventory
             ComboBox items=  rfpOrOrder.Children[0] as ComboBox;
 
             if(items.SelectedIndex!=-1)
-            addReleasePermitPage.serialProducts[items.SelectedIndex]--;
+            parentWindow.releasePermitPage.serialProducts[items.SelectedIndex]--;
 
            WrapPanel locationsWrapPanel= card.Parent as WrapPanel;
             locationsWrapPanel.Children.Remove(card);
@@ -1428,12 +1374,12 @@ namespace _01electronics_inventory
             LocationsWrapPanel.Children.Add(card);
 
 
-            if (addReleasePermitPage.rfpChecked.IsChecked == true) {
+            if (rfp.GetRFPSerial()!=0) {
 
                 rfpCheckBox.IsChecked = true;
             }
 
-            else if (addReleasePermitPage.orderChecked.IsChecked == true) {
+            else if (workOrder.GetOrderSerial()!=0) {
 
                 orderCheckBox.IsChecked = true;
             
@@ -1806,20 +1752,20 @@ namespace _01electronics_inventory
 
 
             workOrdersLocations.Clear();
-            addReleasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
+            parentWindow.releasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
 
 
             workOrdersLocations.ForEach(a => orderLocationsComboBox.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
 
 
-            PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
+            PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = parentWindow.releasePermitPage.workOrder.GetOrderProductsList();
 
             orderItemsComboBox.Items.Clear();
 
             for (int i = 0; i < workOrderProducts.Length; i++)
             {
-
-                orderItemsComboBox.Items.Add(workOrderProducts[i].product_category.category_name + " ," + workOrderProducts[i].productType.product_name + " ," + workOrderProducts[i].productBrand.brand_name + " ," + workOrderProducts[i].productModel.model_name);
+                if(workOrderProducts[i].product_category.category_name!=null)
+                   orderItemsComboBox.Items.Add(workOrderProducts[i].product_category.category_name + " ," + workOrderProducts[i].productType.product_name + " ," + workOrderProducts[i].productBrand.brand_name + " ," + workOrderProducts[i].productModel.model_name);
             }
 
         }
@@ -1828,12 +1774,12 @@ namespace _01electronics_inventory
         {
            ComboBox orderItemsComboBox= sender as ComboBox;
 
-            if (addReleasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].has_serial_number == true)
+            if (parentWindow.releasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].has_serial_number == true)
             {
-                addReleasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex]++;
+                parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex]++;
 
 
-                if (addReleasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productQuantity < addReleasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
+                if (parentWindow.releasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productQuantity < parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
                 {
                      System.Windows.Forms.MessageBox.Show("OrderItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     return;
@@ -1860,10 +1806,10 @@ namespace _01electronics_inventory
 
                     TextBox availableQuantityTextBox = quantityGrid.Children[2] as TextBox;
                     if (availableQuantityTextBox.Text != "")
-                        addReleasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex] += int.Parse(availableQuantityTextBox.Text);
+                        parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex] += int.Parse(availableQuantityTextBox.Text);
                 }
 
-                if (addReleasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productQuantity < addReleasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
+                if (parentWindow.releasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productQuantity < parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
                 {
                     System.Windows.Forms.MessageBox.Show("OrderItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
@@ -1931,140 +1877,298 @@ namespace _01electronics_inventory
 
 
             WrapPanel companyModelPanel=companyModelComboBox.Parent as WrapPanel;
-            Grid home= companyModelPanel.Parent as Grid;
-            WrapPanel companyBrandPanel=home.Children[7] as WrapPanel;
+            StackPanel home= companyModelPanel.Parent as StackPanel;
 
+            WrapPanel choicePanel = home.Children[0] as WrapPanel;
+            ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
+
+            WrapPanel companyBrandPanel=home.Children[3] as WrapPanel;
             ComboBox companyBrandComboBox= companyBrandPanel.Children[1] as ComboBox;
 
-            WrapPanel companyProductPanel = home.Children[6] as WrapPanel;
-
+            WrapPanel companyProductPanel = home.Children[2] as WrapPanel;
             ComboBox companyProductComboBox = companyProductPanel.Children[1] as ComboBox;
 
-            WrapPanel companyCategoryPanel = home.Children[5] as WrapPanel;
-
+            WrapPanel companyCategoryPanel = home.Children[1] as WrapPanel;
             ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
 
-
-
-            WrapPanel companySpecsPanel = home.Children[9] as WrapPanel;
-
+            WrapPanel companySpecsPanel = home.Children[5] as WrapPanel;
             ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
+            if(companyModelComboBox.SelectedIndex !=-1)
+            {
+                ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem productItem = companyProductComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem brandItem = companyBrandComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem modelItem = companyModelComboBox.SelectedItem as ComboBoxItem;
 
-            if(companyModelComboBox.SelectedIndex!=-1)
-            commonQueries.GetModelSpecsNames(companyCategories[companyCategoryComboBox.SelectedIndex].category_id, companyProducts[companyProductComboBox.SelectedIndex].type_id, companyBrands[companyBrandComboBox.SelectedIndex].brand_id, companyModels[companyModelComboBox.SelectedIndex].model_id, ref specs);
+                if (choiceComboBox.SelectedIndex ==1)
+                {
 
-            companySpecsComboBox.Items.Clear();
-            specs.ForEach(a => companySpecsComboBox.Items.Add(a.spec_name));
-            FilterItems();
+                    //if(!commonQueries.GetModelSpecsNames(Int32.Parse(categoryItem.Tag.ToString()), Int32.Parse(productItem.Tag.ToString()), Int32.Parse(brandItem.Tag.ToString()), Int32.Parse(modelItem.Tag.ToString()), ref specs))
+                    //     return;
+
+                    // companySpecsComboBox.Items.Clear();
+                    // specs.ForEach(a => companySpecsComboBox.Items.Add(a.spec_name));
+                    if (workOrder.GetOrderSerial() != 0)
+                    {
+                        for (int i = 0; i < workOrder.GetOrderProductsList().Count(); i++)
+                        {
+                            if (Int32.Parse(categoryItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].product_category.category_id && Int32.Parse(productItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productType.type_id && Int32.Parse(brandItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productBrand.brand_id && Int32.Parse(modelItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productModel.model_id)
+                            {
+                                if (companySpecsComboBox.Items.Cast<ComboBoxItem>().Any(f => Int32.Parse(f.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productSpec.spec_id) == false)
+                                {
+                                    ComboBoxItem specItem = new ComboBoxItem();
+                                    specItem.Content = workOrder.GetOrderProductsList()[i].productSpec.spec_name;
+                                    specItem.Tag = workOrder.GetOrderProductsList()[i].productSpec.spec_id;
+                                    companySpecsComboBox.Items.Add(specItem);
+                                }
+
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                    }
+
+                }
+                FilterItems();
+            }
+           
+        
 
         }
 
         private void OnCompanyBrandComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox companyBrandComboBox = sender as ComboBox;
-
             WrapPanel companyBrandPanel = companyBrandComboBox.Parent as WrapPanel;
+            StackPanel home = companyBrandPanel.Parent as StackPanel;
 
-            Grid home = companyBrandPanel.Parent as Grid;
+            WrapPanel choicePanel = home.Children[0] as WrapPanel;
+            ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
 
-            WrapPanel companyproductPanel = home.Children[6] as WrapPanel;
+            WrapPanel companyCategoryPanel = home.Children[1] as WrapPanel;
+            ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
 
+            WrapPanel companyproductPanel = home.Children[2] as WrapPanel;
             ComboBox companyProductComboBox = companyproductPanel.Children[1] as ComboBox;
 
-
-
-            WrapPanel companyModelPanel = home.Children[8] as WrapPanel;
-
+            WrapPanel companyModelPanel = home.Children[4] as WrapPanel;
             ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
 
+            WrapPanel companySpecsPanel = home.Children[5] as WrapPanel;
+            ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
+
             companyModelComboBox.Items.Clear();
+            
+            if(companyBrandComboBox.SelectedIndex != -1)
+            {
+                ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem productItem = companyProductComboBox.SelectedItem as ComboBoxItem;    
+                ComboBoxItem brandItem = companyBrandComboBox.SelectedItem as ComboBoxItem;
 
-            if (companyBrandComboBox.SelectedIndex == -1)
-                return;
 
-            companyModels.Clear();
-            commonQueries.GetCompanyModels(companyProducts[companyProductComboBox.SelectedIndex], companyBrands[companyBrandComboBox.SelectedIndex], ref companyModels);
+                if(choiceComboBox.SelectedIndex == 0)
+                {
+                 
+                    genericModels.Clear();
+
+                    if (!commonQueries.GetGenericBrandModels(Int32.Parse(productItem.Tag.ToString()), Int32.Parse(brandItem.Tag.ToString()),Int32.Parse(categoryItem.Tag.ToString()), ref genericModels))
+                        return;
 
 
-            companyModels.ForEach(a => companyModelComboBox.Items.Add(a.model_name));
+                    genericModels.ForEach(a => companyModelComboBox.Items.Add(a.model_name));
 
-            FilterItems();
+
+                  
+                }
+                else
+                {
+                    companyModels.Clear();
+                    //if (!commonQueries.GetCompanyModels(companyProducts[companyProductComboBox.SelectedIndex], companyBrands[companyBrandComboBox.SelectedIndex], ref companyModels))
+                    //    return;
+                    //companyModels.ForEach(a => companyModelComboBox.Items.Add(a.model_name));
+                    if (workOrder.GetOrderSerial() != 0)
+                    {
+                        for (int i = 0; i < workOrder.GetOrderProductsList().Count(); i++)
+                        {
+                            if (Int32.Parse(categoryItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].product_category.category_id && Int32.Parse(productItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productType.type_id && Int32.Parse(brandItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productBrand.brand_id)
+                            {
+                                if (companyModelComboBox.Items.Cast<ComboBoxItem>().Any(f => Int32.Parse(f.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productModel.model_id) == false)
+                                {
+                                    ComboBoxItem modelItem = new ComboBoxItem();
+                                    modelItem.Content = workOrder.GetOrderProductsList()[i].productModel.model_name;
+                                    modelItem.Tag = workOrder.GetOrderProductsList()[i].productModel.model_id;
+                                    companyModelComboBox.Items.Add(modelItem);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                    }
+
+                }
+
+                FilterItems();
+            }
+
+           
         }
 
         private void OnCompanyProductComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
             ComboBox companyProductComboBox=sender as ComboBox;
-
             WrapPanel companyProductPanel = companyProductComboBox.Parent as WrapPanel;
+            StackPanel home=companyProductPanel.Parent as StackPanel;
 
-            Grid home=companyProductPanel.Parent as Grid;
+            WrapPanel choicePanel = home.Children[0] as WrapPanel;
+            ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
 
-            WrapPanel companyCategoryPanel=home.Children[5] as WrapPanel;
-
+            WrapPanel companyCategoryPanel=home.Children[1] as WrapPanel;
             ComboBox companyCategoryComboBox=companyCategoryPanel.Children[1] as ComboBox;
 
-
-            WrapPanel companyBrandPanel = home.Children[7] as WrapPanel;
-
+            WrapPanel companyBrandPanel = home.Children[3] as WrapPanel;
             ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
-            WrapPanel companyModelPanel = home.Children[8] as WrapPanel;
-
+            WrapPanel companyModelPanel = home.Children[4] as WrapPanel;
             ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
+
+            WrapPanel companyspecsPanel = home.Children[5] as WrapPanel;
+            ComboBox companyspecsComboBox = companyspecsPanel.Children[1] as ComboBox;
 
             companyBrandComboBox.Items.Clear();
             companyModelComboBox.Items.Clear();
+            companyspecsComboBox.Items.Clear();
 
 
-            if (companyProductComboBox.SelectedIndex == -1)
-                return;
 
-            companyBrands.Clear();
-            commonQueries.GetProductBrands(companyProducts[companyProductComboBox.SelectedIndex].type_id, ref companyBrands);
+            if(companyProductComboBox.SelectedIndex !=-1)
+            {
+                ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                ComboBoxItem productItem = companyProductComboBox.SelectedItem as ComboBoxItem;
 
-            companyBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brand_name));
+                if(choiceComboBox.SelectedIndex ==0 )
+                {
+                    genericBrands.Clear();
+                    if (!commonQueries.GetGenericProductBrands(Int32.Parse(productItem.Tag.ToString()), Int32.Parse(categoryItem.Tag.ToString()), ref genericBrands))
+                        return;
+                    genericBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brand_name));
+                }
+                else
+                {
+                    companyBrands.Clear();
+                    //if(!commonQueries.GetProductBrands(Int32.Parse(productItem.Tag.ToString()), ref companyBrands))
+                    //    return;
+                    //companyBrands.ForEach(a => companyBrandComboBox.Items.Add(a.brand_name));
+                    if (workOrder.GetOrderSerial() != 0)
+                    {
+                        for (int i = 0; i < workOrder.GetOrderProductsList().Count(); i++)
+                        {
+                            if (Int32.Parse(categoryItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].product_category.category_id && Int32.Parse(productItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productType.type_id)
+                            {
+                                if (companyBrandComboBox.Items.Cast<ComboBoxItem>().Any(f => Int32.Parse(f.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productBrand.brand_id) == false)
+                                {
+                                    ComboBoxItem brandItem = new ComboBoxItem();
+                                    brandItem.Content = workOrder.GetOrderProductsList()[i].productBrand.brand_name;
+                                    brandItem.Tag = workOrder.GetOrderProductsList()[i].productBrand.brand_id;
+                                    companyBrandComboBox.Items.Add(brandItem);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
 
-            FilterItems();
+                    }
+                }
+                FilterItems();
+            }
+          
 
         }
 
         private void OnCompanyCategoryComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
                 ComboBox companyCategoryComboBox=sender as ComboBox;
-
                 WrapPanel companyCategoryPanel=companyCategoryComboBox.Parent as WrapPanel;
 
-                Grid home= companyCategoryPanel.Parent as Grid;
+                StackPanel home= companyCategoryPanel.Parent as StackPanel;
 
-                WrapPanel companyProductPanel= home.Children[6] as WrapPanel;
+                WrapPanel choicePanel = home.Children[0] as WrapPanel;
+                ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
+
+                WrapPanel companyProductPanel= home.Children[2] as WrapPanel;
                 ComboBox companyProductComboBox=  companyProductPanel.Children[1] as ComboBox;
 
 
-                WrapPanel companyBrandPanel = home.Children[7] as WrapPanel;
+                WrapPanel companyBrandPanel = home.Children[3] as WrapPanel;
                 ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
 
 
-                WrapPanel companyModelPanel = home.Children[8] as WrapPanel;
+                WrapPanel companyModelPanel = home.Children[4] as WrapPanel;
                 ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
+            if(companyCategoryComboBox.SelectedIndex !=-1)
+            {
+                if (choiceComboBox.SelectedIndex == 1)
+                {
+                    WrapPanel specsPanel = home.Children[5] as WrapPanel;
+                    ComboBox specsComboBox = specsPanel.Children[1] as ComboBox;
+                    specsComboBox.Items.Clear();
+                    companyProductComboBox.Items.Clear();
+                    companyBrandComboBox.Items.Clear();
+                    companyModelComboBox.Items.Clear();
 
-            companyProductComboBox.Items.Clear();
-            companyBrandComboBox.Items.Clear();
-            companyModelComboBox.Items.Clear();
+                    companyProducts.Clear();
+                    ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                    //if (!commonQueries.GetCompanyProducts(ref companyProducts, Int32.Parse(categoryItem.Tag.ToString())))
+                    //    return;
 
-            if (companyCategoryComboBox.SelectedIndex == -1)
-                return;
+                    //companyProductComboBox.Items.Clear();
+                    //companyProducts.ForEach(a => companyProductComboBox.Items.Add(a.product_name));
+                    if(workOrder.GetOrderSerial() !=0)
+                    {
+                        for(int i=0;i<workOrder.GetOrderProductsList().Count();i++)
+                        {
+                            if (Int32.Parse(categoryItem.Tag.ToString()) == workOrder.GetOrderProductsList()[i].product_category.category_id)
+                            {
+                                if(companyProductComboBox.Items.Cast<ComboBoxItem>().Any(f=>Int32.Parse(f.Tag.ToString()) == workOrder.GetOrderProductsList()[i].productType.type_id)==false)
+                                {
+                                    ComboBoxItem productItem = new ComboBoxItem();
+                                    productItem.Content = workOrder.GetOrderProductsList()[i].productType.product_name;
+                                    productItem.Tag = workOrder.GetOrderProductsList()[i].productType.type_id;
+                                    companyProductComboBox.Items.Add(productItem);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
 
-            companyProducts.Clear();
+                    }
+                }
+                else
+                {
+                    companyProductComboBox.Items.Clear();
+                    companyBrandComboBox.Items.Clear();
+                    companyModelComboBox.Items.Clear();
+                    genericProducts.Clear();
+                    companyProductComboBox.Items.Clear();
+                    ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
+                    if (!commonQueries.GetGenericProducts(ref genericProducts, Int32.Parse(categoryItem.Tag.ToString())))
+                        return;
+                       genericProducts.ForEach(a => companyProductComboBox.Items.Add(a.product_name));
 
-            commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[companyCategoryComboBox.SelectedIndex].category_id);
+                }
+                FilterItems();
+            }
+            
+          
 
-            companyProductComboBox.Items.Clear();
-
-            companyProducts.ForEach(a => companyProductComboBox.Items.Add(a.product_name));
-
-            FilterItems();
+           
 
         }
 
@@ -2151,13 +2255,7 @@ namespace _01electronics_inventory
             if (genericProductCombo.SelectedIndex == -1)
                 return;
 
-                genericBrands.Clear();
-
-
-            commonQueries.GetGenericProductBrands(genericProducts[genericProductCombo.SelectedIndex].type_id, genericCategories[genericCategoryComboBox.SelectedIndex].category_id, ref genericBrands);
-
-
-            genericBrands.ForEach(a => genericBrandComboBox.Items.Add(a.brand_name));
+                
 
 
 
@@ -2197,11 +2295,7 @@ namespace _01electronics_inventory
             if (genericCategoryCombo.SelectedIndex == -1)
                 return;
 
-            commonQueries.GetGenericProducts(ref genericProducts, genericCategories[genericCategoryCombo.SelectedIndex].category_id);
-
-      
-
-            genericProducts.ForEach(a => genericProductComboBox.Items.Add(a.product_name));
+          
 
 
 
@@ -2218,49 +2312,49 @@ namespace _01electronics_inventory
             ComboBox choiceComboBox = sender as ComboBox;
             WrapPanel choicePanel = choiceComboBox.Parent as WrapPanel;
 
-            Grid Home = choicePanel.Parent as Grid;
+            StackPanel Home = choicePanel.Parent as StackPanel;
 
-            WrapPanel genericCategoryPanel = Home.Children[1] as WrapPanel;
+            //WrapPanel genericCategoryPanel = Home.Children[1] as WrapPanel;
 
-            ComboBox genericCategoryComboBox = genericCategoryPanel.Children[1] as ComboBox;
+            //ComboBox genericCategoryComboBox = genericCategoryPanel.Children[1] as ComboBox;
 
-            WrapPanel genericProductPanel = Home.Children[2] as WrapPanel;
+            //WrapPanel genericProductPanel = Home.Children[2] as WrapPanel;
 
-            ComboBox genericProductComboBox = genericProductPanel.Children[1] as ComboBox;
-
-
-            WrapPanel genericBrandPanel = Home.Children[3] as WrapPanel;
-
-            ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
+            //ComboBox genericProductComboBox = genericProductPanel.Children[1] as ComboBox;
 
 
-            WrapPanel genericModelPanel = Home.Children[4] as WrapPanel;
+            //WrapPanel genericBrandPanel = Home.Children[3] as WrapPanel;
 
-            ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
+            //ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
 
 
-            WrapPanel companyCategoryPanel = Home.Children[5] as WrapPanel;
+            //WrapPanel genericModelPanel = Home.Children[4] as WrapPanel;
+
+            //ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
+
+
+            WrapPanel companyCategoryPanel = Home.Children[1] as WrapPanel;
 
             ComboBox companyCategoryComboBox = companyCategoryPanel.Children[1] as ComboBox;
 
 
-            WrapPanel companyProductPanel = Home.Children[6] as WrapPanel;
+            WrapPanel companyProductPanel = Home.Children[2] as WrapPanel;
 
             ComboBox companyProductComboBox = companyProductPanel.Children[1] as ComboBox;
 
 
-            WrapPanel companyBrandPanel = Home.Children[7] as WrapPanel;
+            WrapPanel companyBrandPanel = Home.Children[3] as WrapPanel;
 
             ComboBox companyBrandComboBox = companyBrandPanel.Children[1] as ComboBox;
 
 
-            WrapPanel companyModelPanel = Home.Children[8] as WrapPanel;
+            WrapPanel companyModelPanel = Home.Children[4] as WrapPanel;
 
             ComboBox companyModelComboBox = companyModelPanel.Children[1] as ComboBox;
 
 
-            WrapPanel companySpecsPanel = Home.Children[9] as WrapPanel;
-
+            WrapPanel companySpecsPanel = Home.Children[5] as WrapPanel;
+            Label specsLabel = companySpecsPanel.Children[0] as Label;
             ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
 
 
@@ -2269,29 +2363,17 @@ namespace _01electronics_inventory
             if (choiceComboBox.SelectedIndex == 0)
             {
 
-                genericCategoryComboBox.IsEnabled = true;
-                genericProductComboBox.IsEnabled = true;
-                genericBrandComboBox.IsEnabled = true;
-                genericModelComboBox.IsEnabled = true;
+                //genericCategoryComboBox.IsEnabled = true;
+                //genericProductComboBox.IsEnabled = true;
+                //genericBrandComboBox.IsEnabled = true;
+                //genericModelComboBox.IsEnabled = true;
 
-                companyCategoryComboBox.IsEnabled = false;
-                companyCategoryComboBox.SelectedIndex = -1;
-                companyProductComboBox.IsEnabled = false;
-                companyBrandComboBox.IsEnabled = false;
-                companyModelComboBox.IsEnabled = false;
-                companySpecsComboBox.IsEnabled = false;
-
-
-            }
-
-            else            
-            {
-
-                genericCategoryComboBox.IsEnabled = false;
-                genericCategoryComboBox.SelectedIndex = -1;
-                genericProductComboBox.IsEnabled = false;
-                genericBrandComboBox.IsEnabled = false;
-                genericModelComboBox.IsEnabled = false;
+                //companyCategoryComboBox.IsEnabled = false;
+                //companyCategoryComboBox.SelectedIndex = -1;
+                //companyProductComboBox.IsEnabled = false;
+                //companyBrandComboBox.IsEnabled = false;
+                //companyModelComboBox.IsEnabled = false;
+                //companySpecsComboBox.IsEnabled = false;
 
 
                 companyCategoryComboBox.IsEnabled = true;
@@ -2299,6 +2381,72 @@ namespace _01electronics_inventory
                 companyBrandComboBox.IsEnabled = true;
                 companyModelComboBox.IsEnabled = true;
                 companySpecsComboBox.IsEnabled = true;
+
+                companyCategoryComboBox.Items.Clear();
+                companyProductComboBox.Items.Clear();
+                companyBrandComboBox.Items.Clear();
+                companyModelComboBox.Items.Clear();
+                companySpecsComboBox.Items.Clear();
+                companySpecsComboBox.Visibility = Visibility.Collapsed;
+                specsLabel.Visibility = Visibility.Collapsed;
+
+                for(int i = 0;i<genericCategories.Count;i++)
+                {
+                    companyCategoryComboBox.Items.Add(genericCategories[i].category_name);
+                }
+
+            }
+
+            else            
+            {
+
+                //genericCategoryComboBox.IsEnabled = false;
+                //genericCategoryComboBox.SelectedIndex = -1;
+                //genericProductComboBox.IsEnabled = false;
+                //genericBrandComboBox.IsEnabled = false;
+                //genericModelComboBox.IsEnabled = false;
+
+
+                companyCategoryComboBox.IsEnabled = true;
+                companyProductComboBox.IsEnabled = true;
+                companyBrandComboBox.IsEnabled = true;
+                companyModelComboBox.IsEnabled = true;
+                companySpecsComboBox.IsEnabled = true;
+
+                companyCategoryComboBox.Items.Clear();
+                companyProductComboBox.Items.Clear();
+                companyBrandComboBox.Items.Clear();
+                companyModelComboBox.Items.Clear();
+                companySpecsComboBox.Items.Clear();
+                companySpecsComboBox.Visibility = Visibility.Visible;
+                specsLabel.Visibility = Visibility.Visible;
+                // companySpecsComboBox.Visibility = Visibility.Collapsed;
+                if (workOrder.GetOrderSerial() != 0)
+                {
+                    for (int i = 0; i < workOrder.GetOrderProductsList().Count(); i++)
+                    {
+                        ComboBoxItem categoryItem = new ComboBoxItem();
+                        categoryItem.Content = workOrder.GetOrderProductsList()[i].product_category.category_name;
+                        categoryItem.Tag = workOrder.GetOrderProductsList()[i].product_category.category_id;
+                        if (companyCategoryComboBox.Items.Cast<ComboBoxItem>().Any(f => f.Tag == categoryItem.Tag)==false && workOrder.GetOrderProductsList()[i].product_category.category_name!=null)
+                            companyCategoryComboBox.Items.Add(categoryItem);
+
+                        
+                       
+
+                    }
+                }
+                else
+                {
+                    for(int i = 0;i<rfp.rfpItems.Count();i++)
+                    {
+                        ComboBoxItem categoryItem = new ComboBoxItem();
+                        categoryItem.Content = rfp.rfpItems[i].product_category.category_name;
+                        categoryItem.Tag = rfp.rfpItems[i].product_category.category_id;
+                        if (companyCategoryComboBox.Items.Cast<ComboBoxItem>().Any(f => f.Tag == categoryItem.Tag) == false && rfp.rfpItems[i].product_category.category_name != null)
+                            companyCategoryComboBox.Items.Add(categoryItem);
+                    }
+                }
 
             }
 
@@ -2358,7 +2506,7 @@ namespace _01electronics_inventory
         private void OnBackButtonClick(object sender, RoutedEventArgs e)
         {
 
-            this.NavigationService.Navigate(addReleasePermitPage);
+            this.NavigationService.Navigate(parentWindow.releasePermitPage);
 
 
         }
@@ -2379,13 +2527,13 @@ namespace _01electronics_inventory
         private void OnFinishButtonClick(object sender, RoutedEventArgs e)
         {
 
-            if (addReleasePermitPage.ReleaseDatePicker.DisplayDate.ToString() == "")
+            if (parentWindow.releasePermitPage.ReleaseDatePicker.DisplayDate.ToString() == "")
             {
                 System.Windows.Forms.MessageBox.Show("release date is empty", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
 
-            if (addReleasePermitPage.SerialIdTextBox.Text == "") {
+            if (parentWindow.releasePermitPage.SerialIdTextBox.Text == "") {
 
                 System.Windows.Forms.MessageBox.Show("Serial id is empty", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
@@ -2400,9 +2548,9 @@ namespace _01electronics_inventory
             ///////////////////////////////////////////////////////////////////////
             ///YOU NEED TO SET ORDER / RFP STATUS, AND SET RELEASE PERMIT STATUS
             ///////////////////////////////////////////////////////////////////////
-            if (addReleasePermitPage.orderChecked.IsChecked == true)
+            if (parentWindow.releasePermitPage.orderChecked.IsChecked == true)
             {
-                if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
+                if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                     status = COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL;
                 else
                     status = COMPANY_WORK_MACROS.ORDER_RECEIVED_BY_CLIENT;
@@ -2411,39 +2559,41 @@ namespace _01electronics_inventory
                 status = COMPANY_WORK_MACROS.RFP_PENDING_SITE_RECEIVAL;
 
 
-            addReleasePermitPage.materialReleasePermit.GetReleaseItems().ForEach(a => a.release_permit_item_status = status);
+            //parentWindow.releasePermitPage.materialReleasePermit.GetReleaseItems().ForEach(a => a.release_permit_item_status = status);
+            parentWindow.releasePermitPage.workOrder.GetOrderProductsList().ToList().ForEach(a => a.product_status.status_id = status);
 
-
-            if (addReleasePermitPage.orderChecked.IsChecked == true)
+            if (parentWindow.releasePermitPage.orderChecked.IsChecked == true)
             {
-                if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
-                    addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL);
+                if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
+                    parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL);
                 else
-                    addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.ORDER_RECEIVED_BY_CLIENT);
+                    parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RECIEVED_BY_EMPLOYEE);
             }
 
             else
-                addReleasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RFP_PENDING_SITE_RECEIVAL);
+                parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RECIEVED_BY_EMPLOYEE);
 
 
-            if (!addReleasePermitPage.materialReleasePermit.IssueNewMaterialRelease(ref serials,ref addReleasePermitPage.rfpItems))
+
+            
+            if (!parentWindow.releasePermitPage.materialReleasePermit.IssueNewMaterialRelease(ref serials,ref parentWindow.releasePermitPage.rfpItems , workOrder.GetOrderSerial(),orderItemNumber))
                 return;
 
 
-            ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, this.addReleasePermitPage, parentWindow, ref addReleasePermitPage.materialReleasePermit);
+            ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, this.parentWindow.releasePermitPage, parentWindow, ref parentWindow.releasePermitPage.materialReleasePermit);
 
             ReleasePermitUploadFilesPage.addReleasePermitItemPage = this;
             NavigationService.Navigate(ReleasePermitUploadFilesPage);
 
 
-            parentWindow.func1.Invoke(addReleasePermitPage.materialReleasePermit.GetReleaseSerial());
+            parentWindow.func1.Invoke(parentWindow.releasePermitPage.materialReleasePermit.GetReleaseSerial());
 
 
         }
 
         private void BasicInfoLabelMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.NavigationService.Navigate(addReleasePermitPage);
+            this.NavigationService.Navigate(parentWindow.releasePermitPage);
         }
 
         private void LabelMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -2457,7 +2607,7 @@ namespace _01electronics_inventory
 
 
 
-            addReleasePermitPage.materialReleasePermit.GetReleaseItems().Clear();
+            parentWindow.releasePermitPage.materialReleasePermit.GetReleaseItems().Clear();
 
             Grid items = Home.Children[Home.Children.Count - 1] as Grid;
 
@@ -2506,7 +2656,7 @@ namespace _01electronics_inventory
 
                         releaseItem.entry_permit_serial = Convert.ToInt32(item.Tag.ToString().Split(' ')[0]);
                         releaseItem.entry_permit_item_serial = Convert.ToInt32(item.Tag.ToString().Split(' ')[1]);
-                        releaseItem.released_quantity_release = 0;
+                        releaseItem.released_quantity_release = numberOfSelectedItems;
 
 
 
@@ -2536,13 +2686,13 @@ namespace _01electronics_inventory
                             //Grid identityTextBoxGrid = rfpLocationGrid.Children[2] as Grid;
 
 
-                            releaseItem.rfp_info.rfpRequestorTeam = addReleasePermitPage.rfp.GetRFPRequestorTeamId();
+                            releaseItem.rfp_info.rfpRequestorTeam = parentWindow.releasePermitPage.rfp.GetRFPRequestorTeamId();
 
 
                             releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL;
 
-                            releaseItem.rfp_info.rfpSerial = addReleasePermitPage.rfp.GetRFPSerial();
-                            releaseItem.rfp_info.rfpVersion = addReleasePermitPage.rfp.GetRFPVersion();
+                            releaseItem.rfp_info.rfpSerial = parentWindow.releasePermitPage.rfp.GetRFPSerial();
+                            releaseItem.rfp_info.rfpVersion = parentWindow.releasePermitPage.rfp.GetRFPVersion();
 
 
 
@@ -2557,15 +2707,15 @@ namespace _01electronics_inventory
                                 return false;
                             }
 
-                            releaseItem.rfp_item_number = addReleasePermitPage.rfpItems[rfpItems.SelectedIndex].rfp_item_number;
+                            releaseItem.rfp_item_number = parentWindow.releasePermitPage.rfpItems[rfpItems.SelectedIndex].rfp_item_number;
 
 
-                            if (addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
+                            if (parentWindow.releasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
                             {
                                 WorkOrder workOrder = new WorkOrder();
 
 
-                                workOrder.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
+                                workOrder.InitializeWorkOrderInfo(parentWindow.releasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
 
                                 workOrdersLocations.Clear();
                                 workOrder.GetProjectLocations(ref workOrdersLocations);
@@ -2584,11 +2734,11 @@ namespace _01electronics_inventory
 
                             }
 
-                            else if (addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial() != 0)
+                            else if (parentWindow.releasePermitPage.rfp.GetMaintContract().GetMaintContractSerial() != 0)
                             {
 
 
-                                maintenanceContract.InitializeMaintenanceContractInfo(addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial(), addReleasePermitPage.rfp.GetMaintContract().GetMaintContractVersion());
+                                maintenanceContract.InitializeMaintenanceContractInfo(parentWindow.releasePermitPage.rfp.GetMaintContract().GetMaintContractSerial(), parentWindow.releasePermitPage.rfp.GetMaintContract().GetMaintContractVersion());
 
                                 maintenanceContractLocations = maintenanceContract.GetMaintContractProjectLocations();
 
@@ -2614,15 +2764,15 @@ namespace _01electronics_inventory
                             }
 
 
-                            else if (addReleasePermitPage.rfp.GetProjectSerial() != 0)
+                            else if (parentWindow.releasePermitPage.rfp.GetProjectSerial() != 0)
                             {
 
 
                                 companyProjectLocations.Clear();
 
-                                commonQueries.GetCompanyProjectLocations(addReleasePermitPage.rfp.GetProjectSerial(), ref companyProjectLocations);
+                                commonQueries.GetCompanyProjectLocations(parentWindow.releasePermitPage.rfp.GetProjectSerial(), ref companyProjectLocations);
 
-                                releaseItem.company_project_serial = addReleasePermitPage.rfp.GetProjectSerial();
+                                releaseItem.company_project_serial = parentWindow.releasePermitPage.rfp.GetProjectSerial();
 
                                 if (locationsComboBox.Items.Count != 0)
                                 {
@@ -2642,7 +2792,7 @@ namespace _01electronics_inventory
                         {
 
 
-                            if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
+                            if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                                 releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL;
                             else
                                 releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL;
@@ -2656,9 +2806,9 @@ namespace _01electronics_inventory
 
 
 
-                            WrapPanel ordersPanel = addReleasePermitPage.mainPanel.Children[1] as WrapPanel;
+                            WrapPanel ordersPanel = parentWindow.releasePermitPage.mainPanel.Children[2] as WrapPanel;
 
-                            ComboBox ordersComboBox = ordersPanel.Children[0] as ComboBox;
+                            ComboBox ordersComboBox = ordersPanel.Children[1] as ComboBox;
 
                             if (ordersComboBox.SelectedIndex != -1)
                             {
@@ -2666,23 +2816,23 @@ namespace _01electronics_inventory
 
 
 
-                                releaseItem.workOrder_serial = addReleasePermitPage.workOrder.GetOrderSerial();
+                                releaseItem.workOrder_serial = parentWindow.releasePermitPage.workOrder.GetOrderSerial();
 
-                                releaseItem.order_serial = addReleasePermitPage.workOrder.GetOrderSerial();
+                                releaseItem.order_serial = parentWindow.releasePermitPage.workOrder.GetOrderSerial();
 
 
-                                releaseItem.order_project_serial = addReleasePermitPage.workOrder.GetprojectSerial();
+                                releaseItem.order_project_serial = parentWindow.releasePermitPage.workOrder.GetprojectSerial();
 
 
                                 if (orderItemsComboBox.SelectedIndex != -1)
                                 {
 
-                                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
+                                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = parentWindow.releasePermitPage.workOrder.GetOrderProductsList();
 
                                     releaseItem.workOrder_product_number = workOrderProducts[orderItemsComboBox.SelectedIndex].productNumber;
 
 
-                                    if (workOrderProducts[orderItemsComboBox.SelectedIndex].productQuantity < addReleasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
+                                    if (workOrderProducts[orderItemsComboBox.SelectedIndex].productQuantity < parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
                                     {
 
                                         System.Windows.Forms.MessageBox.Show("exceeded the max allowed quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
@@ -2702,7 +2852,7 @@ namespace _01electronics_inventory
 
                                 workOrdersLocations.Clear();
 
-                                addReleasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
+                                parentWindow.releasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
 
                                 if (locationsComboBox.SelectedIndex != -1)
                                 {
@@ -2732,8 +2882,8 @@ namespace _01electronics_inventory
                             return false;
                         }
 
-                        addReleasePermitPage.materialReleasePermit.AddReleaseItem(releaseItem);
-                        addReleasePermitPage.materialReleasePermit.UpdateIsReleasedInfo(releaseItem.entry_permit_serial, releaseItem.entry_permit_item_serial, true);
+                        parentWindow.releasePermitPage.materialReleasePermit.AddReleaseItem(releaseItem);
+                        parentWindow.releasePermitPage.materialReleasePermit.UpdateIsReleasedInfo(releaseItem.entry_permit_serial, releaseItem.entry_permit_item_serial, true);
 
 
 
@@ -2792,11 +2942,11 @@ namespace _01electronics_inventory
 
 
 
-                            releaseItem.rfp_info.rfpRequestorTeam = addReleasePermitPage.rfp.GetRFPRequestorTeamId();
+                            releaseItem.rfp_info.rfpRequestorTeam = parentWindow.releasePermitPage.rfp.GetRFPRequestorTeamId();
 
-                            releaseItem.rfp_info.rfpSerial = addReleasePermitPage.rfp.GetRFPSerial();
+                            releaseItem.rfp_info.rfpSerial = parentWindow.releasePermitPage.rfp.GetRFPSerial();
 
-                            releaseItem.rfp_info.rfpVersion = addReleasePermitPage.rfp.GetRFPVersion();
+                            releaseItem.rfp_info.rfpVersion = parentWindow.releasePermitPage.rfp.GetRFPVersion();
 
                             if (rfpItems.SelectedIndex == -1)
                             {
@@ -2808,16 +2958,16 @@ namespace _01electronics_inventory
                             }
 
 
-                            releaseItem.rfp_item_number = addReleasePermitPage.rfpItems[rfpItems.SelectedIndex].rfp_item_number;
+                            releaseItem.rfp_item_number = parentWindow.releasePermitPage.rfpItems[rfpItems.SelectedIndex].rfp_item_number;
 
 
-                            if (addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
+                            if (parentWindow.releasePermitPage.rfp.GetWorkOrder().GetOrderSerial() != 0)
                             {
 
                                 WorkOrder workOrder = new WorkOrder();
 
 
-                                workOrder.InitializeWorkOrderInfo(addReleasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
+                                workOrder.InitializeWorkOrderInfo(parentWindow.releasePermitPage.rfp.GetWorkOrder().GetOrderSerial());
 
                                 workOrdersLocations.Clear();
                                 workOrder.GetProjectLocations(ref workOrdersLocations);
@@ -2838,11 +2988,11 @@ namespace _01electronics_inventory
 
 
                             }
-                            else if (addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial() != 0)
+                            else if (parentWindow.releasePermitPage.rfp.GetMaintContract().GetMaintContractSerial() != 0)
                             {
 
 
-                                maintenanceContract.InitializeMaintenanceContractInfo(addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial(), addReleasePermitPage.rfp.GetMaintContract().GetMaintContractVersion());
+                                maintenanceContract.InitializeMaintenanceContractInfo(parentWindow.releasePermitPage.rfp.GetMaintContract().GetMaintContractSerial(), parentWindow.releasePermitPage.rfp.GetMaintContract().GetMaintContractVersion());
 
                                 maintenanceContractLocations = maintenanceContract.GetMaintContractProjectLocations();
 
@@ -2873,9 +3023,9 @@ namespace _01electronics_inventory
 
                                 companyProjectLocations.Clear();
 
-                                commonQueries.GetCompanyProjectLocations(addReleasePermitPage.rfp.GetProjectSerial(), ref companyProjectLocations);
+                                commonQueries.GetCompanyProjectLocations(parentWindow.releasePermitPage.rfp.GetProjectSerial(), ref companyProjectLocations);
 
-                                releaseItem.company_project_serial = addReleasePermitPage.rfp.GetProjectSerial();
+                                releaseItem.company_project_serial = parentWindow.releasePermitPage.rfp.GetProjectSerial();
                                 if (locationsComboBox.Items.Count != 0)
                                 {
                                     releaseItem.company_project_location = companyProjectLocations[locationsComboBox.SelectedIndex].location_id;
@@ -2893,10 +3043,10 @@ namespace _01electronics_inventory
                         else if (orderCheckBox.IsChecked == true)
                         {
 
-                            if (addReleasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && addReleasePermitPage.contactComboBox.SelectedIndex != -1)
+                            if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                                 releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL;
                             else
-                                releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL;
+                                releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.RECIEVED_BY_EMPLOYEE;
 
                             Grid orderLocationGrid = location.Children[2] as Grid;
 
@@ -2907,7 +3057,7 @@ namespace _01electronics_inventory
                             ComboBox locationsComboBox = orderLocationGrid.Children[1] as ComboBox;
 
 
-                            WrapPanel ordersPanel = addReleasePermitPage.mainPanel.Children[1] as WrapPanel;
+                            WrapPanel ordersPanel = parentWindow.releasePermitPage.mainPanel.Children[1] as WrapPanel;
 
                             ComboBox ordersComboBox = ordersPanel.Children[0] as ComboBox;
 
@@ -2915,23 +3065,23 @@ namespace _01electronics_inventory
                             if (ordersComboBox.SelectedIndex != -1)
                             {
 
-                                releaseItem.workOrder_serial = addReleasePermitPage.workOrder.GetOrderSerial();
+                                releaseItem.workOrder_serial = parentWindow.releasePermitPage.workOrder.GetOrderSerial();
 
-                                releaseItem.order_serial = addReleasePermitPage.workOrder.GetOrderSerial();
+                                releaseItem.order_serial = parentWindow.releasePermitPage.workOrder.GetOrderSerial();
 
 
-                                releaseItem.order_project_serial = addReleasePermitPage.workOrder.GetprojectSerial();
+                                releaseItem.order_project_serial = parentWindow.releasePermitPage.workOrder.GetprojectSerial();
 
 
                                 if (orderItemsComboBox.SelectedIndex != -1)
                                 {
 
-                                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = addReleasePermitPage.workOrder.GetOrderProductsList();
+                                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = parentWindow.releasePermitPage.workOrder.GetOrderProductsList();
 
                                     releaseItem.workOrder_product_number = workOrderProducts[orderItemsComboBox.SelectedIndex].productNumber;
 
 
-                                    if (workOrderProducts[orderItemsComboBox.SelectedIndex].productQuantity < addReleasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
+                                    if (workOrderProducts[orderItemsComboBox.SelectedIndex].productQuantity < parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
                                     {
 
                                         System.Windows.Forms.MessageBox.Show("exceeded the max allowed quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
@@ -2950,7 +3100,7 @@ namespace _01electronics_inventory
 
                                 workOrdersLocations.Clear();
 
-                                addReleasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
+                                parentWindow.releasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
 
                                 if (locationsComboBox.SelectedIndex != -1)
                                 {
@@ -2983,8 +3133,8 @@ namespace _01electronics_inventory
 
                         }
 
-                        addReleasePermitPage.materialReleasePermit.AddReleaseItem(releaseItem);
-                        addReleasePermitPage.materialReleasePermit.UpdateReleasedQuantity(int.Parse(quantityTextBox.Text), releaseItem.entry_permit_serial, releaseItem.entry_permit_item_serial);
+                        parentWindow.releasePermitPage.materialReleasePermit.AddReleaseItem(releaseItem);
+                        parentWindow.releasePermitPage.materialReleasePermit.UpdateReleasedQuantity(int.Parse(quantityTextBox.Text), releaseItem.entry_permit_serial, releaseItem.entry_permit_item_serial);
                     }
 
                 }

@@ -34,19 +34,29 @@ namespace _01electronics_inventory
 
         public AddReleasePermitPage releasePermitPage;
         public MaterialReleasePermits materialReleasePermit;
+        public AddReleasePermitItemPage releasePermitItemPage;
+        public bool serviceReport;
+        public bool rfp;
+
+        public WorkOrder workOrder;
+        public RFP rfps;
 
         public AddReleasePermitWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, MaterialReleasePermits mMaterialReleasePermit=null, bool mIsView=false,func function=null)
         {
             commonFunctions = mCommonFunctions;
-            commonQueries = mCommonQueries;
+            commonQueries = mCommonQueries; 
             integrityChecks = mIntegrityChecks;
             loggedInUser = mLoggedInUser;
-
+            serviceReport = false;
+            rfp = false;
             InitializeComponent();
             isView=mIsView;
-
+            workOrder = new WorkOrder();
+            rfps = new RFP();
             func1=function;
+            
             releasePermitPage = new AddReleasePermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
+            releasePermitItemPage = new AddReleasePermitItemPage(ref  commonQueries, ref commonFunctions,ref integrityChecks,ref loggedInUser, this);
             if (isView == true)
                 materialReleasePermit = mMaterialReleasePermit;
 
