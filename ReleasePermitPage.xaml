@@ -30,6 +30,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="dashboardLabel" Text="Dashboard" MouseLeftButtonDown="OnButtonClickedDashboard"/>
@@ -43,7 +44,8 @@
             <TextBlock Grid.Row="8" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="releasePermitsLabel" Text="Release Permits" MouseLeftButtonDown="OnButtonClickedReleasePermits"  Background="#EDEDED" Foreground="#105A97"/>
             <TextBlock Grid.Row="9" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="stockAvailabilityLabel" Text="Stock Availability" MouseLeftButtonDown="OnButtonClickedStockAvailability"/>
             <TextBlock Grid.Row="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="rentryPermitItems" Text="Rentry Permits" MouseLeftButtonDown="OnButtonClickedRentryPermit"/>
-            <TextBlock Grid.Row="11" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="reservationsPermitItems" Text="Reservations" MouseLeftButtonDown="OnButtonClickedReservations"/>
+            <TextBlock Grid.Row="11" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="recievalNotes" Text="Recieval Notes" MouseLeftButtonDown="OnButtonClickedRecievalNotes"/>
+            <TextBlock Grid.Row="12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="reservationsPermitItems" Text="Reservations" MouseLeftButtonDown="OnButtonClickedReservations"/>
         </Grid>
 
         <Grid ShowGridLines="False" Grid.Column="1">

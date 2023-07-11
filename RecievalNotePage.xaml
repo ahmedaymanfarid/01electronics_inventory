@@ -30,7 +30,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
-
+                <RowDefinition />
 
             </Grid.RowDefinitions>
 
@@ -46,7 +46,7 @@
             <TextBlock Grid.Row="9" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="stockAvailabilityLabel" Text="Stock Availability" MouseLeftButtonDown="OnButtonClickedStockAvailability"/>
             <TextBlock Grid.Row="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="rentryPermitItems" Text="Rentry Permits" MouseLeftButtonDown="OnButtonClickedRentryPermit" />
             <TextBlock Grid.Row="11" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="recievalNoteItems" Text="Recieval Notes" MouseLeftButtonDown="OnRecievalNoteItemsMouseLeftButtonDown" Background="#EDEDED" Foreground="#105A97"/>
-
+            <TextBlock Grid.Row="12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Style="{StaticResource sideNavigationItemStyle}" Name="reservation" Text="Reservations" MouseLeftButtonDown="OnButtonClickedReservation" />
         </Grid>
 
         <Grid ShowGridLines="False" Grid.Column="1">

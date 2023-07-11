@@ -79,7 +79,7 @@
             <WrapPanel Grid.Row="1">
 
                 <Label  Content="Release Permits" Style="{StaticResource labelStyle}" FontWeight="Bold" Width="134"></Label>
-                <ComboBox  x:Name="releasePermitsComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnreleasePermitsComboBoxSelectionChanged" ></ComboBox>
+                <ComboBox  x:Name="releasePermitsComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnReleasePermitsComboBoxSelectionChanged" ></ComboBox>
 
             </WrapPanel>
 

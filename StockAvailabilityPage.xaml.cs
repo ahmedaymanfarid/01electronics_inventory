@@ -117,7 +117,11 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
-
+        private void OnButtonClickedRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
         ////////////////////////////////////// INITIALIZATION FUNCTION /////////////////////
         private void InitializationFunction()
         {

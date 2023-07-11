@@ -153,7 +153,7 @@ namespace _01electronics_inventory
                     }
 
                 }
-
+                
             }
 
             recievalNote.SetRecievalNoteDate(Convert.ToDateTime(recievalDate.SelectedDate));
@@ -161,6 +161,8 @@ namespace _01electronics_inventory
 
             if (!recievalNote.IssueNewRecievalNote())
                 return;
+
+         
 
             recievalNoteUploadFilesPage = new AddRecievalNoteUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser , this, ref recievalNote);
 
@@ -182,7 +184,7 @@ namespace _01electronics_inventory
 
         }
 
-        private void OnreleasePermitsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnReleasePermitsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
             if (parentWindow.isView == true)

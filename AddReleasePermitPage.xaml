@@ -100,31 +100,36 @@
                 </WrapPanel>
 
 
+                <Border BorderThickness="1" BorderBrush="Gray" CornerRadius="5" Margin="10" Grid.Row="4" x:Name="mainBorder" Visibility="Collapsed">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="5" Direction="270" Opacity="0.5" BlurRadius="5"/>
+                    </Border.Effect>
+                    <StackPanel x:Name="mainPanel" >
 
-                <StackPanel x:Name="mainPanel" Grid.Row="4">
-
-                    <WrapPanel x:Name="rfpPanel"  Visibility="Collapsed">
-                        <Label Style="{StaticResource labelStyle}" Content="RFP Requestor Team"  Width="200" />
-                        <ComboBox x:Name="rfpRequesters" Style="{StaticResource comboBoxStyle}" SelectionChanged="rfpRequestersSelectionChanged"/>
-                    </WrapPanel>
-                    <WrapPanel x:Name="rfpIdPanel" Visibility="Collapsed">
-                        <Label Style="{StaticResource labelStyle}" Content="RFP ID" Width="200"/>
-                        <ComboBox x:Name="rfpSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedRfpIdComboBox" />
-                    </WrapPanel>
-                    <WrapPanel x:Name="orderPanel" Visibility="Collapsed">
-                        <Label Style="{StaticResource labelStyle}" Content="Order ID" Width="200"/>
-                        <ComboBox x:Name="orderSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedOrderSerial" />
-                    </WrapPanel>
-                    <WrapPanel x:Name="orderContactPanel" Visibility="Collapsed">
-                        <Label Style="{StaticResource labelStyle}" Content="Contact" Width="200"/>
-                        <ComboBox x:Name="contactComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedContactsComboBox" />
-                        <Button Style="{StaticResource buttonBrowseStyle}" Height="26" Content="Add New Contact" Name="addContactBtn" Click="OnButtonClickAddContact" Width="200"/>
-                    </WrapPanel>
-                    <WrapPanel Margin="20,0,0,0" x:Name="chooseToBeClosedWith" Visibility="Collapsed">
-                        <CheckBox x:Name="serviceReportCheckBox" Content="Service Report" Style="{StaticResource checkBoxStyle}" Width="210" Checked="OnCheckServiceReportCheckBox"/>
-                        <CheckBox x:Name="receivalNoteCheckBox" Content="Receival Note" Style="{StaticResource checkBoxStyle}" Checked="OnCheckReceivalNoteCheckBox" />
-                    </WrapPanel>
-                </StackPanel>
+                        <WrapPanel x:Name="rfpPanel"  Visibility="Collapsed">
+                            <Label Style="{StaticResource labelStyle}" Content="RFP Requestor Team"  Width="200" />
+                            <ComboBox x:Name="rfpRequesters" Style="{StaticResource comboBoxStyle}" SelectionChanged="rfpRequestersSelectionChanged"/>
+                        </WrapPanel>
+                        <WrapPanel x:Name="rfpIdPanel" Visibility="Collapsed">
+                            <Label Style="{StaticResource labelStyle}" Content="RFP ID" Width="200"/>
+                            <ComboBox x:Name="rfpSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedRfpIdComboBox" />
+                        </WrapPanel>
+                        <WrapPanel x:Name="orderPanel" Visibility="Collapsed">
+                            <Label Style="{StaticResource labelStyle}" Content="Order ID" Width="200"/>
+                            <ComboBox x:Name="orderSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedOrderSerial" />
+                        </WrapPanel>
+                        <WrapPanel x:Name="orderContactPanel" Visibility="Collapsed">
+                            <Label Style="{StaticResource labelStyle}" Content="Contact" Width="200"/>
+                            <ComboBox x:Name="contactComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedContactsComboBox" />
+                            <Button Style="{StaticResource buttonBrowseStyle}" Height="26" Content="Add New Contact" Name="addContactBtn" Click="OnButtonClickAddContact" Width="200"/>
+                        </WrapPanel>
+                        <WrapPanel Margin="20,0,0,0" x:Name="chooseToBeClosedWith" Visibility="Collapsed">
+                            <CheckBox x:Name="serviceReportCheckBox" Content="Service Report" Style="{StaticResource checkBoxStyle}" Width="210" Checked="OnCheckServiceReportCheckBox"/>
+                            <CheckBox x:Name="receivalNoteCheckBox" Content="Receival Note" Style="{StaticResource checkBoxStyle}" Checked="OnCheckReceivalNoteCheckBox" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+               
 
             </Grid>
         </ScrollViewer>

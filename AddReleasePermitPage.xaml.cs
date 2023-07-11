@@ -178,6 +178,7 @@ namespace _01electronics_inventory
         private void rfpCheckedChecked(object sender, RoutedEventArgs e)
         {
             orderChecked.IsChecked = false;
+            mainBorder.Visibility = Visibility.Visible;
 
             WrapPanel rfpRequestorTeamWrapPanel=mainPanel.Children[0] as WrapPanel;
             rfpRequestorTeamWrapPanel.Visibility = Visibility.Visible;
@@ -211,7 +212,7 @@ namespace _01electronics_inventory
         private void orderCheckedChecked(object sender, RoutedEventArgs e)
         {
             rfpChecked.IsChecked = false;
-
+            mainBorder.Visibility = Visibility.Visible;
 
             WrapPanel rfpRequestorPanel = mainPanel.Children[0] as WrapPanel;
             rfpRequestorPanel.Visibility = Visibility.Collapsed;
@@ -449,6 +450,7 @@ namespace _01electronics_inventory
 
             rfpPanel.Visibility = Visibility.Collapsed;
             rfpIdPanel.Visibility = Visibility.Collapsed;   
+            mainBorder.Visibility = Visibility.Collapsed;
         }
 
         private void OnUncheckOrderCheckBox(object sender, RoutedEventArgs e)
@@ -459,6 +461,7 @@ namespace _01electronics_inventory
             chooseToBeClosedWith.Visibility=Visibility.Collapsed;
             serviceReportCheckBox.IsChecked=false;
             receivalNoteCheckBox.IsChecked=false;
+            mainBorder.Visibility=Visibility.Collapsed;
         }
 
         /// <summary>

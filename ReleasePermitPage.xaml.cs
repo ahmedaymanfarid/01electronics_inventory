@@ -90,8 +90,8 @@ namespace _01electronics_inventory
                 Grid card = new Grid() { Margin = new Thickness(0, 0, 0, 10) };
                 card.RowDefinitions.Add(new RowDefinition());
                 card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(470) });
-                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
-                card.ColumnDefinitions.Add(new ColumnDefinition());
+                card.ColumnDefinitions.Add(new ColumnDefinition() /*{ Width = new GridLength(200) }*/);
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(85) });
 
                 Label header = new Label();
                 header.Content = $"Release Permit - {materialReleasePermits[i].release_Permit_Id}";
@@ -112,6 +112,9 @@ namespace _01electronics_inventory
                 card.Children.Add(releaseDate);
 
                 int itemNo = 0;
+                int releasedQuantity = 1;
+                Label quantityLabel = new Label();
+                Border quantity = new Border();
                 for (int j=0; j < materialReleasePermits[i].material_release_items.Count; j++)
                 {
                     if (materialReleasePermits[i].material_release_items[j].rfp_info.rfpSerial != 0)
@@ -126,6 +129,8 @@ namespace _01electronics_inventory
                                    && materialReleasePermits[i].material_release_items[j].materialItemCompanyModel.model_id == materialReleasePermits[i].material_release_items[j-1].materialItemCompanyModel.model_id
                                    && materialReleasePermits[i].material_release_items[j].materialItemCompanySpecs.spec_name == materialReleasePermits[i].material_release_items[j-1].materialItemCompanySpecs.spec_name)
                             {
+                                releasedQuantity++;
+                                quantityLabel.Content = "Released Quantity: " + releasedQuantity;
                                 continue;
                             }
 
@@ -148,41 +153,7 @@ namespace _01electronics_inventory
                             }
                             
 
-                            card.RowDefinitions.Add(new RowDefinition());
-                            Label itemsLabel = new Label();
-                            itemsLabel.Margin = new Thickness(0, 0, 0, 10);
-                            itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
-                            itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_name} - "
-                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialitemCompanyproduct.product_name} - "
-                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyBrand.brand_name} - "
-                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyModel.model_name} - "
-                                                   +$@"{materialReleasePermits[i].material_release_items[j].materialItemCompanySpecs.spec_name}";
-
-                            card.RowDefinitions.Add(new RowDefinition());
-                            Border status = new Border();
-                            status.Margin = new Thickness(5);
-                            status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
-                            status.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
-                            status.BorderThickness = new Thickness(1);
-                            status.CornerRadius = new CornerRadius(20);
-                            status.HorizontalAlignment = HorizontalAlignment.Center;
-
-                            Label statusLabel = new Label();
-                            statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
-                            statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
-                            statusLabel.Foreground = Brushes.White;
-                            statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
-
-                            status.Child = statusLabel;
-
-                            Grid.SetRow(itemsLabel, card.Children.Count);
-                            Grid.SetColumn(itemsLabel, 0);
-
-                            Grid.SetRow(status, card.Children.Count);
-                            Grid.SetColumn(status, 1);
-
-                            card.Children.Add(itemsLabel);
-                            card.Children.Add(status);
+                            
                         }
                         else if(materialReleasePermits[i].material_release_items[j].materialItemGenericCategory.category_id != null)
                         {
@@ -192,7 +163,72 @@ namespace _01electronics_inventory
                                    && materialReleasePermits[i].material_release_items[j].materialItemGenericModel.model_id == materialReleasePermits[i].material_release_items[j - 1].materialItemGenericModel.model_id
                                   )
                             {
+                                releasedQuantity++;
                                 continue;
+                            }
+                            else if(j>0)
+                            {
+                                card.RowDefinitions.Add(new RowDefinition());
+                                Label itemsLabel = new Label();
+                                itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                                itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                                itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialitemCompanyproduct.product_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyBrand.brand_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyModel.model_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialItemCompanySpecs.spec_name}";
+
+                                releasedQuantity = 1; 
+
+                                quantity.Margin = new Thickness(5);
+                                quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                                quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                                quantity.BorderThickness = new Thickness(1);
+                                quantity.CornerRadius = new CornerRadius(10);
+                                quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                                quantity.Width = 170;
+
+
+                                quantityLabel.Content = "Released Quantity: " + releasedQuantity;
+                                quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                                quantityLabel.Foreground = Brushes.White;
+                                quantityLabel.FontSize = 13;
+                                quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                                quantity.Child = quantityLabel;
+
+                                releasedQuantity = 1;
+
+                                card.RowDefinitions.Add(new RowDefinition());
+                                Border status = new Border();
+                                status.Margin = new Thickness(5);
+                                status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                                status.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                                status.BorderThickness = new Thickness(1);
+                                status.CornerRadius = new CornerRadius(20);
+                                status.HorizontalAlignment = HorizontalAlignment.Center;
+
+                                Label statusLabel = new Label();
+                                statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                                statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                                statusLabel.Foreground = Brushes.White;
+                                statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                                status.Child = statusLabel;
+
+                                Grid.SetRow(itemsLabel, card.Children.Count);
+                                Grid.SetColumn(itemsLabel, 0);
+
+                                Grid.SetRow(status, card.Children.Count);
+                                Grid.SetColumn(status, 1);
+
+                                card.Children.Add(itemsLabel);
+                                card.Children.Add(status);
+
+                                Grid.SetRow(quantity, card.Children.Count);
+                                Grid.SetColumn(quantity, 1);
+
+                                card.Children.Add(quantity);
                             }
                             if (materialReleasePermits[i].material_release_items[j].rfp_info.rfpID == "")
                             {
@@ -210,43 +246,70 @@ namespace _01electronics_inventory
                                 Grid.SetRow(rfpIdLabel, card.Children.Count);
                                 Grid.SetColumn(rfpIdLabel, 0);
                                 card.Children.Add(rfpIdLabel);
+
+                                card.RowDefinitions.Add(new RowDefinition());
+                                Label itemsLabel = new Label();
+                                itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                                itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                                itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].materialItemcompanyCategory.category_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialitemCompanyproduct.product_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyBrand.brand_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialItemCompanyModel.model_name} - "
+                                                       + $@"{materialReleasePermits[i].material_release_items[j].materialItemCompanySpecs.spec_name}";
+
+                                quantity.Margin = new Thickness(5);
+                                quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                                quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                                quantity.BorderThickness = new Thickness(1);
+                                quantity.CornerRadius = new CornerRadius(10);
+                                quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                                quantity.Width = 170;
+
+
+                                quantityLabel.Content = "Released Quantity: " + releasedQuantity;
+                                quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                                quantityLabel.Foreground = Brushes.White;
+                                quantityLabel.FontSize = 13;
+                                quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                                quantity.Child = quantityLabel;
+
+                                releasedQuantity = 1;
+
+                                card.RowDefinitions.Add(new RowDefinition());
+                                Border status = new Border();
+                                status.Margin = new Thickness(5);
+                                status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                                status.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
+                                status.BorderThickness = new Thickness(1);
+                                status.CornerRadius = new CornerRadius(20);
+                                status.HorizontalAlignment = HorizontalAlignment.Center;
+
+                                Label statusLabel = new Label();
+                                statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                                statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                                statusLabel.Foreground = Brushes.White;
+                                statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                                status.Child = statusLabel;
+
+                                Grid.SetRow(itemsLabel, card.Children.Count);
+                                Grid.SetColumn(itemsLabel, 0);
+
+                                Grid.SetRow(status, card.Children.Count);
+                                Grid.SetColumn(status, 1);
+
+                                card.Children.Add(itemsLabel);
+                                card.Children.Add(status);
+
+                                Grid.SetRow(quantity, card.Children.Count);
+                                Grid.SetColumn(quantity, 1);
+
+                                card.Children.Add(quantity);
                             }
                            
 
-                            card.RowDefinitions.Add(new RowDefinition());
-                            Label itemsLabel = new Label();
-                            itemsLabel.Margin = new Thickness(0, 0, 0, 10);
-                            itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
-                            itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].materialItemGenericCategory.category_name} - "
-                                                   + $@"{materialReleasePermits[i].material_release_items[j].materialitemGenericproduct.product_name} - "
-                                                   + $@"{materialReleasePermits[i].material_release_items[j].materialItemGenericBrand.brand_name} - "
-                                                   + $@"{materialReleasePermits[i].material_release_items[j].materialItemGenericModel.model_name}";
-
-                            card.RowDefinitions.Add(new RowDefinition());
-                            Border status = new Border();
-                            status.Margin = new Thickness(5);
-                            status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
-                            status.Background = (Brush)(new BrushConverter().ConvertFrom("#FFFF00"));
-                            status.BorderThickness = new Thickness(1);
-                            status.CornerRadius = new CornerRadius(20);
-                            status.HorizontalAlignment = HorizontalAlignment.Center;
-
-                            Label statusLabel = new Label();
-                            statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
-                            statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
-                            statusLabel.Foreground = Brushes.White;
-                            statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
-
-                            status.Child = statusLabel;
-
-                            Grid.SetRow(itemsLabel, card.Children.Count);
-                            Grid.SetColumn(itemsLabel, 0);
-
-                            Grid.SetRow(status, card.Children.Count);
-                            Grid.SetColumn(status, 1);
-
-                            card.Children.Add(itemsLabel);
-                            card.Children.Add(status);
+                            
                         }
                     }
                     else
@@ -260,8 +323,80 @@ namespace _01electronics_inventory
                                && materialReleasePermits[i].material_release_items[j].orderModel.model_id == materialReleasePermits[i].material_release_items[j-1].orderModel.model_id
                                && materialReleasePermits[i].material_release_items[j].orderSpecs.spec_id == materialReleasePermits[i].material_release_items[j-1].orderSpecs.spec_id)
                         {
+                            releasedQuantity++;
+                            quantityLabel.Content = "Released Quantity: " + releasedQuantity;
                             continue;
 
+                        }
+                        else if(j>0)
+                        {
+                           
+
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Label itemsLabel = new Label();
+                            itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                            itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                            itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].orderCategory.category_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderproduct.product_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderBrand.brand_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderModel.model_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderSpecs.spec_name}";
+
+                            releasedQuantity = 1;
+
+                            card.RowDefinitions.Add(new RowDefinition());
+
+                            quantity = new Border();
+                            quantity.Margin = new Thickness(5);
+                            quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                            quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                            quantity.BorderThickness = new Thickness(1);
+                            quantity.CornerRadius = new CornerRadius(10);
+                            quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                            quantity.Width = 170;
+
+                            quantityLabel = new Label();
+                            quantityLabel.Content = "Released Quantity: " + releasedQuantity;
+                            quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            quantityLabel.Foreground = Brushes.White;
+                            quantityLabel.FontSize=13;
+                            quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            quantity.Child = quantityLabel;
+
+                            releasedQuantity = 1;
+
+                            Border status = new Border();
+                            status.Margin = new Thickness(5);
+                            status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
+                            status.Background = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
+                            status.BorderThickness = new Thickness(1);
+                            status.CornerRadius = new CornerRadius(10);
+                            status.HorizontalAlignment = HorizontalAlignment.Right;
+
+                            Label statusLabel = new Label();
+                            statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                            statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            statusLabel.Foreground = Brushes.White;
+                            statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            status.Child = statusLabel;
+
+
+
+
+                            Grid.SetRow(itemsLabel, card.Children.Count);
+                            Grid.SetColumn(itemsLabel, 0);
+
+                            Grid.SetRow(status, card.Children.Count);
+                            Grid.SetColumn(status, 2);
+
+                            Grid.SetRow(quantity, card.Children.Count);
+                            Grid.SetColumn(quantity, 1);
+
+                            card.Children.Add(itemsLabel);
+                            card.Children.Add(status);
+                            card.Children.Add(quantity);
                         }
                        
                         if (materialReleasePermits[i].material_release_items[j].work_order_id == "")
@@ -289,71 +424,77 @@ namespace _01electronics_inventory
                             //Grid.SetRow(quantity, card.Children.Count-1);
                             //Grid.SetColumn(quantity, 2);
                             //card.Children.Add(quantity);
+
+
+
+                            card.RowDefinitions.Add(new RowDefinition());
+                            Label itemsLabel = new Label();
+                            itemsLabel.Margin = new Thickness(0, 0, 0, 10);
+                            itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
+                            itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].orderCategory.category_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderproduct.product_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderBrand.brand_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderModel.model_name} - "
+                                                   + $@"{materialReleasePermits[i].material_release_items[j].orderSpecs.spec_name}";
+
+                            card.RowDefinitions.Add(new RowDefinition());
+
+                            
+                            quantity.Margin = new Thickness(5);
+                            quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                            quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                            quantity.BorderThickness = new Thickness(1);
+                            quantity.CornerRadius = new CornerRadius(10);
+                            quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                            quantity.Width = 170;
+
+                            //quantityLabel = new Label();
+                            quantityLabel.Content = "Released Quantity: " + releasedQuantity;
+                            quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            quantityLabel.Foreground = Brushes.White;
+                            quantityLabel.FontSize = 13;
+                            quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            quantity.Child = quantityLabel;
+
+                            releasedQuantity = 1;
+
+                            Border status = new Border();
+                            status.Margin = new Thickness(5);
+                            status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
+                            status.Background = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
+                            status.BorderThickness = new Thickness(1);
+                            status.CornerRadius = new CornerRadius(10);
+                            status.HorizontalAlignment = HorizontalAlignment.Right;
+
+                            Label statusLabel = new Label();
+                            statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
+                            statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                            statusLabel.Foreground = Brushes.White;
+                            statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                            status.Child = statusLabel;
+
+
+
+
+                            Grid.SetRow(itemsLabel, card.Children.Count);
+                            Grid.SetColumn(itemsLabel, 0);
+
+                            Grid.SetRow(status, card.Children.Count);
+                            Grid.SetColumn(status, 2);
+
+                            Grid.SetRow(quantity, card.Children.Count);
+                            Grid.SetColumn(quantity, 1);
+
+                            card.Children.Add(itemsLabel);
+                            card.Children.Add(status);
+                            card.Children.Add(quantity);
                         }
                        
 
 
-                        card.RowDefinitions.Add(new RowDefinition());
-                        Label itemsLabel = new Label();
-                        itemsLabel.Margin = new Thickness(0, 0, 0, 10);
-                        itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
-                        itemsLabel.Content = $@"Item {itemNo += 1}: {materialReleasePermits[i].material_release_items[j].orderCategory.category_name} - "
-                                               + $@"{materialReleasePermits[i].material_release_items[j].orderproduct.product_name} - "
-                                               + $@"{materialReleasePermits[i].material_release_items[j].orderBrand.brand_name} - "
-                                               + $@"{materialReleasePermits[i].material_release_items[j].orderModel.model_name} - "
-                                               + $@"{materialReleasePermits[i].material_release_items[j].orderSpecs.spec_name}";
-
-                        card.RowDefinitions.Add(new RowDefinition());
-
-                        Border quantity = new Border();
-                        quantity.Margin = new Thickness(5);
-                        quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
-                        quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
-                        quantity.BorderThickness = new Thickness(1);
-                        quantity.CornerRadius = new CornerRadius(10);
-                        quantity.HorizontalAlignment = HorizontalAlignment.Right;
-                        quantity.Width = 190;
-
-                        Label quantityLabel = new Label();
-                        quantityLabel.Content = "Released Quantity: " + materialReleasePermits[i].material_release_items[j].released_quantity_release;
-                        quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
-                        quantityLabel.Foreground = Brushes.White;
-                        quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
-
-                        quantity.Child = quantityLabel;
-
-
-                        Border status = new Border();
-                        status.Margin = new Thickness(5);
-                        status.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
-                        status.Background = (Brush)(new BrushConverter().ConvertFrom("#FDB813"));
-                        status.BorderThickness = new Thickness(1);
-                        status.CornerRadius = new CornerRadius(10);
-                        status.HorizontalAlignment = HorizontalAlignment.Right;
-
-                        Label statusLabel = new Label();
-                        statusLabel.Content = materialReleasePermits[i].material_release_items[j].release_permit_item_status_name;
-                        statusLabel.Style = (Style)FindResource("stackPanelItemHeader");
-                        statusLabel.Foreground = Brushes.White;
-                        statusLabel.HorizontalAlignment = HorizontalAlignment.Center;
-
-                        status.Child = statusLabel;
-
-                     
                        
-
-                        Grid.SetRow(itemsLabel, card.Children.Count);
-                        Grid.SetColumn(itemsLabel, 0);
-
-                        Grid.SetRow(status, card.Children.Count);
-                        Grid.SetColumn(status, 2);
-
-                        Grid.SetRow(quantity, card.Children.Count);
-                        Grid.SetColumn(quantity, 1);
-
-                        card.Children.Add(itemsLabel);
-                        card.Children.Add(status);
-                        card.Children.Add(quantity);
                     }
                     
 
@@ -1582,6 +1723,10 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
-
+        private void OnButtonClickedRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
     }
 }

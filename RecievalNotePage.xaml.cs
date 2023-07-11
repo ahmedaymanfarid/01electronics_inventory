@@ -344,5 +344,11 @@ namespace _01electronics_inventory
 
 
         }
+
+        private void OnButtonClickedReservation(object sender, MouseButtonEventArgs e)
+        {
+            ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(reservationsPage);
+        }
     }
 }

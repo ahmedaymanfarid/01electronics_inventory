@@ -2636,6 +2636,11 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
+        private void OnButtonClickRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //VIEW TABS
@@ -2689,5 +2694,7 @@ namespace _01electronics_inventory
             folderViewBorder.Style = (Style)FindResource("selectedMainTabBorder");
             folderViewLabel.Style = (Style)FindResource("selectedMainTabLabelItem");
         }
+
+      
     }
 }
