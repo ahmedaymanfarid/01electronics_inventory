@@ -130,6 +130,8 @@ namespace _01electronics_inventory
                     card.Children.Add(rfpIdLabel);
                 }
                 int itemNo = 0;
+                int entryProductQuantity = 1;
+                Label quantityLabel = new Label();
                 for (int j = 0; j < materialEntryPermits[i].items.Count; j++)
                 {
                     if (j>0 && materialEntryPermits[i].items[j].product_category.category_id == materialEntryPermits[i].items[j-1].product_category.category_id
@@ -138,7 +140,18 @@ namespace _01electronics_inventory
                         && materialEntryPermits[i].items[j].product_model.model_id == materialEntryPermits[i].items[j - 1].product_model.model_id
                         && materialEntryPermits[i].items[j].product_specs.spec_id == materialEntryPermits[i].items[j - 1].product_specs.spec_id)
                     {
+                        entryProductQuantity++;
+                        quantityLabel.Content = "Item Quantity: " + entryProductQuantity;
                         continue;
+                    }
+                    else
+                    {
+                        if (materialEntryPermits[i].items[j].product_serial_number != null && materialEntryPermits[i].items[j].quantity == 0)
+                            entryProductQuantity = 1;
+                    }
+                    if(materialEntryPermits[i].items[j].quantity!=0)
+                    {
+                        entryProductQuantity = materialEntryPermits[i].items[j].quantity;
                     }
                     card.RowDefinitions.Add(new RowDefinition());
                     Label itemsLabel = new Label();
@@ -150,6 +163,7 @@ namespace _01electronics_inventory
                                           materialEntryPermits[i].items[j].product_model.model_name+"-"+
                                           materialEntryPermits[i].items[j].product_specs.spec_name ;
 
+                    
                     card.RowDefinitions.Add(new RowDefinition());
 
                     Border quantity = new Border();
@@ -159,12 +173,14 @@ namespace _01electronics_inventory
                     quantity.BorderThickness = new Thickness(1);
                     quantity.CornerRadius = new CornerRadius(10);
                     quantity.HorizontalAlignment = HorizontalAlignment.Right;
-                    quantity.Width = 210;
+                    quantity.Width = 170;
 
-                    Label quantityLabel = new Label();
-                    quantityLabel.Content = "Item Quantity: " + materialEntryPermits[i].items[j].quantity;
+
+                    quantityLabel = new Label();
+                    quantityLabel.Content = "Item Quantity: " + entryProductQuantity;
                     quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
                     quantityLabel.Foreground = Brushes.White;
+                    quantityLabel.FontSize = 12;
                     quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
 
                     quantity.Child = quantityLabel;
