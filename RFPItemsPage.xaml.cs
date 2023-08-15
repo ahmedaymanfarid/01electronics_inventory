@@ -1308,7 +1308,20 @@ namespace _01electronics_inventory
                         if (!reservation.IssueMultipleReservations(stockAvailableItemsListOfList[i]))
                             return;
                     }
+                    rfp.rfpItems = new List<RFP_ITEM_MAX_STRUCT>();
+                    if(!rfp.InitializeRFP(rfp.GetRFPRequestorTeamId(),rfp.GetRFPSerial(),rfp.GetRFPVersion()))
+                        return;
+                    for(int i=0;i<rfp.rfpItems.Count;i++)
+                    {
+                        if (rfp.rfpItems[i].item_status.status_id==COMPANY_WORK_MACROS.RFP_PENDING)
+                        {
+                            RFP_ITEM_MAX_STRUCT item = new RFP_ITEM_MAX_STRUCT();
+                            item = rfp.rfpItems[i];
 
+                            if(!rfp.SplitRFPItem(ref item, item.item_quantity, COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED, false))
+                                return;
+                        }
+                    }
                     emailTo.Clear();
                     emailCC.Clear();
                     if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID, ref emailTo))
