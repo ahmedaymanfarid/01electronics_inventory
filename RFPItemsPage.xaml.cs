@@ -62,6 +62,7 @@ namespace _01electronics_inventory
         private INVENTORY_STRUCTS.RESERVATION_RFP_MIN_STRUCT rfpInfo;
         List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> reservedRFPSerialNumber;
         int serialCounter;
+        int availbleQuantityAfterReservation;
 
         public RFPItemsPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRFP, ref int mViewAddCondition)
         {
@@ -96,7 +97,7 @@ namespace _01electronics_inventory
             reservation = new MaterialReservation();
             rfpInfo = new INVENTORY_STRUCTS.RESERVATION_RFP_MIN_STRUCT();
             reservedRFPSerialNumber = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
-
+            availbleQuantityAfterReservation = 0;
            
             InitializeMeasureUnits();
             InitializeRFPsItemsStatus();
@@ -1577,7 +1578,20 @@ namespace _01electronics_inventory
             reservedQuantityTextBox.Text = selectedSerials.Count.ToString();
 
             TextBox availableQuantityTextBox = viewSerialsButtonParent.Children[6] as TextBox;
-            availableQuantityTextBox.Text =(int.Parse(availableQuantityTextBox.Text)- selectedSerials.Count).ToString();
+            int availbleQuanity = 0;
+            int itemNo = Int32.Parse(addButton.Tag.ToString());
+            if (rfp.rfpItems[itemNo - 1].is_company_product)
+            {
+                if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_brand.brand_id, rfp.rfpItems[itemNo - 1].product_model.model_id, rfp.rfpItems[itemNo - 1].product_specs.spec_id, false, ref availbleQuanity))
+                    return;
+            }
+            else
+            {
+                if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_type.type_id, 0, true, ref availbleQuanity))
+                    return;
+
+            }
+            availableQuantityTextBox.Text = (availbleQuanity - selectedSerials.Count).ToString();
         }
         private void OnCloseRFPItemWindow(object sender, EventArgs e)
         {
