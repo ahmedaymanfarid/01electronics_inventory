@@ -505,6 +505,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="01electronics_inventory_TemporaryKey.pfx" />
+    <None Include="Icons\Documents - Shortcut.lnk" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -560,6 +561,51 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\addfiles_icon.jpg" />
+    <Resource Include="Icons\add_row_icon.jpg" />
+    <Resource Include="Icons\arrow_down.png" />
+    <Resource Include="Icons\arrow_up.png" />
+    <Resource Include="Icons\back_icon.png" />
+    <Resource Include="Icons\checkSign.png" />
+    <Resource Include="Icons\client_call_icon.png" />
+    <Resource Include="Icons\client_call_icon_blue.png" />
+    <Resource Include="Icons\client_visit_icon.png" />
+    <Resource Include="Icons\client_visit_icon_blue.png" />
+    <Resource Include="Icons\company_icon.png" />
+    <Resource Include="Icons\company_icon_blue.png" />
+    <Resource Include="Icons\contact_icon.png" />
+    <Resource Include="Icons\contact_icon_blue.png" />
+    <Resource Include="Icons\crossRed.png" />
+    <Resource Include="Icons\cross_icon.jpg" />
+    <Resource Include="Icons\drop_files_icon.jpg" />
+    <Resource Include="Icons\email_icon.png" />
+    <Resource Include="Icons\email_icon_blue.png" />
+    <Resource Include="Icons\excel_icon.jpg" />
+    <Resource Include="Icons\field_icon.png" />
+    <Resource Include="Icons\field_icon_blue.png" />
+    <Resource Include="Icons\folder_icon.png" />
+    <Resource Include="Icons\image_icon.jpg" />
+    <Resource Include="Icons\no_internet_icon.jpg" />
+    <Resource Include="Icons\office_meeting_icon.png" />
+    <Resource Include="Icons\office_meeting_icon_blue.png" />
+    <Resource Include="Icons\pdf_icon.jpg" />
+    <Resource Include="Icons\phone_icon.png" />
+    <Resource Include="Icons\phone_icon_blue.png" />
+    <Resource Include="Icons\plusSign.png" />
+    <Resource Include="Icons\plus_icon.jpg" />
+    <Resource Include="Icons\powerpoint_icon.jpg" />
+    <Resource Include="Icons\red_cross_icon.jpg" />
+    <Resource Include="Icons\Refresh.png" />
+    <Resource Include="Icons\selected_folder_icon.png" />
+    <Resource Include="Icons\selected_pdf_icon.png" />
+    <Resource Include="Icons\status_icon.png" />
+    <Resource Include="Icons\status_icon_blue.png" />
+    <Resource Include="Icons\text_icon.jpg" />
+    <Resource Include="Icons\unknown_icon.jpg" />
+    <Resource Include="Icons\winrar_icon.jpg" />
+    <Resource Include="Icons\word_icon.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

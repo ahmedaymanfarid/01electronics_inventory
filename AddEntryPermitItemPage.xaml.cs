@@ -1574,7 +1574,7 @@ namespace _01electronics_inventory
             ComboBoxItem requestorTeam = requestorTeamComboBox.SelectedItem as ComboBoxItem;
             ComboBoxItem rfpId = rfpIdComboBox.SelectedItem as ComboBoxItem;
             PROCUREMENT_STRUCTS.RFP_MIN_STRUCT rfpItem = (RFP_MIN_STRUCT)rfpId.Tag;
-            if (!commonQueries.GetTeamRFPs(ref rfps, Int32.Parse(requestorTeam.Tag.ToString())))
+            if (!commonQueries.GetTeamRFPsMappedIds(ref rfps, Int32.Parse(requestorTeam.Tag.ToString())))
                 return;
 
             rfpItems.Clear();
@@ -1657,7 +1657,7 @@ namespace _01electronics_inventory
                 rfpIdComboBox.Items.Clear();
                 rfpItemDescriptionComboBox.Items.Clear();
                 rfpIdComboBox.IsEnabled = true;
-                if (!commonQueries.GetTeamRFPs(ref rfps, Int32.Parse(requestorTeamItem.Tag.ToString())))
+                if (!commonQueries.GetTeamRFPsMappedIds(ref rfps, Int32.Parse(requestorTeamItem.Tag.ToString())))
                     return;
                 for (int i = 0; i < rfps.Count; i++)
                 {
@@ -2930,7 +2930,7 @@ namespace _01electronics_inventory
         }
         private void GetRFPRequestorTeam()
         {
-            if (!commonQueries.GetRFPRequestors(ref requestors))
+            if (!commonQueries.GetRFPRequestorsForMappedItems(ref requestors))
                 return;
 
         }

@@ -151,6 +151,7 @@ namespace _01electronics_inventory
                 typeComboBox.IsEnabled = true;
                 brandComboBox.IsEnabled = true;
                 modelTextBlock.IsEnabled = true;
+                addGenericProductButton.IsEnabled = true;
                 categoryComboBox.Items.Clear();
                 FillGenericCategory();
                 for (int i = 0; i < genericCategoryList.Count; i++)
@@ -370,6 +371,7 @@ namespace _01electronics_inventory
             typeComboBox.IsEnabled = false;
             brandComboBox.IsEnabled = false;
             modelTextBlock.IsEnabled = false;
+            addGenericProductButton.IsEnabled = false;
         }
         /// <summary>
         /// ///////////////////////////////////// ENABLE COMBOBOXES FUNCTIONS ///////////////////////////////////////
@@ -384,6 +386,7 @@ namespace _01electronics_inventory
         private void EnableGenericBoxes()
         {
             categoryComboBox.IsEnabled = true;
+            addGenericProductButton.IsEnabled = true;
             //typeComboBox.IsEnabled = true;
             //brandComboBox.IsEnabled = true;
             //modelTextBlock.IsEnabled = true;
@@ -660,6 +663,19 @@ namespace _01electronics_inventory
                     rfp.rfpItems[rfpItem.rfp_item_number - 1] = rfpItem;
                 this.Close();
             }
+        }
+
+        private void OnButtonClickAddGenericItem(object sender, RoutedEventArgs e)
+        {
+            AddGenericProductWindow addGenericProductWindow = new AddGenericProductWindow(ref commonQueries,ref commonFunctions , ref integrityChecks,ref loggedInUser);
+            addGenericProductWindow.Show();
+            addGenericProductWindow.Closed += OnCloseAddGenericProductWindow;
+           
+        }
+
+        private void OnCloseAddGenericProductWindow(object sender, EventArgs e)
+        {
+            
         }
     }
 }
