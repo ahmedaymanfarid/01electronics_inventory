@@ -33,12 +33,14 @@ namespace _01electronics_inventory
         private CommonFunctions commonFunctions;
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
-
+        private RFP rfp;
+        private RFP oldRfp;
         int viewAddCondition;
         private AddEntryPermitWindow entryPermitWindow;
         public AddEntryPermitPage addEntryPermitPage;
 
         public MaterialEntryPermit oldMaterialEntryPermit = null;
+        public MaterialReservation reservation;
 
         public EntryPermitUploadFilesPage EntryPermitUploadFilesPage=null;
 
@@ -64,7 +66,7 @@ namespace _01electronics_inventory
         List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT> specs;
 
         List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> materialReservations;
-
+        int itemNumber;
 
         public AddEntryPermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddEntryPermitWindow mEntryPermitWindow,int mViewAddCondition, ref MaterialEntryPermit moldMaterialEntryPermit) 
         {
@@ -92,15 +94,16 @@ namespace _01electronics_inventory
             requestors = new List<PROCUREMENT_STRUCTS.RFPS_REQUESTORS_STRUCT>();
 
             rfps = new List<PROCUREMENT_STRUCTS.RFP_MIN_STRUCT>();
-
+            rfp = new RFP();
+            oldRfp = new RFP();
             rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
-
+            reservation = new MaterialReservation();
             stockTypes = new List<INVENTORY_STRUCTS.STOCK_TYPES>();
 
             specs = new List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT>();
 
             materialReservations = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
-
+            itemNumber = 1;
             InitializeComponent();
             GetStockTypes();
             GetCurrency();
@@ -119,7 +122,9 @@ namespace _01electronics_inventory
                 {
                     for(int i=0;i<oldMaterialEntryPermit.GetItems().Count;i++)
                     {
-                        InitializeNewCard();
+                        itemNumber=i+1;
+                        InitializeNewCard(itemNumber);
+                        InitializeGenerateSerialCard();
                     }
                     for(int i=0;i<itemsWrapPanel.Children.Count;i++)
                     {
@@ -273,7 +278,9 @@ namespace _01electronics_inventory
                 {
                     for (int i = 0; i < oldMaterialEntryPermit.GetItems().Count; i++)
                     {
-                        InitializeNewCard();
+                        itemNumber = i + 1;
+                        InitializeNewCard(itemNumber);
+                        InitializeGenerateSerialCard();
                     }
                     for (int i = 0; i < itemsWrapPanel.Children.Count; i++)
                     {
@@ -424,11 +431,12 @@ namespace _01electronics_inventory
             else
             {
                // itemsWrapPanel.Children.RemoveAt(itemsWrapPanel.Children.Count - 1);
-                InitializeNewCard();
+                InitializeNewCard(itemNumber);
+                InitializeGenerateSerialCard();
                 addNewItemButton();
             }
         }
-        public void InitializeNewCard()
+        public void InitializeNewCard(int itemNumber)
         {
             ///////////// CREATE CARD ///////////////
             
@@ -439,7 +447,7 @@ namespace _01electronics_inventory
             // border.Background = new SolidColorBrush(Color.FromRgb(237, 237, 237));
             border.Background = new SolidColorBrush(Color.FromRgb(255,255,255));
             border.Width = 500;
-            border.Height = 500;
+            border.Height = 550;
             border.Margin = new Thickness(10);
             border.Effect = new DropShadowEffect { ShadowDepth = 2, BlurRadius = 5, Color = Colors.LightGray };
 
@@ -448,8 +456,9 @@ namespace _01electronics_inventory
             stackPanel.Margin = new Thickness(10);
             border.Child = stackPanel;
 
+           
             var header = new Label();
-            header.Content = $"Item {itemsWrapPanel.Children.Count+1}";
+            header.Content = $"Item {itemNumber}";
             header.Style = (Style)FindResource("GridItem");
             header.HorizontalAlignment = HorizontalAlignment.Stretch;
             header.Foreground = Brushes.White;
@@ -457,24 +466,57 @@ namespace _01electronics_inventory
             header.HorizontalContentAlignment = HorizontalAlignment.Center;
             stackPanel.Children.Add(header);
 
-            var scrollViewer = new ScrollViewer();
-            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-            scrollViewer.Height = 450;
-           // scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-            stackPanel.Children.Add(scrollViewer);
+            // var scrollViewer = new ScrollViewer();
+            // scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            // scrollViewer.Height = 450;
+            //// scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            // stackPanel.Children.Add(scrollViewer);
 
-            var itemsStackPanel = new StackPanel();
-            itemsStackPanel.Background = Brushes.Transparent;
-            itemsStackPanel.Margin = new Thickness(10);
-            itemsStackPanel.Height = 560;
-            scrollViewer.Content= itemsStackPanel;
+            //var itemsStackPanel = new StackPanel();
+            //itemsStackPanel.Background = Brushes.Transparent;
+            //itemsStackPanel.Margin = new Thickness(10);
+            //itemsStackPanel.Height = 560;
+            //scrollViewer.Content= itemsStackPanel;
 
-            var rfpcheckBox = new CheckBox();
-            rfpcheckBox.Style = (Style)FindResource("checkBoxStyle");
-            rfpcheckBox.HorizontalAlignment = HorizontalAlignment.Left;
-            rfpcheckBox.Checked += OnCheckRFPCheckBox;
-            rfpcheckBox.Unchecked += OnUnCheckRFPCheckBox;
-            rfpcheckBox.Content = "RFP";
+            //var rfpcheckBox = new CheckBox();
+            //rfpcheckBox.Style = (Style)FindResource("checkBoxStyle");
+            //rfpcheckBox.HorizontalAlignment = HorizontalAlignment.Left;
+            //rfpcheckBox.Checked += OnCheckRFPCheckBox;
+            //rfpcheckBox.Unchecked += OnUnCheckRFPCheckBox;
+            //rfpcheckBox.Content = "RFP";
+
+            var searchLabel = new Label();
+            searchLabel.Style = (Style)FindResource("labelStyle");
+            searchLabel.Content = "Search";
+            searchLabel.Width = 110;
+            searchLabel.Margin = new Thickness(0);
+
+            var searchTextBox = new TextBox();
+            searchTextBox.Style = (Style)FindResource("textBoxStyle");
+            searchTextBox.Width = 240;
+            searchTextBox.Name = "searchTextBox";
+            searchTextBox.TextChanged += OnTextChangedSearchTextBox;
+
+            var searchWrapPanel = new WrapPanel();
+            searchWrapPanel.Children.Add(searchLabel);
+            searchWrapPanel.Children.Add(searchTextBox);
+
+            var workFormLabel = new Label();
+            workFormLabel.Style = (Style)FindResource("labelStyle");
+            workFormLabel.Content = "Work Form";
+            workFormLabel.Width = 140;
+            workFormLabel.Margin = new Thickness(0);
+            workFormLabel.Name = "workForm";
+
+            var workFormComboBox = new ComboBox();
+            workFormComboBox.Style = (Style)FindResource("comboBoxStyleCard2");
+            workFormComboBox.Items.Add("RFP");
+            workFormComboBox.Items.Add("N/A");
+            workFormComboBox.SelectionChanged += OnSelectionChangedWorkFormComboBox;
+
+            var workFormWrapPanel = new WrapPanel();
+            workFormWrapPanel.Children.Add(workFormLabel);
+            workFormWrapPanel.Children.Add(workFormComboBox);
 
             var requestorLabel = new Label();
             requestorLabel.Style = (Style)FindResource("labelStyle");
@@ -518,7 +560,7 @@ namespace _01electronics_inventory
             itemDescriptionTextBlock.Background = Brushes.Transparent;
             itemDescriptionTextBlock.Margin = new Thickness(3, 0, 0, 0);
             itemDescriptionTextBlock.TextWrapping = TextWrapping.Wrap;
-            itemDescriptionTextBlock.Text = "RFP Item Description";
+            itemDescriptionTextBlock.Text = "RFP Item";
             itemDescriptionTextBlock.Width = 137;
             itemDescriptionTextBlock.Name = "itemDescriptionTextBlock";
 
@@ -650,55 +692,55 @@ namespace _01electronics_inventory
             specsWrapPanel.Children.Add(specsLabel);
             specsWrapPanel.Children.Add(specsComboBox);
 
-            var startSerialWrapPanel = new WrapPanel();
+            //var startSerialWrapPanel = new WrapPanel();
 
-            var startSerialLabel = new Label();
-            startSerialLabel.Style = (Style)FindResource("labelStyle");
-            startSerialLabel.Margin = new Thickness(0);
-            startSerialLabel.Background = Brushes.Transparent;
-            startSerialLabel.Content = "Start Serial";
-            startSerialLabel.Width = 140;
-            startSerialLabel.Name = "startSerialLabel";
+            //var startSerialLabel = new Label();
+            //startSerialLabel.Style = (Style)FindResource("labelStyle");
+            //startSerialLabel.Margin = new Thickness(0);
+            //startSerialLabel.Background = Brushes.Transparent;
+            //startSerialLabel.Content = "Start Serial";
+            //startSerialLabel.Width = 140;
+            //startSerialLabel.Name = "startSerialLabel";
 
-            var startSerialTextBox = new TextBox();
-            startSerialTextBox.Style = (Style)FindResource("textBoxStyle");
-            startSerialTextBox.Name = "startSerialTextBox";
-            startSerialTextBox.Margin = new Thickness(0);
-            startSerialTextBox.Width = 240;
+            //var startSerialTextBox = new TextBox();
+            //startSerialTextBox.Style = (Style)FindResource("textBoxStyle");
+            //startSerialTextBox.Name = "startSerialTextBox";
+            //startSerialTextBox.Margin = new Thickness(0);
+            //startSerialTextBox.Width = 240;
 
-            startSerialWrapPanel.Children.Add(startSerialLabel);
-            startSerialWrapPanel.Children.Add(startSerialTextBox);
+            //startSerialWrapPanel.Children.Add(startSerialLabel);
+            //startSerialWrapPanel.Children.Add(startSerialTextBox);
 
-            // Create the second WrapPanel control
-            var endSerialWrapPanel = new WrapPanel();
+            //// Create the second WrapPanel control
+            //var endSerialWrapPanel = new WrapPanel();
 
-            var endSerialLabel = new Label();
-            endSerialLabel.Style = (Style)FindResource("labelStyle");
-            endSerialLabel.Margin = new Thickness(0);
-            endSerialLabel.Background = Brushes.Transparent;
-            endSerialLabel.Content = "End Serial";
-            endSerialLabel.Width = 140;
-            endSerialLabel.Name = "endSerialLabel";
+            //var endSerialLabel = new Label();
+            //endSerialLabel.Style = (Style)FindResource("labelStyle");
+            //endSerialLabel.Margin = new Thickness(0);
+            //endSerialLabel.Background = Brushes.Transparent;
+            //endSerialLabel.Content = "End Serial";
+            //endSerialLabel.Width = 140;
+            //endSerialLabel.Name = "endSerialLabel";
 
-            var endSerialTextBox = new TextBox();
-            endSerialTextBox.Style = (Style)FindResource("textBoxStyle");
-            endSerialTextBox.Name = "endSerialTextBox";
-            endSerialTextBox.Margin = new Thickness(0);
-            endSerialTextBox.Width = 240;
+            //var endSerialTextBox = new TextBox();
+            //endSerialTextBox.Style = (Style)FindResource("textBoxStyle");
+            //endSerialTextBox.Name = "endSerialTextBox";
+            //endSerialTextBox.Margin = new Thickness(0);
+            //endSerialTextBox.Width = 240;
 
-            var generateButton = new Button();
-            generateButton.Style = (Style)FindResource("buttonStyle2");
-            generateButton.Width = 50;
-            generateButton.Content = "generate";
-            generateButton.FontSize = 10;
-            generateButton.Margin = new Thickness(10,0,0,0);
-            generateButton.Background = new SolidColorBrush(Color.FromRgb(16, 90, 151));
-            generateButton.Foreground = Brushes.White;
-            generateButton.Click += OnButtonClickGenenrateSerials;
+            //var generateButton = new Button();
+            //generateButton.Style = (Style)FindResource("buttonStyle2");
+            //generateButton.Width = 50;
+            //generateButton.Content = "generate";
+            //generateButton.FontSize = 10;
+            //generateButton.Margin = new Thickness(10,0,0,0);
+            //generateButton.Background = new SolidColorBrush(Color.FromRgb(16, 90, 151));
+            //generateButton.Foreground = Brushes.White;
+            //generateButton.Click += OnButtonClickGenenrateSerials;
 
-            endSerialWrapPanel.Children.Add(endSerialLabel);
-            endSerialWrapPanel.Children.Add(endSerialTextBox);
-            endSerialWrapPanel.Children.Add(generateButton);
+            //endSerialWrapPanel.Children.Add(endSerialLabel);
+            //endSerialWrapPanel.Children.Add(endSerialTextBox);
+            //endSerialWrapPanel.Children.Add(generateButton);
 
             var quantityLabel = new Label();
             quantityLabel.Style = (Style)FindResource("labelStyle");
@@ -777,51 +819,274 @@ namespace _01electronics_inventory
             stockTypeWrapPanel.Children.Add(stockTypeLabel);
             stockTypeWrapPanel.Children.Add(stockTypeComboBox);
 
-             var generatedSerialsStackPanel = new StackPanel();
-             //generatedSerialsStackPanel.Visibility = Visibility.Collapsed;
-             //generatedSerialsStackPanel.Height = 100;
+             //var generatedSerialsStackPanel = new StackPanel();
+             ////generatedSerialsStackPanel.Visibility = Visibility.Collapsed;
+             ////generatedSerialsStackPanel.Height = 100;
              
-             var generatedSerialsScrollViewer = new ScrollViewer();
-             generatedSerialsScrollViewer.Content = generatedSerialsStackPanel;
-             generatedSerialsScrollViewer.Height = 100;
-             generatedSerialsScrollViewer.Visibility = Visibility.Collapsed;
-             generatedSerialsScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+             //var generatedSerialsScrollViewer = new ScrollViewer();
+             //generatedSerialsScrollViewer.Content = generatedSerialsStackPanel;
+             //generatedSerialsScrollViewer.Height = 100;
+             //generatedSerialsScrollViewer.Visibility = Visibility.Collapsed;
+             //generatedSerialsScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 
             itemsWrapPanel.Children.Add(border);
-            itemsStackPanel.Children.Add(rfpcheckBox);
-            itemsStackPanel.Children.Add(requestorWrapPanel);
-            itemsStackPanel.Children.Add(rfpIdWrapPanel);
-            itemsStackPanel.Children.Add(rfpItemDescriptionWrapPanel);
-            itemsStackPanel.Children.Add(choiseWrapPanel);
-            itemsStackPanel.Children.Add(companyCategoryWrapPanel);
-            itemsStackPanel.Children.Add(productCategoryWrapPanel);
-            itemsStackPanel.Children.Add(brandWrapPanel);
-            itemsStackPanel.Children.Add(modelWrapPanel);
-            itemsStackPanel.Children.Add(specsWrapPanel);
-            itemsStackPanel.Children.Add(startSerialWrapPanel);
-            itemsStackPanel.Children.Add(endSerialWrapPanel);
-            itemsStackPanel.Children.Add(quantityWrapPanel);
-            itemsStackPanel.Children.Add(priceWrapPanel);
-            itemsStackPanel.Children.Add(currencyWrapPanel);
-            itemsStackPanel.Children.Add(stockTypeWrapPanel);
-            itemsStackPanel.Children.Add(generatedSerialsScrollViewer);
+            stackPanel.Children.Add(searchWrapPanel);
+            stackPanel.Children.Add(workFormWrapPanel);
+            stackPanel.Children.Add(requestorWrapPanel);
+            stackPanel.Children.Add(rfpIdWrapPanel);
+            stackPanel.Children.Add(rfpItemDescriptionWrapPanel);
+            stackPanel.Children.Add(choiseWrapPanel);
+            stackPanel.Children.Add(companyCategoryWrapPanel);
+            stackPanel.Children.Add(productCategoryWrapPanel);
+            stackPanel.Children.Add(brandWrapPanel);
+            stackPanel.Children.Add(modelWrapPanel);
+            stackPanel.Children.Add(specsWrapPanel);
+            //stackPanel.Children.Add(startSerialWrapPanel);
+           // stackPanel.Children.Add(endSerialWrapPanel);
+            stackPanel.Children.Add(quantityWrapPanel);
+            stackPanel.Children.Add(priceWrapPanel);
+            stackPanel.Children.Add(currencyWrapPanel);
+            stackPanel.Children.Add(stockTypeWrapPanel);
+            //itemsStackPanel.Children.Add(generatedSerialsScrollViewer);
             if (itemsWrapPanel.Children.Count > 1 && viewAddCondition != COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
             {
-                RemoveItemButton(ref itemsStackPanel);
+                RemoveItemButton(ref stackPanel);
             }
 
 
         }
+
+        private void OnTextChangedSearchTextBox(object sender, TextChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnSelectionChangedWorkFormComboBox(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox workForm = sender as ComboBox;
+            WrapPanel workFormWrapPanel = workForm.Parent as WrapPanel;
+            StackPanel itemsStackPanel = workFormWrapPanel.Parent as StackPanel;
+
+            WrapPanel rfpRequestorTeamWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
+            WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
+            WrapPanel rfpItemDescriptionWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
+
+            ComboBox rfpRequestorTeamComboBox = rfpRequestorTeamWrapPanel.Children[1] as ComboBox;
+            ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
+            ComboBox rfpItemDescriptionComboBox = rfpItemDescriptionWrapPanel.Children[1] as ComboBox;
+            if (workForm.SelectedIndex==0)
+            {
+                
+
+                rfpRequestorTeamWrapPanel.Visibility = Visibility.Visible;
+                rfpIdWrapPanel.Visibility = Visibility.Visible;
+                rfpItemDescriptionWrapPanel.Visibility = Visibility.Visible;
+                rfpRequestorTeamComboBox.IsEnabled = true;
+                rfpIdComboBox.IsEnabled = true; 
+                rfpItemDescriptionComboBox.IsEnabled = true;
+
+                for (int i = 0; i < requestors.Count; i++)
+                {
+                    ComboBoxItem requestorTeamItem = new ComboBoxItem();
+
+                    requestorTeamItem.Content = requestors[i].requestor_team.team_name;
+                    requestorTeamItem.Tag = requestors[i].requestor_team.team_id;
+                    if (rfpRequestorTeamComboBox.Items.Cast<ComboBoxItem>().Any(f => f.Tag.Equals(requestorTeamItem.Tag)))
+                        continue;
+                    rfpRequestorTeamComboBox.Items.Add(requestorTeamItem);
+                }
+            }
+            else
+            {
+                rfpRequestorTeamWrapPanel.Visibility = Visibility.Collapsed;
+                rfpIdWrapPanel.Visibility = Visibility.Collapsed;
+                rfpItemDescriptionWrapPanel.Visibility = Visibility.Collapsed;
+
+                rfpRequestorTeamComboBox.IsEnabled = false;
+                rfpIdComboBox.IsEnabled = false;
+                rfpItemDescriptionComboBox.IsEnabled = false;
+
+                rfpRequestorTeamComboBox.Items.Clear();
+                rfpIdComboBox.Items.Clear();
+                rfpItemDescriptionComboBox.Items.Clear();
+
+            }
+          
+        }
+
+        public void InitializeGenerateSerialCard()
+        {
+            var border = new Border();
+            border.BorderThickness = new Thickness(1);
+            border.BorderBrush = Brushes.Gray;
+            border.CornerRadius = new CornerRadius(10);
+            // border.Background = new SolidColorBrush(Color.FromRgb(237, 237, 237));
+            border.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+            border.Width = 500;
+            border.Height = 550;
+            border.Margin = new Thickness(10);
+            border.Effect = new DropShadowEffect { ShadowDepth = 2, BlurRadius = 5, Color = Colors.LightGray };
+
+            var stackPanel = new StackPanel();
+            stackPanel.Background = Brushes.Transparent;
+            stackPanel.Margin = new Thickness(10);
+            border.Child = stackPanel;
+
+            var header = new Label();
+            header.Content = $"Generate Serials Item {itemNumber}";
+            header.Style = (Style)FindResource("GridItem");
+            header.Foreground = Brushes.White;
+            header.VerticalAlignment = VerticalAlignment.Center;
+
+            var generateSerialCheckBox = new CheckBox();
+            generateSerialCheckBox.Content = header;
+            generateSerialCheckBox.HorizontalAlignment= HorizontalAlignment.Center;
+            generateSerialCheckBox.VerticalAlignment= VerticalAlignment.Center;
+            generateSerialCheckBox.VerticalContentAlignment= VerticalAlignment.Center;
+            generateSerialCheckBox.Checked += OnCheckGenerateSerialCheckBox;
+            generateSerialCheckBox.Unchecked += OnUnCheckGenerateSerialsCheckBox;
+            generateSerialCheckBox.Margin=new Thickness(200,4,0,0);
+
+            var generateSerialLabelBackGround = new WrapPanel();
+            generateSerialLabelBackGround.Background= new SolidColorBrush(Color.FromRgb(16, 90, 151));
+            generateSerialLabelBackGround.Children.Add(generateSerialCheckBox);
+            generateSerialLabelBackGround.HorizontalAlignment = HorizontalAlignment.Center;
+            generateSerialLabelBackGround.Width = 500;
+            stackPanel.Children.Add(generateSerialLabelBackGround);
+
+            var startSerialWrapPanel = new WrapPanel();
+
+            var startSerialLabel = new Label();
+            startSerialLabel.Style = (Style)FindResource("labelStyle");
+            startSerialLabel.Margin = new Thickness(0);
+            startSerialLabel.Background = Brushes.Transparent;
+            startSerialLabel.Content = "Start Serial";
+            startSerialLabel.Width = 140;
+            startSerialLabel.Name = "startSerialLabel";
+
+            var startSerialTextBox = new TextBox();
+            startSerialTextBox.Style = (Style)FindResource("textBoxStyle");
+            startSerialTextBox.Name = "startSerialTextBox";
+            startSerialTextBox.Margin = new Thickness(0);
+            startSerialTextBox.Width = 240;
+            startSerialTextBox.IsEnabled = false;
+
+            startSerialWrapPanel.Children.Add(startSerialLabel);
+            startSerialWrapPanel.Children.Add(startSerialTextBox);
+
+            // Create the second WrapPanel control
+            var endSerialWrapPanel = new WrapPanel();
+
+            var endSerialLabel = new Label();
+            endSerialLabel.Style = (Style)FindResource("labelStyle");
+            endSerialLabel.Margin = new Thickness(0);
+            endSerialLabel.Background = Brushes.Transparent;
+            endSerialLabel.Content = "End Serial";
+            endSerialLabel.Width = 140;
+            endSerialLabel.Name = "endSerialLabel";
+
+            var endSerialTextBox = new TextBox();
+            endSerialTextBox.Style = (Style)FindResource("textBoxStyle");
+            endSerialTextBox.Name = "endSerialTextBox";
+            endSerialTextBox.Margin = new Thickness(0);
+            endSerialTextBox.Width = 240;
+            endSerialTextBox.IsEnabled = false;
+
+            var generatedSerialsStackPanel = new StackPanel();
+            //generatedSerialsStackPanel.Visibility = Visibility.Collapsed;
+            //generatedSerialsStackPanel.Height = 100;
+
+            var generatedSerialsScrollViewer = new ScrollViewer();
+            generatedSerialsScrollViewer.Content = generatedSerialsStackPanel;
+            generatedSerialsScrollViewer.Height = 300;
+            generatedSerialsScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+            var generateButton = new Button();
+            generateButton.Style = (Style)FindResource("buttonStyle2");
+            generateButton.Width = 200;
+            generateButton.Content = "generate";
+            generateButton.FontSize = 20;
+            generateButton.Height = 40;
+            generateButton.Background = new SolidColorBrush(Color.FromRgb(16, 90, 151));
+            generateButton.Foreground = Brushes.White;
+            generateButton.Click += OnButtonClickGenenrateSerials;
+            generateButton.IsEnabled = false;
+
+            endSerialWrapPanel.Children.Add(endSerialLabel);
+            endSerialWrapPanel.Children.Add(endSerialTextBox);
+
+            stackPanel.Children.Add(startSerialWrapPanel);
+            stackPanel.Children.Add(endSerialWrapPanel);
+            stackPanel.Children.Add(generatedSerialsScrollViewer);
+            stackPanel.Children.Add(generateButton);
+
+            itemsWrapPanel.Children.Add(border);
+        }
+
+        private void OnUnCheckGenerateSerialsCheckBox(object sender, RoutedEventArgs e)
+        {
+            CheckBox generateSerialCheckBox = sender as CheckBox;
+            WrapPanel generateSerialCheckBoxContainerWrapPnel = generateSerialCheckBox.Parent as WrapPanel;
+            StackPanel itemsStackPanel = generateSerialCheckBoxContainerWrapPnel.Parent as StackPanel;
+            WrapPanel startSerialWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
+            WrapPanel endSerialWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+            ScrollViewer generatedSerialsScrollViewer = itemsStackPanel.Children[3] as ScrollViewer;
+            Button generateButton = itemsStackPanel.Children[4] as Button;
+
+            TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
+            TextBox endSerialTextbox = endSerialWrapPanel.Children[1] as TextBox;
+            StackPanel generatedSerialsStackPanel = generatedSerialsScrollViewer.Content as StackPanel;
+
+            startSerialTextBox.IsEnabled = false;
+            startSerialTextBox.Clear();
+            endSerialTextbox.IsEnabled = false ;
+            endSerialTextbox.Clear();
+            generatedSerialsStackPanel.Children.Clear();
+           
+
+            generateButton.IsEnabled = false ;
+        }
+
+        private void OnCheckGenerateSerialCheckBox(object sender, RoutedEventArgs e)
+        {
+            CheckBox generateSerialCheckBox = sender as CheckBox;
+            WrapPanel generateSerialCheckBoxContainerWrapPnel = generateSerialCheckBox.Parent as WrapPanel;
+            StackPanel itemsStackPanel = generateSerialCheckBoxContainerWrapPnel.Parent as StackPanel;
+            WrapPanel startSerialWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
+            WrapPanel endSerialWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+            Button generateButton = itemsStackPanel.Children[4] as Button;
+
+            TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
+            TextBox endSerialTextbox = endSerialWrapPanel.Children[1] as TextBox;
+
+            startSerialTextBox.IsEnabled = true;
+            endSerialTextbox.IsEnabled = true;
+
+            generateButton.IsEnabled = true;
+        }
+
         private void addNewItemButton()
         {
+            var border = new Border();
+            border.BorderThickness = new Thickness(1);
+            border.BorderBrush = Brushes.Gray;
+            border.CornerRadius = new CornerRadius(10);
+            // border.Background = new SolidColorBrush(Color.FromRgb(237, 237, 237));
+            border.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+            border.Width = 500;
+            border.Height = 500;
+            border.Margin = new Thickness(10);
+            border.Effect = new DropShadowEffect { ShadowDepth = 2, BlurRadius = 5, Color = Colors.LightGray };
+
             var addNewItemButton = new Button();
             addNewItemButton.Content = "ADD NEW ITEM";
             addNewItemButton.Width = 200;
+            addNewItemButton.Height = 50;
             addNewItemButton.Style = (Style)FindResource("buttonBrowseStyle");
             addNewItemButton.Click += OnButtonClickAddNewCard;
             addNewItemButton.Margin = new Thickness(10);
-
-            itemsWrapPanel.Children.Add(addNewItemButton);
+            border.Child = addNewItemButton;
+            itemsWrapPanel.Children.Add(border);
         }
         private void RemoveItemButton(ref StackPanel itemsStackPanel)
         {
@@ -830,7 +1095,6 @@ namespace _01electronics_inventory
             removeItemButton.Width = 100;
             removeItemButton.Style = (Style)FindResource("buttonBrowseStyle");
             removeItemButton.Click += OnButtonClickRemoveItem; 
-            removeItemButton.Margin = new Thickness(0,40,0,0);
             removeItemButton.Background = Brushes.Red;
 
             itemsStackPanel.Children.Add(removeItemButton);
@@ -1103,11 +1367,11 @@ namespace _01electronics_inventory
             WrapPanel categoryWrapPanel = categoryComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = categoryWrapPanel.Parent as StackPanel;
 
-            WrapPanel choiceWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
-            WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
-            WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
-            WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
-            WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+            WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+            WrapPanel brandWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+            WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
 
             ComboBox typeComboBox = typeWrapPanel.Children[1] as ComboBox;
             ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
@@ -1206,11 +1470,11 @@ namespace _01electronics_inventory
             WrapPanel typeWrapPanel = typeComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = typeWrapPanel.Parent as StackPanel;
 
-            WrapPanel choiceWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
-            WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
-            WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
-            WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
-            WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+            WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+            WrapPanel brandWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+            WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
 
             ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
             ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
@@ -1271,11 +1535,11 @@ namespace _01electronics_inventory
             WrapPanel brandWrapPanel = brandComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = brandWrapPanel.Parent as StackPanel;
 
-            WrapPanel choiceWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
-            WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
-            WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
-            WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
-            WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+            WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+            WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+            WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+            WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
 
             ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
             ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
@@ -1337,11 +1601,11 @@ namespace _01electronics_inventory
             WrapPanel modelWrapPanel = modelComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = modelWrapPanel.Parent as StackPanel;
 
-            WrapPanel choiceWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
-            WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
-            WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
-            WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
-            WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+            WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+            WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+            WrapPanel brandWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
 
             ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
             ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
@@ -1385,11 +1649,11 @@ namespace _01electronics_inventory
             WrapPanel choiceWrapPanel = choiceComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = choiceWrapPanel.Parent as StackPanel;
 
-            WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
-            WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
-            WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
-            WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
-            WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+            WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+            WrapPanel brandWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+            WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
 
             ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
             ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
@@ -1432,113 +1696,127 @@ namespace _01electronics_inventory
         }
         private void OnSelChangedRfpItemDescriptionComboBox(object sender, SelectionChangedEventArgs e)
         {
-
-            ComboBox rfpItemsComboBox = sender as ComboBox;
-
-            if (rfpItemsComboBox.SelectedIndex == -1)
-                return;
-
-            WrapPanel rfpItemsPanel = rfpItemsComboBox.Parent as WrapPanel;
-
-
-            Grid card = rfpItemsPanel.Parent as Grid;
-
-            WrapPanel rfpRequsterPanel = card.Children[2] as WrapPanel;
-
-            ComboBox serialComboBox = rfpRequsterPanel.Children[2] as ComboBox;
-
-            WrapPanel startSerialPanel = card.Children[14] as WrapPanel;
-            WrapPanel endSerialPanel = card.Children[15] as WrapPanel;
-
-            WrapPanel stockTypePanel = card.Children[19] as WrapPanel;
-
-            WrapPanel validityDatePanel = card.Children[20] as WrapPanel;
-
-
-            Button generateSerialsButton = card.Children[21] as Button;
-
-
-
-
-
-            commonQueries.GetRfpItemsMapping(rfps[serialComboBox.SelectedIndex].rfpSerial, rfps[serialComboBox.SelectedIndex].rfpVersion, rfps[serialComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems);
-
-
-
-            rfpItemsComboBox.Tag = rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity;
-
-            if (rfpItems[rfpItemsComboBox.SelectedIndex].product_category.category_name != "")
+           
+            ComboBox rfpItemDescription = sender as ComboBox;
+            if(rfpItemDescription.SelectedIndex!=-1)
             {
+                WrapPanel rfpItemDescriptionWrapPanel = rfpItemDescription.Parent as WrapPanel;
+                StackPanel itemsStackPanel = rfpItemDescriptionWrapPanel.Parent as StackPanel;
 
-
-                if (rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == false)
-                {
-
-                    startSerialPanel.Visibility = Visibility.Collapsed;
-                    endSerialPanel.Visibility = Visibility.Collapsed;
-
-                    stockTypePanel.Visibility = Visibility.Visible;
-                    validityDatePanel.Visibility = Visibility.Visible;
-
-                    generateSerialsButton.Visibility = Visibility.Collapsed;
-
-                }
-
-                else
-                {
-
-                    startSerialPanel.Visibility = Visibility.Visible;
-                    endSerialPanel.Visibility = Visibility.Visible;
-                    stockTypePanel.Visibility = Visibility.Collapsed;
-
-                    validityDatePanel.Visibility = Visibility.Collapsed;
-                    generateSerialsButton.Visibility = Visibility.Visible;
-
-
-
-
-                }
-
+                WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+                TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+                ComboBoxItem descriptionItem = rfpItemDescription.SelectedItem as ComboBoxItem;
+                RFP_ITEM_MAX_STRUCT rfpItem = (RFP_ITEM_MAX_STRUCT)descriptionItem.Tag;
+                quantityTextBox.Text = rfpItem.item_quantity.ToString();
             }
+           
 
-            else
-            {
+            //ComboBox rfpItemsComboBox = sender as ComboBox;
 
+            //if (rfpItemsComboBox.SelectedIndex == -1)
+            //    return;
 
-                if (rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == false)
-                {
-
-                    startSerialPanel.Visibility = Visibility.Collapsed;
-                    endSerialPanel.Visibility = Visibility.Collapsed;
-                    stockTypePanel.Visibility = Visibility.Visible;
-                    validityDatePanel.Visibility = Visibility.Visible;
-
-                    generateSerialsButton.Visibility = Visibility.Collapsed;
+            //WrapPanel rfpItemsPanel = rfpItemsComboBox.Parent as WrapPanel;
 
 
+            //Grid card = rfpItemsPanel.Parent as Grid;
+
+            //WrapPanel rfpRequsterPanel = card.Children[2] as WrapPanel;
+
+            //ComboBox serialComboBox = rfpRequsterPanel.Children[2] as ComboBox;
+
+            //WrapPanel startSerialPanel = card.Children[14] as WrapPanel;
+            //WrapPanel endSerialPanel = card.Children[15] as WrapPanel;
+
+            //WrapPanel stockTypePanel = card.Children[19] as WrapPanel;
+
+            //WrapPanel validityDatePanel = card.Children[20] as WrapPanel;
 
 
-                }
-
-
-                else
-                {
-
-                    startSerialPanel.Visibility = Visibility.Visible;
-                    endSerialPanel.Visibility = Visibility.Visible;
-
-                    stockTypePanel.Visibility = Visibility.Collapsed;
-                    validityDatePanel.Visibility = Visibility.Collapsed;
-
-                    generateSerialsButton.Visibility = Visibility.Visible;
+            //Button generateSerialsButton = card.Children[21] as Button;
 
 
 
 
-                }
+
+            //commonQueries.GetRfpItemsMapping(rfps[serialComboBox.SelectedIndex].rfpSerial, rfps[serialComboBox.SelectedIndex].rfpVersion, rfps[serialComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems);
 
 
-            }
+
+            //rfpItemsComboBox.Tag = rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity;
+
+            //if (rfpItems[rfpItemsComboBox.SelectedIndex].product_category.category_name != "")
+            //{
+
+
+            //    if (rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == false)
+            //    {
+
+            //        startSerialPanel.Visibility = Visibility.Collapsed;
+            //        endSerialPanel.Visibility = Visibility.Collapsed;
+
+            //        stockTypePanel.Visibility = Visibility.Visible;
+            //        validityDatePanel.Visibility = Visibility.Visible;
+
+            //        generateSerialsButton.Visibility = Visibility.Collapsed;
+
+            //    }
+
+            //    else
+            //    {
+
+            //        startSerialPanel.Visibility = Visibility.Visible;
+            //        endSerialPanel.Visibility = Visibility.Visible;
+            //        stockTypePanel.Visibility = Visibility.Collapsed;
+
+            //        validityDatePanel.Visibility = Visibility.Collapsed;
+            //        generateSerialsButton.Visibility = Visibility.Visible;
+
+
+
+
+            //    }
+
+            //}
+
+            //else
+            //{
+
+
+            //    if (rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == false)
+            //    {
+
+            //        startSerialPanel.Visibility = Visibility.Collapsed;
+            //        endSerialPanel.Visibility = Visibility.Collapsed;
+            //        stockTypePanel.Visibility = Visibility.Visible;
+            //        validityDatePanel.Visibility = Visibility.Visible;
+
+            //        generateSerialsButton.Visibility = Visibility.Collapsed;
+
+
+
+
+            //    }
+
+
+            //    else
+            //    {
+
+            //        startSerialPanel.Visibility = Visibility.Visible;
+            //        endSerialPanel.Visibility = Visibility.Visible;
+
+            //        stockTypePanel.Visibility = Visibility.Collapsed;
+            //        validityDatePanel.Visibility = Visibility.Collapsed;
+
+            //        generateSerialsButton.Visibility = Visibility.Visible;
+
+
+
+
+            //    }
+
+
+            //}
 
 
         }
@@ -1548,10 +1826,10 @@ namespace _01electronics_inventory
             WrapPanel rfpIdWrapPanel = rfpIdComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = rfpIdWrapPanel.Parent as StackPanel;
 
-            WrapPanel itemDescriptionWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
+            WrapPanel itemDescriptionWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
             ComboBox itemDescriptionComboBox = itemDescriptionWrapPanel.Children[1] as ComboBox;
 
-            WrapPanel requestorTeamWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
+            WrapPanel requestorTeamWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
             ComboBox requestorTeamComboBox = requestorTeamWrapPanel.Children[1] as ComboBox;
 
 
@@ -1579,20 +1857,22 @@ namespace _01electronics_inventory
 
             rfpItems.Clear();
 
-            if (!commonQueries.GetRfpItemsMapping(rfpItem.rfpSerial, rfpItem.rfpVersion, rfpItem.rfpRequestorTeam, ref rfpItems))
+            //if (!commonQueries.GetRfpItemsMapping(rfpItem.rfpSerial, rfpItem.rfpVersion, rfpItem.rfpRequestorTeam, ref rfpItems))
+            //    return;
+            
+            if(!rfp.InitializeRFP(rfpItem.rfpRequestorTeam,rfpItem.rfpSerial,rfpItem.rfpVersion))
                 return;
 
+            //for (int i = 0; i < rfp.rfpItems.Count; i++)
+            //{
 
-            for (int i = 0; i < rfpItems.Count; i++)
-            {
+            //    if (rfp.rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
+            //    {
 
-                if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
-                {
-
-                    rfpItems.RemoveAt(i);
-                    i--;
-                }
-            }
+            //        rfp.rfpItems.RemoveAt(i);
+            //        i--;
+            //    }
+            //}
 
 
             //WrapPanel descriptionPanel= card.Children[3] as WrapPanel;
@@ -1604,35 +1884,45 @@ namespace _01electronics_inventory
 
 
 
-            if (rfpItems.Count == 0)
+            //if (rfp.rfpItems.Count == 0)
+            //{
+
+            //    System.Windows.Forms.MessageBox.Show("Inventory must revise it first", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+
+            //    return;
+            //}
+
+            for (int i = 0; i < rfp.rfpItems.Count; i++)
             {
 
-                System.Windows.Forms.MessageBox.Show("RFP Items are not mapped!.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //if (rfpItems[i].product_category.category_id == 0)
+                //{
+                //    itemDescriptionComboBox.Items.Add(rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
 
 
-                return;
-            }
+                //}
 
-            for (int i = 0; i < rfpItems.Count; i++)
-            {
+                //else
+                //{
 
 
-                if (rfpItems[i].product_category.category_id == 0)
+                //    itemDescriptionComboBox.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
+
+
+
+                //}
+                if (rfp.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED)
                 {
-                    itemDescriptionComboBox.Items.Add(rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
-
-
+                    
+                        ComboBoxItem descriptionItem = new ComboBoxItem();
+                        descriptionItem.Content = rfp.rfpItems[i].item_description;
+                        descriptionItem.Tag = rfp.rfpItems[i];
+                        itemDescriptionComboBox.Items.Add(descriptionItem);
+                    
                 }
-
-                else
-                {
-
-
-                    itemDescriptionComboBox.Items.Add(rfpItems[i].product_category.category_name + "," + rfpItems[i].product_type.product_name + "," + rfpItems[i].product_brand.brand_name + "," + rfpItems[i].product_model.model_name);
-
-
-
-                }
+                
 
             }
 
@@ -1643,8 +1933,8 @@ namespace _01electronics_inventory
             ComboBox requestorComboBox = sender as ComboBox;
             WrapPanel requestorTeamWrapPanel = requestorComboBox.Parent as WrapPanel;
             StackPanel itemsStackPanel = requestorTeamWrapPanel.Parent as StackPanel;
-            WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
-            WrapPanel rfpItemDescription = itemsStackPanel.Children[3] as WrapPanel;
+            WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
+            WrapPanel rfpItemDescription = itemsStackPanel.Children[5] as WrapPanel;
 
 
             ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
@@ -1657,14 +1947,21 @@ namespace _01electronics_inventory
                 rfpIdComboBox.Items.Clear();
                 rfpItemDescriptionComboBox.Items.Clear();
                 rfpIdComboBox.IsEnabled = true;
-                if (!commonQueries.GetTeamRFPsMappedIds(ref rfps, Int32.Parse(requestorTeamItem.Tag.ToString())))
+                if (!commonQueries.GetRFPs(ref rfps))
                     return;
                 for (int i = 0; i < rfps.Count; i++)
                 {
-                    ComboBoxItem rfpId = new ComboBoxItem();
-                    rfpId.Content = rfps[i].rfpID;
-                    rfpId.Tag = rfps[i];
-                    rfpIdComboBox.Items.Add(rfpId);
+                    if (rfps[i].rfpRequestorTeam==Convert.ToInt32(requestorTeamItem.Tag) && (rfps[i].rfpStatus==COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED))
+                    {
+                        ComboBoxItem rfpId = new ComboBoxItem();
+                        rfpId.Content = rfps[i].rfpID;
+                        rfpId.Tag = rfps[i];
+
+                        if (rfpIdComboBox.Items.Cast<ComboBoxItem>().Any(f => f.Tag.Equals(rfpId.Tag)))
+                            continue;
+                        rfpIdComboBox.Items.Add(rfpId);
+                    }
+                
                 }
             }
 
@@ -1695,40 +1992,67 @@ namespace _01electronics_inventory
         private void OnButtonClickGenenrateSerials(object sender, RoutedEventArgs e)
         {
             Button generateSerialsButton = sender as Button;
-            WrapPanel endSerialWrapPanel = generateSerialsButton.Parent as WrapPanel;
-            StackPanel itemsStackPanel = endSerialWrapPanel.Parent as StackPanel;
+            StackPanel itemsStackPanel = generateSerialsButton.Parent as StackPanel;
+            Border generateSerialsCardBorder = itemsStackPanel.Parent as Border;
+            int positionOfCardBorder = itemsWrapPanel.Children.IndexOf(generateSerialsCardBorder);
 
-            WrapPanel startSerialWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
-            WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+            WrapPanel startSerilWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
+            TextBox startSerialTextBox = startSerilWrapPanel.Children[1] as TextBox;
 
-            TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
-            TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
-            TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
-
-            CheckBox rfpCheckBox = itemsStackPanel.Children[0] as CheckBox;
-
-           // Grid card= generateButton.Parent as Grid;
+            WrapPanel endSerialWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+            TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;   
 
 
-           // WrapPanel rfpPanel = card.Children[1] as WrapPanel;
-
-           //CheckBox rfpCheckBox= rfpPanel.Children[1] as CheckBox;
-
-           // WrapPanel startSerialWrapPanel=card.Children[14] as WrapPanel;
 
 
-           //     TextBox startSerialTextBox=startSerialWrapPanel.Children[1] as TextBox;
+            Border itemCard = itemsWrapPanel.Children[positionOfCardBorder - 1] as Border;
+            StackPanel itemsCardStackPanel = itemCard.Child as StackPanel;
+            WrapPanel workForm = itemsCardStackPanel.Children[2] as WrapPanel;
+            WrapPanel quantity = itemsCardStackPanel.Children[12] as WrapPanel;
 
-           // WrapPanel endSerialWrapPanel = card.Children[15] as WrapPanel;
-
-
-           //     TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
-
-
-           // WrapPanel quantityWrapPanel = card.Children[16] as WrapPanel;
+            ComboBox workFormComboBox = workForm.Children[1] as ComboBox;
+            TextBox quantityTextBox = quantity.Children[1] as TextBox;
 
 
-           // TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+
+
+
+
+
+            //WrapPanel endSerialWrapPanel = generateSerialsButton.Parent as WrapPanel;
+            //StackPanel itemsStackPanel = endSerialWrapPanel.Parent as StackPanel;
+
+            //WrapPanel startSerialWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+            //WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+
+            //TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
+            //TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
+            //TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+
+            //CheckBox rfpCheckBox = itemsStackPanel.Children[0] as CheckBox;
+
+            // Grid card= generateButton.Parent as Grid;
+
+
+            // WrapPanel rfpPanel = card.Children[1] as WrapPanel;
+
+            //CheckBox rfpCheckBox= rfpPanel.Children[1] as CheckBox;
+
+            // WrapPanel startSerialWrapPanel=card.Children[14] as WrapPanel;
+
+
+            //     TextBox startSerialTextBox=startSerialWrapPanel.Children[1] as TextBox;
+
+            // WrapPanel endSerialWrapPanel = card.Children[15] as WrapPanel;
+
+
+            //     TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
+
+
+            // WrapPanel quantityWrapPanel = card.Children[16] as WrapPanel;
+
+
+            // TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
 
 
 
@@ -1809,7 +2133,7 @@ namespace _01electronics_inventory
                 }
 
 
-                if (int.Parse(quantityTextBox.Text) != (int.Parse(number2) - int.Parse(number)) + 1)
+                if ((Int32)(Convert.ToDecimal(quantityTextBox.Text.ToString())) != (int.Parse(number2) - int.Parse(number)) + 1)
                 {
 
                     System.Windows.Forms.MessageBox.Show("The quantity dosent match the range!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
@@ -1823,7 +2147,7 @@ namespace _01electronics_inventory
                 //serialsGrid.ColumnDefinitions.Clear();
                 //serialsGrid.Children.Clear();
 
-                ScrollViewer serialsGeneratedScrollViewer = itemsStackPanel.Children[16] as ScrollViewer;
+                ScrollViewer serialsGeneratedScrollViewer = itemsStackPanel.Children[3] as ScrollViewer;
                 serialsGeneratedScrollViewer.Visibility = Visibility.Visible;
                 StackPanel generatedSerialsStackPanel = serialsGeneratedScrollViewer.Content as StackPanel;
                 generatedSerialsStackPanel.Children.Clear();
@@ -1917,13 +2241,13 @@ namespace _01electronics_inventory
                     wrapPanel.Children.Add(stockTypeCombobox);
 
 
-                    if (rfpCheckBox.IsChecked == true) {
+                    if (workFormComboBox.SelectedIndex == 0) {
 
                         DatePicker vailidityDatePicker = new DatePicker();
 
 
                         vailidityDatePicker.Style = (Style)FindResource("minidatePickerStyle");
-
+                        vailidityDatePicker.Margin = new Thickness(140, 0, 0, 0);
 
                         DateTime returnDateTime = new DateTime();
                         commonQueries.GetTodaysDate(ref returnDateTime);
@@ -2003,848 +2327,1112 @@ namespace _01electronics_inventory
                 System.Windows.Forms.MessageBox.Show("WareHouse or transaction date or entryPermitId is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
-
+            
             addEntryPermitPage.materialEntryPermit.GetItems().Clear();
             materialReservations.Clear();
 
 
             int rfpItemCount = 1;
 
-            for (int i = 0; i < itemsWrapPanel.Children.Count-1; i++)
+            for (int i = 0; i < itemsWrapPanel.Children.Count-1; i+=2)
             {
 
                 Border itemBorder = itemsWrapPanel.Children[i] as Border;
-                StackPanel mainStackPanel = itemBorder.Child as StackPanel;
-                Label header = mainStackPanel.Children[0] as Label;
+                Border generateSerialsBorder = itemsWrapPanel.Children[i + 1] as Border;
 
-                ScrollViewer itemScrollViewer = mainStackPanel.Children[1] as ScrollViewer;
-                StackPanel itemsStackPanel = itemScrollViewer.Content as StackPanel;
+                StackPanel itemsStackPanel = itemBorder.Child as StackPanel;
+                StackPanel generateSerialsMainStackPanel = generateSerialsBorder.Child as StackPanel;
 
+                WrapPanel workFormWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+                ComboBox workFormComboBox = workFormWrapPanel.Children[1] as ComboBox;
 
-                CheckBox rfpCheckBox = itemsStackPanel.Children[0] as CheckBox;
-                //rfpCheckBox.IsChecked = true;
+                WrapPanel rfpRequestorTeamWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
+                ComboBox rfpRequestorTeamComboBox = rfpRequestorTeamWrapPanel.Children[1] as ComboBox;
 
-
-                WrapPanel rfpRequestorsWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
-                rfpRequestorsWrapPanel.Visibility = Visibility.Visible;
-                ComboBox rfpRequestorsComboBox = rfpRequestorsWrapPanel.Children[1] as ComboBox;
-
-
-
-                WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
-                rfpIdWrapPanel.Visibility = Visibility.Visible;
+                WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
                 ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
 
+                WrapPanel rfpItemDescription = itemsStackPanel.Children[5] as WrapPanel;
+                ComboBox rfpItemdescriptionComboBox = rfpItemDescription.Children[1] as ComboBox;
 
+                WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+                ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
 
-                WrapPanel rfpDescriptipnWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
-                rfpDescriptipnWrapPanel.Visibility = Visibility.Visible;
-                ComboBox rfpDescriptionComboBox = rfpDescriptipnWrapPanel.Children[1] as ComboBox;
-
-
-                WrapPanel choiseWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
-                ComboBox choiceComboBox = choiseWrapPanel.Children[1] as ComboBox;
-
-
-                WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
+                WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
                 ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
 
+                WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+                ComboBox typecomboBox = typeWrapPanel.Children[1] as ComboBox;
 
+                WrapPanel brandsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+                ComboBox brandComboBox = brandsWrapPanel.Children[1] as ComboBox;
 
-                WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
-                ComboBox typeComboBox = typeWrapPanel.Children[1] as ComboBox;
-
-
-
-                WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
-                ComboBox brandComboBox = brandWrapPanel.Children[1] as ComboBox;
-
-
-
-                WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+                WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
                 ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
 
-
-
-                WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+                WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
                 ComboBox specsComboBox = specsWrapPanel.Children[1] as ComboBox;
-
-                WrapPanel startSerialWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
-                TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
-
-
-
-                WrapPanel endSerialWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
-                TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
-
-
-
-                Button generateSerials = endSerialWrapPanel.Children[2] as Button;
-
 
                 WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
                 TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
 
-
-
                 WrapPanel priceWrapPanel = itemsStackPanel.Children[13] as WrapPanel;
                 TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
 
-
-
                 WrapPanel currencyWrapPanel = itemsStackPanel.Children[14] as WrapPanel;
                 ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
-
-
-                WrapPanel stockWrapPanel = itemsStackPanel.Children[15] as WrapPanel;
-                ComboBox stockComboBox = stockWrapPanel.Children[1] as ComboBox;
-
-                ScrollViewer generatedSerialsScrollViewer = itemsStackPanel.Children[16] as ScrollViewer;
-                StackPanel generatedSerialsStackPanel = generatedSerialsScrollViewer.Content as StackPanel;
-                //if the checkbox is unchecked
-                INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-                materialEntryItem.entry_permit_item_serial = i + 1;
-                if (rfpCheckBox.IsChecked == false)
-                {
-
-                    //if the choice is generic
-                    if (choiceComboBox.SelectedIndex == 0)
-                    {
-
-
-                        if (modelComboBox.SelectedIndex == -1)
-                        {
-
-                            System.Windows.Forms.MessageBox.Show("You have to choose a model", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-
-                            return;
-                        }
-
-                        else
-                        {
-
-                            if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "")
-                            {
-
-
-
-                                // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-
-                                materialEntryItem.product_category.category_id = genericCategories[categoryComboBox.SelectedIndex].category_id;
-
-                                genericProducts.Clear();
-
-                                commonQueries.GetGenericProducts(ref genericProducts, genericCategories[categoryComboBox.SelectedIndex].category_id);
-
-                                materialEntryItem.product_type.type_id = genericProducts[typeComboBox.SelectedIndex].type_id;
-
-                                genericBrands.Clear();
-
-                                commonQueries.GetGenericProductBrands(genericProducts[typeComboBox.SelectedIndex].type_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands);
-
-                                materialEntryItem.product_brand.brand_id = genericBrands[brandComboBox.SelectedIndex].brand_id;
-
-                                genericModels.Clear();
-
-                                commonQueries.GetGenericBrandModels(genericProducts[typeComboBox.SelectedIndex].type_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels);
-
-
-                                materialEntryItem.product_model.model_id = genericModels[modelComboBox.SelectedIndex].model_id;
-
-                                materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-
-                                if(currencyComboBox.SelectedIndex !=-1)
-                                materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
-                                else
-                                {
-                                    System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                    return;
-                                }
-
-                                materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
-
-
-                                commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typeComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
-
-
-                                materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
-
-
-
-                                //if (stockTypeComboBoxMain.SelectedIndex == -1)
-                                //{
-
-                                //System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                //return;
-
-                                //}
-
-                                //materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_id;
-                                //materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_name;
-                                //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
-
-
-
-
-                                addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
-
-
-                            }
-
-                            else
-                            {
-                                int count = 1;
-
-                                for (int j = 0; j < generatedSerialsStackPanel.Children.Count; j++)
-                                {
-
-
-                                    //  INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-
-                                    materialEntryItem.product_category.category_id = genericCategories[categoryComboBox.SelectedIndex].category_id;
-
-                                    genericProducts.Clear();
-
-                                    commonQueries.GetGenericProducts(ref genericProducts, genericCategories[categoryComboBox.SelectedIndex].category_id);
-
-                                    materialEntryItem.product_type.type_id = genericProducts[typeComboBox.SelectedIndex].type_id;
-
-                                    genericBrands.Clear();
-
-                                    commonQueries.GetGenericProductBrands(genericProducts[typeComboBox.SelectedIndex].type_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands);
-
-                                    materialEntryItem.product_brand.brand_id = genericBrands[brandComboBox.SelectedIndex].brand_id;
-
-                                    genericModels.Clear();
-
-                                    commonQueries.GetGenericBrandModels(genericProducts[typeComboBox.SelectedIndex].type_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels);
-
-
-                                    materialEntryItem.product_model.model_id = genericModels[modelComboBox.SelectedIndex].model_id;
-                                    materialEntryItem.quantity = 0;
-
-                                    materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-
-                                    if (currencyComboBox.SelectedIndex != -1)
-                                    {
-                                        materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
-                                    }
-                                    else
-                                    {
-                                        System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                        return;
-                                    }
-
-                                    commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typeComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
-
-
-                                    materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                    materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
-
-
-
-
-                                    materialEntryItem.entry_permit_item_serial = count;
-
-                                    count++;
-
-                                    WrapPanel serialPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
-                                    TextBox serialText = serialPanel.Children[0] as TextBox;
-                                    ComboBox stockTypeComboBox = serialPanel.Children[1] as ComboBox;
-
-                                    if (stockTypeComboBox.SelectedIndex == -1)
-                                    {
-
-                                        System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                        return;
-
-                                    }
-
-                                    materialEntryItem.product_serial_number = serialText.Text;
-
-
-
-                                    materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
-                                    materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
-                                    //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
-
-
-
-                                    addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
-
-                                }
-
-
-
-
-                            }
-
-
-
-                        }
-
-
-                    }
-
-                    //if the choice is company
-
-                    else
-                    {
-
-                        if (specsComboBox.SelectedIndex == -1)
-                        {
-
-                            System.Windows.Forms.MessageBox.Show("You have to choose a spec", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                            return;
-                        }
-
-
-                        else
-                        {
-
-                            if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "")
-                            {
-
-                                ///INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-
-
-                                materialEntryItem.is_company_product = true;
-                                materialEntryItem.product_category.category_id = companyCategories[categoryComboBox.SelectedIndex].category_id;
-                                companyProducts.Clear();
-
-                                commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[categoryComboBox.SelectedIndex].category_id);
-
-                                materialEntryItem.product_type.type_id = companyProducts[typeComboBox.SelectedIndex].type_id;
-
-                                companyBrands.Clear();
-
-                                commonQueries.GetProductBrands(companyProducts[typeComboBox.SelectedIndex].type_id, ref companyBrands);
-
-                                materialEntryItem.product_brand.brand_id = companyBrands[brandComboBox.SelectedIndex].brand_id;
-
-                                companyModels.Clear();
-
-                                commonQueries.GetCompanyModels(companyProducts[typeComboBox.SelectedIndex], companyBrands[brandComboBox.SelectedIndex], ref companyModels);
-
-
-                                materialEntryItem.product_model.model_id = companyModels[modelComboBox.SelectedIndex].model_id;
-
-                                specs.Clear();
-
-
-                                if (priceTextBox.Text != "")
-                                    materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-                                if(currencyComboBox.SelectedIndex != -1)
-                                materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
-                                else
-                                {
-                                    System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                    return;
-                                }
-
-                                materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
-
-
-                                commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typeComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
-
-
-                                materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
-
-
-                                if (stockComboBox.SelectedIndex == -1)
-                                {
-
-                                    System.Windows.Forms.MessageBox.Show("You have to choose the stock Type ", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                    return;
-
-                                }
-
-                                if(stockComboBox.SelectedIndex !=-1)
-                                {
-                                    materialEntryItem.stock_type.stock_type_id = stockTypes[stockComboBox.SelectedIndex].stock_type_id;
-                                    materialEntryItem.stock_type.stock_type_name = stockTypes[stockComboBox.SelectedIndex].stock_type_name;
-                                }
-                                
-                                //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
-
-
-                                addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
-
-
-                            }
-
-                            else
-                            {
-                                int count = 1;
-
-                                for (int j = 0; j < generatedSerialsStackPanel.Children.Count; j++)
-                                {
-
-                                    // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-                                    materialEntryItem.is_company_product = true;
-                                    materialEntryItem.product_category.category_id = companyCategories[categoryComboBox.SelectedIndex].category_id;
-
-                                    companyProducts.Clear();
-
-                                    commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[categoryComboBox.SelectedIndex].category_id);
-
-                                    materialEntryItem.product_type.type_id = companyProducts[typeComboBox.SelectedIndex].type_id;
-
-                                    companyBrands.Clear();
-
-                                    commonQueries.GetProductBrands(companyProducts[typeComboBox.SelectedIndex].type_id, ref companyBrands);
-
-                                    materialEntryItem.product_brand.brand_id = companyBrands[brandComboBox.SelectedIndex].brand_id;
-
-                                    companyModels.Clear();
-
-                                    commonQueries.GetCompanyModels(companyProducts[typeComboBox.SelectedIndex], companyBrands[brandComboBox.SelectedIndex], ref companyModels);
-
-
-                                    materialEntryItem.product_model.model_id = companyModels[modelComboBox.SelectedIndex].model_id;
-
-                                    materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-
-                                    if(currencyComboBox.SelectedIndex != -1)
-                                    materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
-                                    else
-                                    {
-                                        System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                        return;
-                                    }
-
-                                    commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typeComboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
-
-
-                                    materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
-                                    materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
-
-
-                                    materialEntryItem.quantity = 0;
-
-
-
-                                    materialEntryItem.entry_permit_item_serial = count;
-
-                                    count++;
-
-                                    WrapPanel serialPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
-                                    TextBox serialText = serialPanel.Children[0] as TextBox;
-                                    ComboBox stockTypeComBoBox = serialPanel.Children[1] as ComboBox;
-
-                                    if (stockTypeComBoBox.SelectedIndex == -1)
-                                    {
-
-                                        System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                        return;
-
-                                    }
-                                     if(stockComboBox.SelectedIndex != -1)
-                                    {
-                                        materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_id;
-                                        materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_name;
-                                    }
-                                    
-                                    //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
-
-                                    materialEntryItem.product_serial_number = serialText.Text;
-
-                                    addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
-
-                                }
-
-
-
-
-                            }
-
-
-                        }
-
-
-
-                    }
-
-
-                }
-
-                //if the checkbox is checked
-
-                else
-                {
-
-
-                    //////////////////////////////////////////////////
-                    //to implement rfp items after the mapping is done
-                    //////////////////////////////////////////////////
-
-                    if (startSerialTextBox.Text == "" && endSerialTextBox.Text == "" && quantityTextBox.Text != "" && rfpCheckBox.IsChecked==true)
-                    {
-
-                        // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-
-                        materialEntryItem.rfp_info.rfpRequestorTeam = requestors[rfpRequestorsComboBox.SelectedIndex].requestor_team.team_id;
-
-                        rfps.Clear();
-
-                        commonQueries.GetTeamRFPs(ref rfps, requestors[rfpRequestorsComboBox.SelectedIndex].requestor_team.team_id);
-
-                        materialEntryItem.rfp_info.rfpSerial = rfps[rfpIdComboBox.SelectedIndex].rfpSerial;
-                        materialEntryItem.rfp_info.rfpVersion = rfps[rfpIdComboBox.SelectedIndex].rfpVersion;
-
-                        rfpItems.Clear();
-
-                        commonQueries.GetRfpItemsMapping(rfps[rfpIdComboBox.SelectedIndex].rfpSerial, rfps[rfpIdComboBox.SelectedIndex].rfpVersion, materialEntryItem.rfp_info.rfpRequestorTeam, ref rfpItems);
-
-                        materialEntryItem.rfp_item_number = rfpItems[rfpDescriptionComboBox.SelectedIndex].rfp_item_number;
-                        materialEntryItem.entry_permit_item_serial = rfpItemCount;
-
-
-                        if (priceTextBox.Text != "")
-                            materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-
-                        if(currencyComboBox.SelectedIndex != -1)
-                        materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
-                        else
-                        {
-                            System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                            return;
-                        }
-
-                        materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
-
-                        INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT materialReservation = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
-
-
-                        //materialReservation.hold_until = validityDate.DisplayDate;
-
-                        materialReservation.reserved_by_id = loggedInUser.GetEmployeeId();
-
-                        materialReservation.rfp_serial = materialEntryItem.rfp_info.rfpSerial;
-
-                        materialReservation.rfp_version = materialEntryItem.rfp_info.rfpVersion;
-
-                        materialReservation.rfp_item_no = materialEntryItem.rfp_item_number;
-
-                        materialReservation.rfp_requestor_team = materialEntryItem.rfp_info.rfpRequestorTeam;
-
-                        materialReservation.quantity = materialEntryItem.quantity;
-
-                        materialReservation.entry_permit_item_serial = rfpItemCount;
-
-                        materialReservations.Add(materialReservation);
-
-
-                        if (rfpItems[rfpDescriptionComboBox.SelectedIndex].is_company_product == true)
-                        {
-
-
-                            materialEntryItem.product_category.category_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_category.category_id;
-                            materialEntryItem.product_type.type_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_type.type_id;
-                            materialEntryItem.product_brand.brand_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_brand.brand_id;
-                            materialEntryItem.product_model.model_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_model.model_id;
-                            materialEntryItem.product_specs.spec_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_specs.spec_id;
-
-
-                        }
-
-                        else
-                        {
-
-                            materialEntryItem.product_category.category_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_category.category_id;
-                            materialEntryItem.product_type.type_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_type.type_id;
-                            materialEntryItem.product_brand.brand_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_brand.brand_id;
-                            materialEntryItem.product_model.model_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_model.model_id;
-
-
-                        }
-
-
-                        if (stockComboBox.SelectedIndex == -1)
-                        {
-
-                            System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                            return;
-
-                        }
-
-                        if(stockComboBox.SelectedIndex !=-1)
-                        {
-                            materialEntryItem.stock_type.stock_type_id = stockTypes[stockComboBox.SelectedIndex].stock_type_id;
-                            materialEntryItem.stock_type.stock_type_name = stockTypes[stockComboBox.SelectedIndex].stock_type_name;
-                        }
-                       
-
-
-                        addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
-
-                        rfpItemCount++;
-
-
-                    }
-
-                    else
-                    {
-
-                        for (int j = 0; j < generatedSerialsStackPanel.Children.Count; j++)
-                        {
-
-
-                            // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
-
-                            materialEntryItem.rfp_info.rfpRequestorTeam = requestors[rfpRequestorsComboBox.SelectedIndex].requestor_team.team_id;
-
-                            rfps.Clear();
-
-                            commonQueries.GetTeamRFPs(ref rfps, requestors[rfpRequestorsComboBox.SelectedIndex].requestor_team.team_id);
-
-                            materialEntryItem.rfp_info.rfpSerial = rfps[rfpIdComboBox.SelectedIndex].rfpSerial;
-                            materialEntryItem.rfp_info.rfpVersion = rfps[rfpIdComboBox.SelectedIndex].rfpVersion;
-
-                            rfpItems.Clear();
-
-                            commonQueries.GetRfpItemsMapping(rfps[rfpIdComboBox.SelectedIndex].rfpSerial, rfps[rfpIdComboBox.SelectedIndex].rfpVersion, materialEntryItem.rfp_info.rfpRequestorTeam, ref rfpItems);
-
-                            materialEntryItem.rfp_item_number = rfpItems[rfpDescriptionComboBox.SelectedIndex].rfp_item_number;
-
-
-                            if (priceTextBox.Text != "")
-                                materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
-
-                            if(currencyComboBox.SelectedIndex !=-1)
-                            materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
-                            else
-                            {
-                                System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                return;
-                            }
-                            materialEntryItem.quantity = 1;
-
-
-
-                            materialEntryItem.entry_permit_item_serial = rfpItemCount;
-
-
-                            INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT materialReservation = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
-
-
-                            //  materialReservation.hold_until = validityDate.DisplayDate;
-
-                            materialReservation.reserved_by_id = loggedInUser.GetEmployeeId();
-
-                            materialReservation.rfp_serial = materialEntryItem.rfp_info.rfpSerial;
-
-                            materialReservation.rfp_version = materialEntryItem.rfp_info.rfpVersion;
-
-                            materialReservation.rfp_item_no = materialEntryItem.rfp_item_number;
-
-                            materialReservation.rfp_requestor_team = materialEntryItem.rfp_info.rfpRequestorTeam;
-
-                            materialReservation.quantity = materialEntryItem.quantity;
-
-                            materialReservation.entry_permit_item_serial = rfpItemCount;
-
-                            materialReservations.Add(materialReservation);
-
-                            rfpItemCount++;
-
-
-                            WrapPanel serialPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
-                            TextBox serialText = serialPanel.Children[0] as TextBox;
-
-                            ComboBox stockTypeComBoBox = serialPanel.Children[1] as ComboBox;
-
-                            if (stockTypeComBoBox.SelectedIndex == -1)
-                            {
-
-                                System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                                return;
-
-                            }
-
-                            materialEntryItem.product_serial_number = serialText.Text;
-
-
-                            materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_id;
-                            materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_name;
-                            //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
-
-                            if (rfpItems[rfpDescriptionComboBox.SelectedIndex].product_category.category_name == "")
-                            {
-                                materialEntryItem.product_category.category_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_category.category_id;
-                                materialEntryItem.product_type.type_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_type.type_id;
-                                materialEntryItem.product_brand.brand_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_brand.brand_id;
-                                materialEntryItem.product_model.model_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_model.model_id;
-                                materialEntryItem.product_specs.spec_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_specs.spec_id;
-
-
-
-                            }
-
-                            else
-                            {
-
-                                materialEntryItem.product_category.category_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_category.category_id;
-                                materialEntryItem.product_type.type_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_type.type_id;
-                                materialEntryItem.product_brand.brand_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_brand.brand_id;
-                                materialEntryItem.product_model.model_id = rfpItems[rfpDescriptionComboBox.SelectedIndex].product_model.model_id;
-
-
-                            }
-
-
-                            addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
-
-                        }
-
-
-                    }
-
-                }
-
-            }
-
-
-                if (viewAddCondition != COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION)
-                {
-                    if (!addEntryPermitPage.materialEntryPermit.IssueNewEntryPermit())
-                        return;
-
-
-                    if (materialReservations.Count != 0)
-                    {
-
-                        for (int i = 0; i < materialReservations.Count; i++)
-                        {
-                            INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT reservationItem = materialReservations[i];
-                            reservationItem.entry_permit_serial = addEntryPermitPage.materialEntryPermit.GetEntryPermitSerial();
-
-                            materialReservations[i] = reservationItem;
-                        }
-
-                        MaterialReservation reservation = new MaterialReservation();
-                        reservation.SetReservationDate(Convert.ToDateTime(addEntryPermitPage.TransactionDatePicker.SelectedDate));
-
-                        reservation.SetReservedBy(loggedInUser.GetEmployeeId());
-                        reservation.SetRfpSerial(materialReservations[0].rfp_serial);
-
-                        reservation.SetReservationStatusId(COMPANY_WORK_MACROS.PENDING_RESERVATION);
-
-
-                        if (!reservation.IssueMultipleReservations(materialReservations))
-                            return;
-                    }
-
-                }
-
-                else
-
-                {
-                    addEntryPermitPage.materialEntryPermit.UpdateMaterialEntryPermit(oldMaterialEntryPermit);
-                }
-
-                addEntryPermitPage.WareHouseCombo.IsEnabled = false;
-                addEntryPermitPage.TransactionDatePicker.IsEnabled = false;
-
-            for (int i = 0; i < itemsWrapPanel.Children.Count-1; i++)
-            {
-
-                Border itemBorder = itemsWrapPanel.Children[i] as Border;
-                StackPanel mainStackPanel = itemBorder.Child as StackPanel;
-                Label header = mainStackPanel.Children[0] as Label;
-                ScrollViewer itemScrollViewer = mainStackPanel.Children[1] as ScrollViewer;
-                StackPanel itemsStackPanel = itemScrollViewer.Content as StackPanel;
-                CheckBox rfpCheckBox = itemsStackPanel.Children[0] as CheckBox;
-                rfpCheckBox.IsEnabled = false;
-
-                WrapPanel rfpRequestorsWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
-                rfpRequestorsWrapPanel.Visibility = Visibility.Visible;
-                ComboBox rfpRequestorsComboBox = rfpRequestorsWrapPanel.Children[1] as ComboBox;
-                rfpRequestorsComboBox.IsEnabled = false;
-
-                WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
-                rfpIdWrapPanel.Visibility = Visibility.Visible;
-                ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
-                rfpIdComboBox.IsEnabled = false;
-
-                WrapPanel rfpDescriptipnWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
-                rfpDescriptipnWrapPanel.Visibility = Visibility.Visible;
-                ComboBox rfpDescriptionComboBox = rfpDescriptipnWrapPanel.Children[1] as ComboBox;
-                rfpDescriptionComboBox.IsEnabled = true;
-
-
-
-                WrapPanel choiseWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
-                ComboBox choiceComboBox = choiseWrapPanel.Children[1] as ComboBox;
-
-
-                WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
-                ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
-                categoryComboBox.IsEnabled = false;
-
-                WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
-                ComboBox typeComboBox = typeWrapPanel.Children[1] as ComboBox;
-                typeComboBox.IsEnabled = false;
-
-                WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
-                ComboBox brandComboBox = brandWrapPanel.Children[1] as ComboBox;
-                brandComboBox.IsEnabled = false;
-
-                WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
-                ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
-                modelComboBox.IsEnabled = false;
-
-                WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
-                ComboBox specsComboBox = specsWrapPanel.Children[1] as ComboBox;
-
-                specsComboBox.IsEnabled = false;
-                
-
-                WrapPanel startSerialWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
-                TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
-                startSerialTextBox.IsEnabled = false;
-
-                WrapPanel endSerialWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
-                TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
-                endSerialTextBox.IsEnabled = false;
-
-                Button generateSerials = endSerialWrapPanel.Children[2] as Button;
-                generateSerials.IsEnabled = false;
-
-                WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
-                TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
-                quantityTextBox.IsEnabled = false;
-
-                WrapPanel priceWrapPanel = itemsStackPanel.Children[13] as WrapPanel;
-                TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
-                priceTextBox.IsEnabled = false;
-
-                WrapPanel currencyWrapPanel = itemsStackPanel.Children[14] as WrapPanel;
-                ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
-                currencyComboBox.IsEnabled = false;
 
                 WrapPanel stockTypeWrapPanel = itemsStackPanel.Children[15] as WrapPanel;
                 ComboBox stockTypeComboBox = stockTypeWrapPanel.Children[1] as ComboBox;
-                stockTypeComboBox.IsEnabled = false;
+
+
+
+
+                WrapPanel startSerialWrapPanel = generateSerialsMainStackPanel.Children[1] as WrapPanel;
+                TextBox startSerialTexBox = startSerialWrapPanel.Children[1] as TextBox;
+
+                WrapPanel endSerialWrapPanel = generateSerialsMainStackPanel.Children[2] as WrapPanel;
+                TextBox endSerialTexBox = endSerialWrapPanel.Children[1] as TextBox;
+
+                ScrollViewer generatedSerialsScrollViewer = generateSerialsMainStackPanel.Children[3] as ScrollViewer;
+                StackPanel generatedSerialsStackPanel = generatedSerialsScrollViewer.Content as StackPanel;
+
+                if(categoryComboBox.SelectedIndex==-1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Category is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if(typecomboBox.SelectedIndex==-1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Type is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (brandComboBox.SelectedIndex == -1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Brand is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (modelComboBox.SelectedIndex == -1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Model is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if(choiceComboBox.SelectedIndex==1)
+                if (specsComboBox.SelectedIndex == -1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Specs is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (quantityTextBox.Text =="")
+                {
+                    System.Windows.Forms.MessageBox.Show("Quantity is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (priceTextBox.Text == "")
+                {
+                    System.Windows.Forms.MessageBox.Show("Price is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (currencyComboBox.SelectedIndex == -1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Currency is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (stockTypeComboBox.SelectedIndex == -1)
+                {
+                    System.Windows.Forms.MessageBox.Show("Stock is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                ComboBoxItem categoryItem = (ComboBoxItem)categoryComboBox.SelectedItem;
+                ComboBoxItem typeItem = (ComboBoxItem)typecomboBox.SelectedItem;
+                ComboBoxItem brandItem = (ComboBoxItem)brandComboBox.SelectedItem;
+                ComboBoxItem modelItem = (ComboBoxItem)modelComboBox.SelectedItem;
+               
+                ComboBoxItem currencyItem = (ComboBoxItem)currencyComboBox.SelectedItem;
+                ComboBoxItem stockTypeItem = (ComboBoxItem)stockTypeComboBox.SelectedItem;
+                if (choiceComboBox.SelectedIndex==1)
+                {
+                    ComboBoxItem specsItem = (ComboBoxItem)specsComboBox.SelectedItem;
+                }
+                
+                if (workFormComboBox.SelectedIndex==0)
+                {
+                    ComboBoxItem descriptionItem = (ComboBoxItem)rfpItemdescriptionComboBox.SelectedItem;
+                    RFP_ITEM_MAX_STRUCT rfpItem = (RFP_ITEM_MAX_STRUCT)descriptionItem.Tag;
+                    rfpItem.product_category.category_id = Convert.ToInt32(categoryItem.Tag);
+                    rfpItem.product_category.category_name = categoryItem.Content.ToString();
+                    rfpItem.product_type.type_id= Convert.ToInt32(typeItem.Tag);
+                    rfpItem.product_type.product_name=typeItem.Content.ToString();
+                    rfpItem.product_brand.brand_id = Convert.ToInt32(brandItem.Tag);
+                    rfpItem.product_brand.brand_name=brandItem.Content.ToString();
+                    rfpItem.product_model.model_id = Convert.ToInt32(modelItem.Tag);
+                    rfpItem.product_model.model_name=modelItem.Content.ToString();
+                    if (choiceComboBox.SelectedIndex == 1)
+                    {
+                        ComboBoxItem specsItem = (ComboBoxItem)specsComboBox.SelectedItem;
+                        rfpItem.product_specs.spec_id = Convert.ToInt32(specsItem.Tag);
+                        rfpItem.product_specs.spec_name=specsItem.Content.ToString();
+                        rfpItem.is_company_product = true;
+                        rfpItem.item_description = $@"{categoryItem.Content.ToString()} - {typeItem.Content.ToString()} - {brandItem.Content.ToString()} - {modelItem.Content.ToString()} - {specsItem.Content.ToString()}";
+                    }
+                    else
+                    {
+                        rfpItem.is_company_product = false;
+                        rfpItem.item_description = $@"{categoryItem.Content.ToString()} - {typeItem.Content.ToString()} - {brandItem.Content.ToString()} - {modelItem.Content.ToString()} ";
+                    }
+                    RFP_ITEM_MAX_STRUCT oldRfpItem = rfp.rfpItems.Find(f=>f.rfp_item_number==rfpItem.rfp_item_number);
+                    int itemIndex = rfp.rfpItems.IndexOf(oldRfpItem);
+                    rfp.rfpItems.Remove(oldRfpItem);
+                    rfp.rfpItems.Insert(itemIndex, rfpItem);
+
+
+                    if (!oldRfp.InitializeRFP(rfp.GetRFPRequestorTeamId(), rfp.GetRFPSerial(), rfp.GetRFPVersion()))
+                         return;
+                    if (!rfp.EditRFPItems(ref oldRfp.rfpItems))
+                        return;
+
+
+
+                    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT entryPermitItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                    entryPermitItem.product_category = rfpItem.product_category;
+                    entryPermitItem.product_type = rfpItem.product_type;
+                    entryPermitItem.product_brand = rfpItem.product_brand;
+                    entryPermitItem.product_model = rfpItem.product_model;
+                    entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
+                    entryPermitItem.quantity = Convert.ToInt32(Convert.ToDecimal(quantityTextBox.Text.ToString()));
+                    entryPermitItem.item_price = Convert.ToDecimal(priceTextBox.Text.ToString());
+                    entryPermitItem.item_currency.currencyId = Convert.ToInt32(currencyItem.Tag.ToString());
+                    entryPermitItem.rfp_info.rfpRequestorTeam=rfp.GetRFPRequestorTeamId();
+                    entryPermitItem.rfp_info.rfpSerial = rfp.GetRFPSerial();
+                    entryPermitItem.rfp_info.rfpVersion = rfp.GetRFPVersion();
+                    entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
+                    entryPermitItem.is_released = false;
+                    entryPermitItem.stock_type.stock_type_id = Convert.ToInt32(stockTypeItem.Tag.ToString());
+                    entryPermitItem.rfp_info.rfp_item_description = rfpItem.item_description;
+                    entryPermitItem.rfp_item.measure_unit_id = rfpItem.measure_unit_id;
+                    entryPermitItem.rfp_item.item_notes = rfpItem.item_notes;
+                    
+
+
+                    if (choiceComboBox.SelectedIndex == 1)
+                    {
+                        entryPermitItem.product_specs = rfpItem.product_specs;
+                        entryPermitItem.is_company_product = true;
+                    }
+                    for (int j=0;j<generatedSerialsStackPanel.Children.Count;j++)
+                    {
+
+                      
+                        WrapPanel serialWrapPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
+                        TextBox serialNumber = serialWrapPanel.Children[1] as TextBox;
+                        entryPermitItem.product_serial_number=serialNumber.Text;
+                        ComboBox serialStockCategory = serialWrapPanel.Children[2] as ComboBox;
+                        DatePicker datePicker = serialWrapPanel.Children[3] as DatePicker;
+                        if(serialStockCategory.SelectedIndex==-1)
+                        {
+                            System.Windows.Forms.MessageBox.Show("Serial type is not specified!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            return;
+                        }
+                        entryPermitItem.valid_until = (DateTime)datePicker.SelectedDate;
+                        addEntryPermitPage.materialEntryPermit.AddItem(entryPermitItem);
+
+                        entryPermitItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                        entryPermitItem.product_category = rfpItem.product_category;
+                        entryPermitItem.product_type = rfpItem.product_type;
+                        entryPermitItem.product_brand = rfpItem.product_brand;
+                        entryPermitItem.product_model = rfpItem.product_model;
+                        entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
+                        entryPermitItem.quantity = Convert.ToInt32(Convert.ToDecimal(quantityTextBox.Text.ToString()));
+                        entryPermitItem.item_price = Convert.ToDecimal(priceTextBox.Text.ToString());
+                        entryPermitItem.item_currency.currencyId = Convert.ToInt32(currencyItem.Tag.ToString());
+                        entryPermitItem.rfp_info.rfpRequestorTeam = rfp.GetRFPRequestorTeamId();
+                        entryPermitItem.rfp_info.rfpSerial = rfp.GetRFPSerial();
+                        entryPermitItem.rfp_info.rfpVersion = rfp.GetRFPVersion();
+                        entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
+                        entryPermitItem.is_released = false;
+                        entryPermitItem.stock_type.stock_type_id = stockTypes[serialStockCategory.SelectedIndex].stock_type_id;
+                        entryPermitItem.valid_until= (DateTime)datePicker.SelectedDate;
+                        entryPermitItem.rfp_info.rfp_item_description = rfpItem.item_description;
+                        entryPermitItem.rfp_item.measure_unit_id = rfpItem.measure_unit_id;
+                        entryPermitItem.rfp_item.item_notes = rfpItem.item_notes;
+
+                        if (choiceComboBox.SelectedIndex == 1)
+                        {
+                            entryPermitItem.product_specs = rfpItem.product_specs;
+                            entryPermitItem.is_company_product = true;
+                        }
+
+                    }
+                   
+                   
+                }
+                else
+                {
+
+                }
+               
+
+                //Border itemBorder = itemsWrapPanel.Children[i] as Border;
+                //StackPanel mainStackPanel = itemBorder.Child as StackPanel;
+                //Label header = mainStackPanel.Children[0] as Label;
+
+                //ScrollViewer itemScrollViewer = mainStackPanel.Children[1] as ScrollViewer;
+                //StackPanel itemsStackPanel = itemScrollViewer.Content as StackPanel;
+
+
+                //CheckBox rfpCheckBox = itemsStackPanel.Children[0] as CheckBox;
+                ////rfpCheckBox.IsChecked = true;
+
+
+                //WrapPanel rfpRequestorsWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
+                //rfpRequestorsWrapPanel.Visibility = Visibility.Visible;
+                //ComboBox rfpRequestorsComboBox = rfpRequestorsWrapPanel.Children[1] as ComboBox;
+
+
+
+                //WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+                //rfpIdWrapPanel.Visibility = Visibility.Visible;
+                //ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
+
+
+
+                //WrapPanel rfpDescriptipnWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
+                //rfpDescriptipnWrapPanel.Visibility = Visibility.Visible;
+                //ComboBox rfpDescriptionComboBox = rfpDescriptipnWrapPanel.Children[1] as ComboBox;
+
+
+                //WrapPanel choiseWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
+                //ComboBox choiceComboBox = choiseWrapPanel.Children[1] as ComboBox;
+
+
+                //WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
+                //ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
+
+
+
+                //WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+                //ComboBox typeComboBox = typeWrapPanel.Children[1] as ComboBox;
+
+
+
+                //WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+                //ComboBox brandComboBox = brandWrapPanel.Children[1] as ComboBox;
+
+
+
+                //WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+                //ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
+
+
+
+                //WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+                //ComboBox specsComboBox = specsWrapPanel.Children[1] as ComboBox;
+
+                //WrapPanel startSerialWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+                //TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
+
+
+
+                //WrapPanel endSerialWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
+                //TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
+
+
+
+                //Button generateSerials = endSerialWrapPanel.Children[2] as Button;
+
+
+                //WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+                //TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+
+
+
+                //WrapPanel priceWrapPanel = itemsStackPanel.Children[13] as WrapPanel;
+                //TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
+
+
+
+                //WrapPanel currencyWrapPanel = itemsStackPanel.Children[14] as WrapPanel;
+                //ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
+
+
+                //WrapPanel stockWrapPanel = itemsStackPanel.Children[15] as WrapPanel;
+                //ComboBox stockComboBox = stockWrapPanel.Children[1] as ComboBox;
+
+                //ScrollViewer generatedSerialsScrollViewer = itemsStackPanel.Children[16] as ScrollViewer;
+                //StackPanel generatedSerialsStackPanel = generatedSerialsScrollViewer.Content as StackPanel;
+                //if the checkbox is unchecked
+                //    INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                //    materialEntryItem.entry_permit_item_serial = i + 1;
+                //    if (workFormComboBox.SelectedIndex!=0)
+                //    {
+
+                //        //if the choice is generic
+                //        if (choiceComboBox.SelectedIndex == 0)
+                //        {
+
+
+                //            if (modelComboBox.SelectedIndex == -1)
+                //            {
+
+                //                System.Windows.Forms.MessageBox.Show("You have to choose a model", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+
+                //                return;
+                //            }
+
+                //            else
+                //            {
+
+                //                if (startSerialTexBox.Text == "" && endSerialTexBox.Text == "" && quantityTextBox.Text != "")
+                //                {
+
+
+
+                //                    // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+
+                //                    materialEntryItem.product_category.category_id = genericCategories[categoryComboBox.SelectedIndex].category_id;
+
+                //                    genericProducts.Clear();
+
+                //                    commonQueries.GetGenericProducts(ref genericProducts, genericCategories[categoryComboBox.SelectedIndex].category_id);
+
+                //                    materialEntryItem.product_type.type_id = genericProducts[typecomboBox.SelectedIndex].type_id;
+
+                //                    genericBrands.Clear();
+
+                //                    commonQueries.GetGenericProductBrands(genericProducts[typecomboBox.SelectedIndex].type_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands);
+
+                //                    materialEntryItem.product_brand.brand_id = genericBrands[brandComboBox.SelectedIndex].brand_id;
+
+                //                    genericModels.Clear();
+
+                //                    commonQueries.GetGenericBrandModels(genericProducts[typecomboBox.SelectedIndex].type_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels);
+
+
+                //                    materialEntryItem.product_model.model_id = genericModels[modelComboBox.SelectedIndex].model_id;
+
+                //                    materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
+
+                //                    if(currencyComboBox.SelectedIndex !=-1)
+                //                    materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                //                    else
+                //                    {
+                //                        System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                        return;
+                //                    }
+
+                //                    materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
+
+
+                //                    commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typecomboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
+
+
+                //                    materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                //                    materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+
+
+
+                //                    //if (stockTypeComboBoxMain.SelectedIndex == -1)
+                //                    //{
+
+                //                    //System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                    //return;
+
+                //                    //}
+
+                //                    //materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_id;
+                //                    //materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBoxMain.SelectedIndex].stock_type_name;
+                //                    //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
+
+
+
+
+                //                    addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
+
+
+                //                }
+
+                //                else
+                //                {
+                //                    int count = 1;
+
+                //                    for (int j = 0; j < generatedSerialsStackPanel.Children.Count; j++)
+                //                    {
+
+
+                //                        //  INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+
+                //                        materialEntryItem.product_category.category_id = genericCategories[categoryComboBox.SelectedIndex].category_id;
+
+                //                        genericProducts.Clear();
+
+                //                        commonQueries.GetGenericProducts(ref genericProducts, genericCategories[categoryComboBox.SelectedIndex].category_id);
+
+                //                        materialEntryItem.product_type.type_id = genericProducts[typecomboBox.SelectedIndex].type_id;
+
+                //                        genericBrands.Clear();
+
+                //                        commonQueries.GetGenericProductBrands(genericProducts[typecomboBox.SelectedIndex].type_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands);
+
+                //                        materialEntryItem.product_brand.brand_id = genericBrands[brandComboBox.SelectedIndex].brand_id;
+
+                //                        genericModels.Clear();
+
+                //                        commonQueries.GetGenericBrandModels(genericProducts[typecomboBox.SelectedIndex].type_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels);
+
+
+                //                        materialEntryItem.product_model.model_id = genericModels[modelComboBox.SelectedIndex].model_id;
+                //                        materialEntryItem.quantity = 0;
+
+                //                        materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
+
+                //                        if (currencyComboBox.SelectedIndex != -1)
+                //                        {
+                //                            materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                //                        }
+                //                        else
+                //                        {
+                //                            System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                            return;
+                //                        }
+
+                //                        commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typecomboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
+
+
+                //                        materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                //                        materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+
+
+
+
+                //                        materialEntryItem.entry_permit_item_serial = count;
+
+                //                        count++;
+
+                //                        WrapPanel serialPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
+                //                        TextBox serialText = serialPanel.Children[0] as TextBox;
+                //                        ComboBox stocktypeComboBox = serialPanel.Children[1] as ComboBox;
+
+                //                        if (stocktypeComboBox.SelectedIndex == -1)
+                //                        {
+
+                //                            System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                            return;
+
+                //                        }
+
+                //                        materialEntryItem.product_serial_number = serialText.Text;
+
+
+
+                //                        materialEntryItem.stock_type.stock_type_id = stockTypes[stocktypeComboBox.SelectedIndex].stock_type_id;
+                //                        materialEntryItem.stock_type.stock_type_name = stockTypes[stocktypeComboBox.SelectedIndex].stock_type_name;
+                //                        //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
+
+
+
+                //                        addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
+
+                //                    }
+
+
+
+
+                //                }
+
+
+
+                //            }
+
+
+                //        }
+
+                //        //if the choice is company
+
+                //        else
+                //        {
+
+                //            if (specsComboBox.SelectedIndex == -1)
+                //            {
+
+                //                System.Windows.Forms.MessageBox.Show("You have to choose a spec", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                return;
+                //            }
+
+
+                //            else
+                //            {
+
+                //                if (startSerialTexBox.Text == "" && endSerialTexBox.Text == "" && quantityTextBox.Text != "")
+                //                {
+
+                //                    ///INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+
+
+                //                    materialEntryItem.is_company_product = true;
+                //                    materialEntryItem.product_category.category_id = companyCategories[categoryComboBox.SelectedIndex].category_id;
+                //                    companyProducts.Clear();
+
+                //                    commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[categoryComboBox.SelectedIndex].category_id);
+
+                //                    materialEntryItem.product_type.type_id = companyProducts[typecomboBox.SelectedIndex].type_id;
+
+                //                    companyBrands.Clear();
+
+                //                    commonQueries.GetProductBrands(companyProducts[typecomboBox.SelectedIndex].type_id, ref companyBrands);
+
+                //                    materialEntryItem.product_brand.brand_id = companyBrands[brandComboBox.SelectedIndex].brand_id;
+
+                //                    companyModels.Clear();
+
+                //                    commonQueries.GetCompanyModels(companyProducts[typecomboBox.SelectedIndex], companyBrands[brandComboBox.SelectedIndex], ref companyModels);
+
+
+                //                    materialEntryItem.product_model.model_id = companyModels[modelComboBox.SelectedIndex].model_id;
+
+                //                    specs.Clear();
+
+
+                //                    if (priceTextBox.Text != "")
+                //                        materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
+                //                    if(currencyComboBox.SelectedIndex != -1)
+                //                    materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                //                    else
+                //                    {
+                //                        System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                        return;
+                //                    }
+
+                //                    materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
+
+
+                //                    commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typecomboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
+
+
+                //                    materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                //                    materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+
+
+                //                    if (stockTypeComboBox.SelectedIndex == -1)
+                //                    {
+
+                //                        System.Windows.Forms.MessageBox.Show("You have to choose the stock Type ", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                        return;
+
+                //                    }
+
+                //                    if(stockTypeComboBox.SelectedIndex !=-1)
+                //                    {
+                //                        materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
+                //                        materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
+                //                    }
+
+                //                    //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBoxMain.SelectedIndex].added_by;
+
+
+                //                    addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
+
+
+                //                }
+
+                //                else
+                //                {
+                //                    int count = 1;
+
+                //                    for (int j = 0; j < generatedSerialsStackPanel.Children.Count; j++)
+                //                    {
+
+                //                        // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                //                        materialEntryItem.is_company_product = true;
+                //                        materialEntryItem.product_category.category_id = companyCategories[categoryComboBox.SelectedIndex].category_id;
+
+                //                        companyProducts.Clear();
+
+                //                        commonQueries.GetCompanyProducts(ref companyProducts, companyCategories[categoryComboBox.SelectedIndex].category_id);
+
+                //                        materialEntryItem.product_type.type_id = companyProducts[typecomboBox.SelectedIndex].type_id;
+
+                //                        companyBrands.Clear();
+
+                //                        commonQueries.GetProductBrands(companyProducts[typecomboBox.SelectedIndex].type_id, ref companyBrands);
+
+                //                        materialEntryItem.product_brand.brand_id = companyBrands[brandComboBox.SelectedIndex].brand_id;
+
+                //                        companyModels.Clear();
+
+                //                        commonQueries.GetCompanyModels(companyProducts[typecomboBox.SelectedIndex], companyBrands[brandComboBox.SelectedIndex], ref companyModels);
+
+
+                //                        materialEntryItem.product_model.model_id = companyModels[modelComboBox.SelectedIndex].model_id;
+
+                //                        materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
+
+                //                        if(currencyComboBox.SelectedIndex != -1)
+                //                        materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                //                        else
+                //                        {
+                //                            System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                            return;
+                //                        }
+
+                //                        commonQueries.GetModelSpecsNames(companyCategories[categoryComboBox.SelectedIndex].category_id, companyProducts[typecomboBox.SelectedIndex].type_id, companyBrands[brandComboBox.SelectedIndex].brand_id, companyModels[modelComboBox.SelectedIndex].model_id, ref specs);
+
+
+                //                        materialEntryItem.product_specs.spec_id = specs[specsComboBox.SelectedIndex].spec_id;
+                //                        materialEntryItem.product_specs.spec_name = specs[specsComboBox.SelectedIndex].spec_name;
+
+
+                //                        materialEntryItem.quantity = 0;
+
+
+
+                //                        materialEntryItem.entry_permit_item_serial = count;
+
+                //                        count++;
+
+                //                        WrapPanel serialPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
+                //                        TextBox serialText = serialPanel.Children[0] as TextBox;
+                //                        ComboBox stocktypeComBoBox = serialPanel.Children[1] as ComboBox;
+
+                //                        if (stocktypeComBoBox.SelectedIndex == -1)
+                //                        {
+
+                //                            System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                            return;
+
+                //                        }
+                //                         if(stockTypeComboBox.SelectedIndex != -1)
+                //                        {
+                //                            materialEntryItem.stock_type.stock_type_id = stockTypes[stocktypeComBoBox.SelectedIndex].stock_type_id;
+                //                            materialEntryItem.stock_type.stock_type_name = stockTypes[stocktypeComBoBox.SelectedIndex].stock_type_name;
+                //                        }
+
+                //                        //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
+
+                //                        materialEntryItem.product_serial_number = serialText.Text;
+
+                //                        addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
+
+                //                    }
+
+
+
+
+                //                }
+
+
+                //            }
+
+
+
+                //        }
+
+
+                //    }
+
+                //    //if the checkbox is checked
+
+                //    else
+                //    {
+
+
+                //        //////////////////////////////////////////////////
+                //        //to implement rfp items after the mapping is done
+                //        //////////////////////////////////////////////////
+
+                //        if (startSerialTexBox.Text == "" && endSerialTexBox.Text == "" && quantityTextBox.Text != "" && workFormComboBox.SelectedIndex==0)
+                //        {
+
+                //            // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+
+                //            materialEntryItem.rfp_info.rfpRequestorTeam = requestors[rfpRequestorTeamComboBox.SelectedIndex].requestor_team.team_id;
+
+                //            rfps.Clear();
+
+                //            commonQueries.GetTeamRFPs(ref rfps, requestors[rfpRequestorTeamComboBox.SelectedIndex].requestor_team.team_id);
+
+                //            materialEntryItem.rfp_info.rfpSerial = rfps[rfpIdComboBox.SelectedIndex].rfpSerial;
+                //            materialEntryItem.rfp_info.rfpVersion = rfps[rfpIdComboBox.SelectedIndex].rfpVersion;
+
+                //            rfpItems.Clear();
+
+                //            commonQueries.GetRfpItemsMapping(rfps[rfpIdComboBox.SelectedIndex].rfpSerial, rfps[rfpIdComboBox.SelectedIndex].rfpVersion, materialEntryItem.rfp_info.rfpRequestorTeam, ref rfpItems);
+
+                //            materialEntryItem.rfp_item_number = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].rfp_item_number;
+                //            materialEntryItem.entry_permit_item_serial = rfpItemCount;
+
+
+                //            if (priceTextBox.Text != "")
+                //                materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
+
+                //            if(currencyComboBox.SelectedIndex != -1)
+                //            materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                //            else
+                //            {
+                //                System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                return;
+                //            }
+
+                //            materialEntryItem.quantity = int.Parse(quantityTextBox.Text);
+
+                //            INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT materialReservation = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
+
+
+                //            //materialReservation.hold_until = validityDate.DisplayDate;
+
+                //            materialReservation.reserved_by_id = loggedInUser.GetEmployeeId();
+
+                //            materialReservation.rfp_serial = materialEntryItem.rfp_info.rfpSerial;
+
+                //            materialReservation.rfp_version = materialEntryItem.rfp_info.rfpVersion;
+
+                //            materialReservation.rfp_item_no = materialEntryItem.rfp_item_number;
+
+                //            materialReservation.rfp_requestor_team = materialEntryItem.rfp_info.rfpRequestorTeam;
+
+                //            materialReservation.quantity = materialEntryItem.quantity;
+
+                //            materialReservation.entry_permit_item_serial = rfpItemCount;
+
+                //            materialReservations.Add(materialReservation);
+
+
+                //            if (rfpItems[rfpItemdescriptionComboBox.SelectedIndex].is_company_product == true)
+                //            {
+
+
+                //                materialEntryItem.product_category.category_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_category.category_id;
+                //                materialEntryItem.product_type.type_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_type.type_id;
+                //                materialEntryItem.product_brand.brand_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                //                materialEntryItem.product_model.model_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_model.model_id;
+                //                materialEntryItem.product_specs.spec_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_specs.spec_id;
+
+
+                //            }
+
+                //            else
+                //            {
+
+                //                materialEntryItem.product_category.category_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_category.category_id;
+                //                materialEntryItem.product_type.type_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_type.type_id;
+                //                materialEntryItem.product_brand.brand_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                //                materialEntryItem.product_model.model_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_model.model_id;
+
+
+                //            }
+
+
+                //            if (stockTypeComboBox.SelectedIndex == -1)
+                //            {
+
+                //                System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                return;
+
+                //            }
+
+                //            if(stockTypeComboBox.SelectedIndex !=-1)
+                //            {
+                //                materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_id;
+                //                materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComboBox.SelectedIndex].stock_type_name;
+                //            }
+
+
+
+                //            addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
+
+                //            rfpItemCount++;
+
+
+                //        }
+
+                //        else
+                //        {
+
+                //            for (int j = 0; j < generatedSerialsStackPanel.Children.Count; j++)
+                //            {
+
+
+                //                // INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT materialEntryItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+
+                //                materialEntryItem.rfp_info.rfpRequestorTeam = requestors[rfpRequestorTeamComboBox.SelectedIndex].requestor_team.team_id;
+
+                //                rfps.Clear();
+
+                //                commonQueries.GetTeamRFPs(ref rfps, requestors[rfpRequestorTeamComboBox.SelectedIndex].requestor_team.team_id);
+
+                //                materialEntryItem.rfp_info.rfpSerial = rfps[rfpIdComboBox.SelectedIndex].rfpSerial;
+                //                materialEntryItem.rfp_info.rfpVersion = rfps[rfpIdComboBox.SelectedIndex].rfpVersion;
+
+                //                rfpItems.Clear();
+
+                //                commonQueries.GetRfpItemsMapping(rfps[rfpIdComboBox.SelectedIndex].rfpSerial, rfps[rfpIdComboBox.SelectedIndex].rfpVersion, materialEntryItem.rfp_info.rfpRequestorTeam, ref rfpItems);
+
+                //                materialEntryItem.rfp_item_number = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].rfp_item_number;
+
+
+                //                if (priceTextBox.Text != "")
+                //                    materialEntryItem.item_price = decimal.Parse(priceTextBox.Text);
+
+                //                if(currencyComboBox.SelectedIndex !=-1)
+                //                materialEntryItem.item_currency.currencyId = currencies[currencyComboBox.SelectedIndex].currencyId;
+                //                else
+                //                {
+                //                    System.Windows.Forms.MessageBox.Show("Please choose currency", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                    return;
+                //                }
+                //                materialEntryItem.quantity = 1;
+
+
+
+                //                materialEntryItem.entry_permit_item_serial = rfpItemCount;
+
+
+                //                INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT materialReservation = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
+
+
+                //                //  materialReservation.hold_until = validityDate.DisplayDate;
+
+                //                materialReservation.reserved_by_id = loggedInUser.GetEmployeeId();
+
+                //                materialReservation.rfp_serial = materialEntryItem.rfp_info.rfpSerial;
+
+                //                materialReservation.rfp_version = materialEntryItem.rfp_info.rfpVersion;
+
+                //                materialReservation.rfp_item_no = materialEntryItem.rfp_item_number;
+
+                //                materialReservation.rfp_requestor_team = materialEntryItem.rfp_info.rfpRequestorTeam;
+
+                //                materialReservation.quantity = materialEntryItem.quantity;
+
+                //                materialReservation.entry_permit_item_serial = rfpItemCount;
+
+                //                materialReservations.Add(materialReservation);
+
+                //                rfpItemCount++;
+
+
+                //                WrapPanel serialPanel = generatedSerialsStackPanel.Children[j] as WrapPanel;
+                //                TextBox serialText = serialPanel.Children[0] as TextBox;
+
+                //                ComboBox stockTypeComBoBox = serialPanel.Children[1] as ComboBox;
+
+                //                if (stockTypeComBoBox.SelectedIndex == -1)
+                //                {
+
+                //                    System.Windows.Forms.MessageBox.Show("You have to choose the stock Type for each serial", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                //                    return;
+
+                //                }
+
+                //                materialEntryItem.product_serial_number = serialText.Text;
+
+
+                //                materialEntryItem.stock_type.stock_type_id = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_id;
+                //                materialEntryItem.stock_type.stock_type_name = stockTypes[stockTypeComBoBox.SelectedIndex].stock_type_name;
+                //                //materialEntryItem.stock_type.added_by = stockTypes[stockTypeComboBox.SelectedIndex].added_by;
+
+                //                if (rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_category.category_name == "")
+                //                {
+                //                    materialEntryItem.product_category.category_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_category.category_id;
+                //                    materialEntryItem.product_type.type_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_type.type_id;
+                //                    materialEntryItem.product_brand.brand_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                //                    materialEntryItem.product_model.model_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_model.model_id;
+                //                    materialEntryItem.product_specs.spec_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_specs.spec_id;
+
+
+
+                //                }
+
+                //                else
+                //                {
+
+                //                    materialEntryItem.product_category.category_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_category.category_id;
+                //                    materialEntryItem.product_type.type_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_type.type_id;
+                //                    materialEntryItem.product_brand.brand_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_brand.brand_id;
+                //                    materialEntryItem.product_model.model_id = rfpItems[rfpItemdescriptionComboBox.SelectedIndex].product_model.model_id;
+
+
+                //                }
+
+
+                //                addEntryPermitPage.materialEntryPermit.AddItem(materialEntryItem);
+
+                //            }
+
+
+                //        }
+
+                //    }
+
+                //}
+
+
+                //    if (viewAddCondition != COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION)
+                //    {
+                //        if (!addEntryPermitPage.materialEntryPermit.IssueNewEntryPermit())
+                //            return;
+
+
+                //        if (materialReservations.Count != 0)
+                //        {
+
+                //            for (int i = 0; i < materialReservations.Count; i++)
+                //            {
+                //                INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT reservationItem = materialReservations[i];
+                //                reservationItem.entry_permit_serial = addEntryPermitPage.materialEntryPermit.GetEntryPermitSerial();
+
+                //                materialReservations[i] = reservationItem;
+                //            }
+
+                //            MaterialReservation reservation = new MaterialReservation();
+                //            reservation.SetReservationDate(Convert.ToDateTime(addEntryPermitPage.TransactionDatePicker.SelectedDate));
+
+                //            reservation.SetReservedBy(loggedInUser.GetEmployeeId());
+                //            reservation.SetRfpSerial(materialReservations[0].rfp_serial);
+
+                //            reservation.SetReservationStatusId(COMPANY_WORK_MACROS.PENDING_RESERVATION);
+
+
+                //            if (!reservation.IssueMultipleReservations(materialReservations))
+                //                return;
+                //        }
+
+                //    }
+
+                //    else
+
+                //    {
+                //        addEntryPermitPage.materialEntryPermit.UpdateMaterialEntryPermit(oldMaterialEntryPermit);
+                //    }
+
+                //    addEntryPermitPage.WareHouseCombo.IsEnabled = false;
+                //    addEntryPermitPage.TransactionDatePicker.IsEnabled = false;
+
+                //for (int i = 0; i < itemsWrapPanel.Children.Count-1; i++)
+                //{
+
+                //    //Border itemBorder = itemsWrapPanel.Children[i] as Border;
+                //    //StackPanel mainStackPanel = itemBorder.Child as StackPanel;
+                //    //Label header = mainStackPanel.Children[0] as Label;
+                //    //ScrollViewer itemScrollViewer = mainStackPanel.Children[1] as ScrollViewer;
+                //    //StackPanel itemsStackPanel = itemScrollViewer.Content as StackPanel;
+                //    //CheckBox rfpCheckBox = itemsStackPanel.Children[0] as CheckBox;
+                //    //rfpCheckBox.IsEnabled = false;
+
+                //    //WrapPanel rfpRequestorsWrapPanel = itemsStackPanel.Children[1] as WrapPanel;
+                //    //rfpRequestorsWrapPanel.Visibility = Visibility.Visible;
+                //    //ComboBox rfpRequestorsComboBox = rfpRequestorsWrapPanel.Children[1] as ComboBox;
+                //    //rfpRequestorsComboBox.IsEnabled = false;
+
+                //    //WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+                //    //rfpIdWrapPanel.Visibility = Visibility.Visible;
+                //    //ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
+                //    //rfpIdComboBox.IsEnabled = false;
+
+                //    //WrapPanel rfpDescriptipnWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
+                //    //rfpDescriptipnWrapPanel.Visibility = Visibility.Visible;
+                //    //ComboBox rfpDescriptionComboBox = rfpDescriptipnWrapPanel.Children[1] as ComboBox;
+                //    //rfpDescriptionComboBox.IsEnabled = true;
+
+
+
+                //    //WrapPanel choiseWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
+                //    //ComboBox choiceComboBox = choiseWrapPanel.Children[1] as ComboBox;
+
+
+                //    //WrapPanel categoryWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
+                //    //ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
+                //    //categoryComboBox.IsEnabled = false;
+
+                //    //WrapPanel typeWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+                //    //ComboBox typeComboBox = typeWrapPanel.Children[1] as ComboBox;
+                //    //typeComboBox.IsEnabled = false;
+
+                //    //WrapPanel brandWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+                //    //ComboBox brandComboBox = brandWrapPanel.Children[1] as ComboBox;
+                //    //brandComboBox.IsEnabled = false;
+
+                //    //WrapPanel modelWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+                //    //ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
+                //    //modelComboBox.IsEnabled = false;
+
+                //    //WrapPanel specsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+                //    //ComboBox specsComboBox = specsWrapPanel.Children[1] as ComboBox;
+
+                //    //specsComboBox.IsEnabled = false;
+
+
+                //    //WrapPanel startSerialWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+                //    //TextBox startSerialTextBox = startSerialWrapPanel.Children[1] as TextBox;
+                //    //startSerialTextBox.IsEnabled = false;
+
+                //    //WrapPanel endSerialWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
+                //    //TextBox endSerialTextBox = endSerialWrapPanel.Children[1] as TextBox;
+                //    //endSerialTextBox.IsEnabled = false;
+
+                //    //Button generateSerials = endSerialWrapPanel.Children[2] as Button;
+                //    //generateSerials.IsEnabled = false;
+
+                //    //WrapPanel quantityWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+                //    //TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+                //    //quantityTextBox.IsEnabled = false;
+
+                //    //WrapPanel priceWrapPanel = itemsStackPanel.Children[13] as WrapPanel;
+                //    //TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
+                //    //priceTextBox.IsEnabled = false;
+
+                //    //WrapPanel currencyWrapPanel = itemsStackPanel.Children[14] as WrapPanel;
+                //    //ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
+                //    //currencyComboBox.IsEnabled = false;
+
+                //    //WrapPanel stockTypeWrapPanel = itemsStackPanel.Children[15] as WrapPanel;
+                //    //ComboBox stockTypeComboBox = stockTypeWrapPanel.Children[1] as ComboBox;
+                //    //stockTypeComboBox.IsEnabled = false;
             }
+            if (!addEntryPermitPage.materialEntryPermit.IssueNewEntryPermit())
+                return;
+           
+            for (int i = 0; i < addEntryPermitPage.materialEntryPermit.GetItems().Count; i++)
+            {
+                INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT reservationItem = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
+                reservationItem.entry_permit_serial = addEntryPermitPage.materialEntryPermit.GetEntryPermitSerial();
+                reservationItem.entry_permit_item_serial = addEntryPermitPage.materialEntryPermit.GetItems()[i].entry_permit_item_serial;
+                reservationItem.rfp_serial = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfpSerial;
+                reservationItem.rfp_version = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfpVersion;
+                reservationItem.rfp_item_no = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_item_number;
+                reservationItem.quantity = addEntryPermitPage.materialEntryPermit.GetItems()[i].quantity;
+                reservationItem.rfp_requestor_team = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfpRequestorTeam;
+                reservationItem.reserved_by_id = loggedInUser.GetEmployeeId();
+                reservationItem.reservation_date = DateTime.Now;
+                reservationItem.hold_until = addEntryPermitPage.materialEntryPermit.GetItems()[i].valid_until;
+                reservationItem.rfp_item_description = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfp_item_description;
+                reservationItem.rfp_item.measure_unit_id = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_item.measure_unit_id;
+                reservationItem.rfp_item_notes = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_item.item_notes;
 
-
+                materialReservations.Add(reservationItem);
+                reservation.SetRfpSerial(addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfpSerial);
+                reservation.SetRfpRequseterTeamId(addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfpRequestorTeam);
+                reservation.SetRfpVersion(addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfpVersion);
+                reservation.SetRfpItemNumber(addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_item_number);
+                reservation.SetEntryPermitSerial(addEntryPermitPage.materialEntryPermit.GetEntryPermitSerial());
+                
+            }
+            
+            if (!reservation.IssueMultipleReservations(materialReservations))
+                return;
                 EntryPermitUploadFilesPage = new EntryPermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, addEntryPermitPage, entryPermitWindow, ref addEntryPermitPage.materialEntryPermit);
 
 
@@ -2858,7 +3446,9 @@ namespace _01electronics_inventory
         private void OnButtonClickAddNewCard (object sender, RoutedEventArgs e)
         {
             itemsWrapPanel.Children.RemoveAt(itemsWrapPanel.Children.Count - 1);
-            InitializeNewCard();
+            itemNumber++;
+            InitializeNewCard(itemNumber);
+            InitializeGenerateSerialCard();
             addNewItemButton();
         }
         private void OnButtonClickBack(object sender, RoutedEventArgs e)
@@ -2876,17 +3466,20 @@ namespace _01electronics_inventory
         {
             Button removeButton = sender as Button;
             StackPanel itemsStackPanel = removeButton.Parent as StackPanel;
-            ScrollViewer itemsScrollViewer = itemsStackPanel.Parent as ScrollViewer;
-            StackPanel mainStackPanel = itemsScrollViewer.Parent as StackPanel;
-            Border mainBorder = mainStackPanel.Parent as Border;
+            Border mainBorder = itemsStackPanel.Parent as Border;
+            
+            itemNumber--;
+            int position=itemsWrapPanel.Children.IndexOf(mainBorder);
             itemsWrapPanel.Children.Remove(mainBorder);
-
-            for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i++)
+            itemsWrapPanel.Children.RemoveRange(position,1);
+            int itemNumberr = 1;
+            for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i+=2)
             {
                 Border itemsBorder = itemsWrapPanel.Children[i] as Border;
                 StackPanel maxItemsStackPanel = itemsBorder.Child as StackPanel;
                 Label header = maxItemsStackPanel.Children[0] as Label;
-                header.Content = $"Item {i + 1}";
+                header.Content = $"Item {itemNumberr}";
+                itemNumberr++;
             }
         }
         /// <summary>
@@ -2930,7 +3523,7 @@ namespace _01electronics_inventory
         }
         private void GetRFPRequestorTeam()
         {
-            if (!commonQueries.GetRFPRequestorsForMappedItems(ref requestors))
+            if (!commonQueries.GetRFPRequestorsUnOrdered(ref requestors))
                 return;
 
         }

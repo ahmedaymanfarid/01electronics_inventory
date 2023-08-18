@@ -18,7 +18,7 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="#105A97">
@@ -58,17 +58,9 @@
         </Grid>
 
         <ScrollViewer Grid.Row="2">
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
+            <StackPanel>
 
-
-                </Grid.RowDefinitions>
-
-                <WrapPanel Grid.Row="0">
+                <WrapPanel >
                     <WrapPanel>
                         <Label Style="{StaticResource labelStyle}" Content="Transaction Date" Width="200"/>
                         <DatePicker Style="{StaticResource datePickerStyle}" Name="TransactionDatePicker" IsEnabled="True" SelectedDateChanged="TransactionDatePickerSelectedDateChanged"/>
@@ -100,7 +92,9 @@
                 </WrapPanel>
 
 
-            </Grid>
+            </StackPanel>
+
+           
         </ScrollViewer>
 
         <Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
