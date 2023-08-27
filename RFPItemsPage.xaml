@@ -80,7 +80,7 @@
                     <Label Grid.Column="0" Name="itemNoHeader" Style="{StaticResource tableSubHeaderItem}" Content="Item no."/>
                     <Label Grid.Column="1" Name="itemDescriptionHeader" Style="{StaticResource tableSubHeaderItem}" Content="Description"/>
                     <Label Grid.Column="2" Name="itemVendorsHeader" Style="{StaticResource tableSubHeaderItem}" Content="Brands"/>
-                    <Label Grid.Column="3" Name="itemQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Quantity"/>
+                    <Label Grid.Column="3" Name="itemQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Requested Quantity"/>
                     <Label Grid.Column="7" Name="itemStatusHeader" Style="{StaticResource tableSubHeaderItem}" Content="Status"/>
                     <Label Grid.Column="8" Name="itemNotesHeader" Style="{StaticResource tableSubHeaderItem}" Content="Notes"/>
                     <Label Grid.Column="4" Name="availableQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Available Quantity"/>

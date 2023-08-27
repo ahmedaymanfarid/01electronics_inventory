@@ -1,20 +1,14 @@
-﻿using System;
+﻿using _01electronics_library;
+using _01electronics_windows_library;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
-using _01electronics_library;
-using _01electronics_windows_library;
 using static _01electronics_library.PROCUREMENT_STRUCTS;
 
 namespace _01electronics_inventory
@@ -63,6 +57,7 @@ namespace _01electronics_inventory
         List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT> reservedRFPSerialNumber;
         int serialCounter;
         int availbleQuantityAfterReservation;
+        bool edit;
 
         public RFPItemsPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, ref RFP mRFP, ref int mViewAddCondition)
         {
@@ -98,11 +93,15 @@ namespace _01electronics_inventory
             rfpInfo = new INVENTORY_STRUCTS.RESERVATION_RFP_MIN_STRUCT();
             reservedRFPSerialNumber = new List<INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT>();
             availbleQuantityAfterReservation = 0;
-           
+            edit = false;
+            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                edit = true;
             InitializeMeasureUnits();
             InitializeRFPsItemsStatus();
 
             InitializeUIElements();
+            edit=false;
+            reservedRFPSerialNumber.Clear();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -468,13 +467,17 @@ namespace _01electronics_inventory
                         TextBox availableQuantityLabel = new TextBox();
                         availableQuantityLabel.Style = (Style)FindResource("microTextBoxStyle");
                         availableQuantityLabel.Text = availableQantity.ToString();
+                        availableQuantityLabel.Tag = availableQantity;
                         availableQuantityLabel.IsEnabled = false;
                         subGrid.Children.Add(availableQuantityLabel);
                         Grid.SetColumn(availableQuantityLabel, 4);
 
                         TextBox reservredQuantity = new TextBox();
                         reservredQuantity.Style = (Style)FindResource("miniTextBoxStyle");
-                        //reservredQuantity.TextChanged += OnTextChangedReservedQuantity;
+                    //reservredQuantity.KeyDown += ONKeyDownReservedQuantity;
+                        reservredQuantity.Tag = stock.GetEntryPermit();
+                        reservredQuantity.TextChanged += OnTextChangedReservedQuantity;
+                       
                         reservredQuantity.IsEnabled = false;
                         subGrid.Children.Add(reservredQuantity);
                         Grid.SetColumn(reservredQuantity, 5);
@@ -541,7 +544,25 @@ namespace _01electronics_inventory
                 }
             }
 
-        
+        private void ONKeyDownReservedQuantity(object sender, KeyEventArgs e)
+        {
+            TextBox reservedQuantityTextBox = sender as TextBox;
+            Grid parent = reservedQuantityTextBox.Parent as Grid;
+            TextBox availableQuantityTextBox = parent.Children[6] as TextBox;
+            int availableQuantity = Convert.ToInt32(availableQuantityTextBox.Tag);
+            if (e.Key == Key.Back)
+            {
+                availableQuantityTextBox.Text = (Convert.ToInt32(availableQuantityTextBox.Tag) - Convert.ToInt32(reservedQuantityTextBox.Text)).ToString();
+                e.Handled = true;
+            }
+
+            else if (reservedQuantityTextBox.Text != "" && Convert.ToInt32(reservedQuantityTextBox.Text) != 0)
+            {
+                availableQuantity -= Convert.ToInt32(reservedQuantityTextBox.Text);
+                availableQuantityTextBox.Text = availableQuantity.ToString();
+            }
+
+        }
 
         private void FillVendorsCombo(ref ComboBox currentCombo)
         {
@@ -689,6 +710,35 @@ namespace _01electronics_inventory
                             tempItem.item_notes = notes.Text;
                             tempItem.rfp_item_number = Int32.Parse(description.Tag.ToString());
                             rfp.rfpItems[j] = tempItem;
+                            
+                            Button viewSerialsButton = (Button)currentGrid.Children[8];
+                            TextBlock serials = (TextBlock)viewSerialsButton.Content;
+                            TextBox reservedQuantity = (TextBox)currentGrid.Children[7];
+                            INVENTORY_STRUCTS.ENTRY_PERMIT_MAX_STRUCT entryPermitItem =(INVENTORY_STRUCTS.ENTRY_PERMIT_MAX_STRUCT) reservedQuantity.Tag;
+                            if (rfp.rfpItems[j].product_model.has_serial_number==false && (reservedQuantity.Text !="" && Convert.ToInt32(reservedQuantity.Text)!=0))
+                            {
+                                
+                                INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT reserve = new INVENTORY_STRUCTS.MATERIAL_RESERVATION_MED_STRUCT();
+                                reserve.rfp_requestor_team = rfp.GetRFPRequestorTeamId();
+                                reserve.rfp_serial = rfp.GetRFPSerial();
+                                reserve.rfp_version = rfp.GetRFPVersion();
+                                reserve.rfp_notes = rfp.GetRFPNotes();
+                                reserve.rfp_item_notes = rfp.rfpItems[j].item_notes;
+                                reserve.rfp_item_description = rfp.rfpItems[j].item_description;
+                                reserve.rfp_item_no = rfp.rfpItems[j].rfp_item_number;
+                                reserve.rfp_measure_unit.unit_id = rfp.rfpItems[j].measure_unit_id;
+                                reserve.quantity = Convert.ToInt32(reservedQuantity.Text);
+                                reserve.reservation_date=DateTime.Now;
+                                reserve.hold_until=DateTime.Now.AddDays(5);
+                                reserve.reserved_by_id=loggedInUser.GetEmployeeId();
+                                if(entryPermitItem.items.Count!=0)
+                                {
+                                    reserve.entry_permit_serial = entryPermitItem.items[0].entry_permit_serial;
+                                    reserve.entry_permit_item_serial = entryPermitItem.items[0].entry_permit_item_serial;
+                                }
+                                reservedRFPSerialNumber.Add(reserve);
+                                stockAvailableItemsListOfList.Add(reservedRFPSerialNumber);
+                            }
                             j++;
                             // rfp.rfpItems.Add(tempItem);
                         }
@@ -1308,40 +1358,40 @@ namespace _01electronics_inventory
                         if (!reservation.IssueMultipleReservations(stockAvailableItemsListOfList[i]))
                             return;
                     }
-                    rfp.rfpItems = new List<RFP_ITEM_MAX_STRUCT>();
-                    if(!rfp.InitializeRFP(rfp.GetRFPRequestorTeamId(),rfp.GetRFPSerial(),rfp.GetRFPVersion()))
-                        return;
-                    for(int i=0;i<rfp.rfpItems.Count;i++)
-                    {
-                        if (rfp.rfpItems[i].item_status.status_id==COMPANY_WORK_MACROS.RFP_PENDING)
-                        {
-                            RFP_ITEM_MAX_STRUCT item = new RFP_ITEM_MAX_STRUCT();
-                            item = rfp.rfpItems[i];
+                    //rfp.rfpItems = new List<RFP_ITEM_MAX_STRUCT>();
+                    //if(!rfp.InitializeRFP(rfp.GetRFPRequestorTeamId(),rfp.GetRFPSerial(),rfp.GetRFPVersion()))
+                    //    return;
+                    //for(int i=0;i<rfp.rfpItems.Count;i++)
+                    //{
+                    //    if (rfp.rfpItems[i].item_status.status_id==COMPANY_WORK_MACROS.RFP_PENDING)
+                    //    {
+                    //        RFP_ITEM_MAX_STRUCT item = new RFP_ITEM_MAX_STRUCT();
+                    //        item = rfp.rfpItems[i];
 
-                            if(!rfp.SplitRFPItem(ref item, item.item_quantity, COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED, false))
-                                return;
-                        }
-                    }
-                    emailTo.Clear();
-                    emailCC.Clear();
-                    if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID, ref emailTo))
-                        return;
-                    if (!commonQueries.GetInventoryTeamBusinessEmails(ref emailTo))
-                        return;
-                    if (!commonQueries.GetSpecificDepartmentBusinessEmailsForManagers(rfp.GetRFPRequestor().GetEmployeeDepartmentId(), rfp.GetRFPRequestor().GetEmployeePositionId(), ref emailCC))
-                        return;
-                    if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.HUMAN_RESOURCES_DEPARTMENT_ID, ref emailCC))
-                        return;
-                    if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID, ref emailCC))
-                        return;
-                    if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.BOARD_OF_DIRECTORS, ref emailCC))
-                        return;
-                    emailCC.Add(rfp.GetRFPRequestor().GetEmployeeBusinessEmail());
-                    string subject = "";
-                    string header = "RFP IS UPDATED !";
-                    SubjectMaker(ref subject, viewAddCondition);
-                    object mailObject = rfp as object;
-                    emailFormat.SendEmail(ref emailTo, ref emailCC, subject, header, ref mailObject, BASIC_MACROS.IS_RFP);
+                    //        if(!rfp.SplitRFPItem(ref item, item.item_quantity, COMPANY_WORK_MACROS., false))
+                    //            return;
+                    //    }
+                    //}
+                    //emailTo.Clear();
+                    //emailCC.Clear();
+                    //if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID, ref emailTo))
+                    //    return;
+                    //if (!commonQueries.GetInventoryTeamBusinessEmails(ref emailTo))
+                    //    return;
+                    //if (!commonQueries.GetSpecificDepartmentBusinessEmailsForManagers(rfp.GetRFPRequestor().GetEmployeeDepartmentId(), rfp.GetRFPRequestor().GetEmployeePositionId(), ref emailCC))
+                    //    return;
+                    //if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.HUMAN_RESOURCES_DEPARTMENT_ID, ref emailCC))
+                    //    return;
+                    //if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID, ref emailCC))
+                    //    return;
+                    //if (!commonQueries.GetSpecificDepartmentBusinessEmails(COMPANY_ORGANISATION_MACROS.BOARD_OF_DIRECTORS, ref emailCC))
+                    //    return;
+                    //emailCC.Add(rfp.GetRFPRequestor().GetEmployeeBusinessEmail());
+                    //string subject = "";
+                    //string header = "RFP IS UPDATED !";
+                    //SubjectMaker(ref subject, viewAddCondition);
+                    //object mailObject = rfp as object;
+                    //emailFormat.SendEmail(ref emailTo, ref emailCC, subject, header, ref mailObject, BASIC_MACROS.IS_RFP);
                 }
 
                 if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
@@ -1516,8 +1566,8 @@ namespace _01electronics_inventory
             Button addButtonn = (Button)sender;
             int itemNo = Int32.Parse(addButtonn.Tag.ToString());
             Grid parent = (Grid)addButtonn.Parent;
-            Button viewSerialButton = parent.Children[8] as Button;
-            viewSerialButton.IsEnabled = true;
+            //Button viewSerialButton = parent.Children[8] as Button;
+            //viewSerialButton.IsEnabled = true;
         
             mailObject = new object();
             mailObject = (Object)addButtonn;
@@ -1615,6 +1665,14 @@ namespace _01electronics_inventory
             Grid addButtonParent = addButton.Parent as Grid;
             TextBox availableQuantityTextBox = addButtonParent.Children[6] as TextBox;
             TextBlock description = addButton.Content as TextBlock;
+
+
+
+            Button viewSerialButton = addButtonParent.Children[8] as Button;
+
+            TextBox reservedQuantity = addButtonParent.Children[7] as TextBox;
+
+
             int itemNo = Int32.Parse(addButton.Tag.ToString());
             if (oldRFPsItemsList.Count < rfp.rfpItems.Count || rfp.rfpItems.Count == 0)
             {
@@ -1633,6 +1691,18 @@ namespace _01electronics_inventory
                 {
                     if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_brand.brand_id, rfp.rfpItems[itemNo - 1].product_model.model_id, rfp.rfpItems[itemNo - 1].product_specs.spec_id, false, ref availbleQuanity))
                         return;
+                    if (!stock.GetAvailableCompanySerials(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_brand.brand_id, rfp.rfpItems[itemNo - 1].product_model.model_id, rfp.rfpItems[itemNo - 1].product_specs.spec_id))
+                        return;
+                    if (rfp.rfpItems[itemNo - 1].product_model.has_serial_number)
+                    {
+                        viewSerialButton.IsEnabled = true;
+                        reservedQuantity.IsEnabled = false;
+                    }
+                    else
+                    {
+                        reservedQuantity.IsEnabled = true;
+                        reservedQuantity.Clear();
+                    }
                 }
                 else
                 {
@@ -1641,6 +1711,7 @@ namespace _01electronics_inventory
 
                 }
                 availableQuantityTextBox.Text = availbleQuanity.ToString();
+                availableQuantityTextBox.Tag = availbleQuanity;
             }
         }
         private void SubjectMaker(ref string subject, int state)
@@ -1680,8 +1751,55 @@ namespace _01electronics_inventory
       
 
         private void OnTextChangedReservedQuantity(object sender, TextChangedEventArgs e)
-        {
+       {
+            TextBox reservedQuantityTextBox = sender as TextBox;
+            Grid parentGrid = reservedQuantityTextBox.Parent as Grid;
+            TextBox availableQuantityTextBox;
+            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || edit )
+            {
+                availableQuantityTextBox = (TextBox)parentGrid.Children[7];
+               
+            }
+            else
+            {
+                availableQuantityTextBox = (TextBox)parentGrid.Children[6];
 
+
+                WrapPanel neededQuantityWrapPanel = (WrapPanel)parentGrid.Children[3];
+                TextBox neededQuantity = neededQuantityWrapPanel.Children[0] as TextBox;
+                int availabeQuantity = Convert.ToInt32(availableQuantityTextBox.Tag);
+
+                if (reservedQuantityTextBox.Text != "" && Convert.ToInt32(reservedQuantityTextBox.Text) != 0)
+                {
+
+                    if (Convert.ToInt32(reservedQuantityTextBox.Text) > Convert.ToDecimal(neededQuantity.Text))
+                    {
+                        System.Windows.Forms.MessageBox.Show("Reserved quantity exceeded available quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        reservedQuantityTextBox.Text = reservedQuantityTextBox.Text.ToString().Substring(0, reservedQuantityTextBox.Text.Length - 1);
+
+                    }
+                    if (reservedQuantityTextBox.Text == "")
+                    {
+                        availableQuantityTextBox.Text = availabeQuantity.ToString();
+                    }
+                    else
+                    {
+                        availabeQuantity -= Convert.ToInt32(reservedQuantityTextBox.Text);
+                        availableQuantityTextBox.Text = availabeQuantity.ToString();
+                        e.Handled = true;
+                    }
+
+
+
+
+                }
+                else if (reservedQuantityTextBox.Text == "")
+                {
+                    availableQuantityTextBox.Text = availabeQuantity.ToString();
+                }
+            }
+            
+            
         }
     }
 

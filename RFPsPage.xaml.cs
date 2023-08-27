@@ -1023,13 +1023,14 @@ namespace _01electronics_inventory
                         {
                             canEdit = true;
                             canDelete = true;
+                            break;
 
                         }
                         else
                         {
                             canEdit = false;
                             canDelete = false;
-                            break;
+                           
                         }
                     }
                     else
