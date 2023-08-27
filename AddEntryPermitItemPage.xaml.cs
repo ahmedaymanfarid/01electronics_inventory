@@ -676,7 +676,7 @@ namespace _01electronics_inventory
                         //InitializeGenerateSerialCard();
                     }
                     int counter = 0;
-                    for (int i = 0; i < itemsWrapPanel.Children.Count; i += 2)
+                    for (int i = 0; i < itemsWrapPanel.Children.Count; i++)
                     {
                         Border itemBorder = itemsWrapPanel.Children[i] as Border;
                        // Border generateSerialsBorder = itemsWrapPanel.Children[i + 1] as Border;
@@ -767,38 +767,39 @@ namespace _01electronics_inventory
                             if (oldMaterialEntryPermit.GetItems()[counter].is_company_product)
                             {
                                 choiceComboBox.SelectedIndex = 1;
-                                categoryComboBox.Items.Clear();
-                                categoryComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[counter].product_category.category_name;
+                                categoryComboBox.SelectedItem = categoryComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f=>Convert.ToInt32( f.Tag )==oldMaterialEntryPermit.GetItems()[counter].product_category.category_id);
 
-                                typecomboBox.Items.Clear();
-                                typecomboBox.SelectedItem= oldMaterialEntryPermit.GetItems()[counter].product_type.product_name;
+                                
+                                typecomboBox.SelectedItem= typecomboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_type.type_id);
 
-                                brandComboBox.Items.Clear();
-                                brandComboBox.SelectedItem=oldMaterialEntryPermit.GetItems()[counter].product_brand.brand_name;
+                              
+                                brandComboBox.SelectedItem= brandComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_brand.brand_id);
 
-                                modelComboBox.Items.Clear();
-                                modelComboBox.SelectedItem =oldMaterialEntryPermit.GetItems()[counter].product_model.model_name ;
+                                
+                                modelComboBox.SelectedItem = modelComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_model.model_id);
 
-                                specsComboBox.Items.Clear();
-                                specsComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[counter].product_specs.spec_name;
+                              
+                                specsComboBox.SelectedItem = specsComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_specs.spec_id);
 
+                                if (oldMaterialEntryPermit.GetItems()[counter].product_serial_number!=null)
                                 serialNumberTextBox.Text = oldMaterialEntryPermit.GetItems()[counter].product_serial_number.ToString();
                                 serialNumberWrapPanel.Visibility = Visibility.Visible;
                             }
                             else
                             {
                                 choiceComboBox.SelectedIndex = 0;
-                                categoryComboBox.Items.Clear();
-                                categoryComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[counter].product_category.category_name;
+                                categoryComboBox.SelectedItem = categoryComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_category.category_id);
 
-                                typecomboBox.Items.Clear();
-                                typecomboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[counter].product_type.product_name;
 
-                                brandComboBox.Items.Clear();
-                                brandComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[counter].product_brand.brand_name;
+                                typecomboBox.SelectedItem = typecomboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_type.type_id);
 
-                                modelComboBox.Items.Clear();
-                                modelComboBox.SelectedItem = oldMaterialEntryPermit.GetItems()[counter].product_model.model_name;
+
+                                brandComboBox.SelectedItem = brandComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_brand.brand_id);
+
+
+                                modelComboBox.SelectedItem = modelComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].product_model.model_id);
+
+                                specsComboBox.Items.Clear();
                                 specsComboBox.IsEnabled = false;
                                 serialNumberWrapPanel.Visibility = Visibility.Collapsed;
                             }
@@ -807,10 +808,26 @@ namespace _01electronics_inventory
                         else
                         {
                             workFormComboBox.SelectedIndex = 0;
-                            rfpRequestorTeamComboBox.SelectedItem = rfpRequestorTeamComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => (Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpRequestorTeam));
 
+
+                            ComboBoxItem requestorItem = new ComboBoxItem();
+                            ComboBoxItem rfpIdItem = new ComboBoxItem();
+                            ComboBoxItem itemDescriptionItem = new ComboBoxItem();
+
+                            requestorItem.Content = oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfp_requestor_team_name;
+                            requestorItem.Tag = oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpRequestorTeam;
+
+                            rfpIdItem.Content = oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpID;
+                            rfpIdItem.Tag = oldMaterialEntryPermit.GetItems()[counter].rfp_info;
+
+                            itemDescriptionItem.Content = oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfp_item_description;
+                            itemDescriptionItem.Tag = oldMaterialEntryPermit.GetItems()[counter].rfp_item;
+
+                            rfpRequestorTeamComboBox.SelectedItem = rfpRequestorTeamComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => (Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpRequestorTeam));
+                            rfpIdComboBox.Items.Add(rfpIdItem);
                            
                             rfpIdComboBox.SelectedItem= rfpIdComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => ((RFP_MIN_STRUCT)f.Tag).rfpID == oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpID);
+
                             rfpItemdescriptionComboBox.SelectedItem= rfpItemdescriptionComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => ((RFP_ITEM_MAX_STRUCT)f.Tag).rfp_item_number == oldMaterialEntryPermit.GetItems()[counter].rfp_item_number);
 
 
@@ -1340,10 +1357,55 @@ namespace _01electronics_inventory
             WrapPanel rfpRequestorTeamWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
             WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
             WrapPanel rfpItemDescriptionWrapPanel = itemsStackPanel.Children[5] as WrapPanel;
+           
 
             ComboBox rfpRequestorTeamComboBox = rfpRequestorTeamWrapPanel.Children[1] as ComboBox;
             ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
             ComboBox rfpItemDescriptionComboBox = rfpItemDescriptionWrapPanel.Children[1] as ComboBox;
+
+            WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+            ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
+
+
+            WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+            ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
+
+
+            WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+            ComboBox typecomboBox = typeWrapPanel.Children[1] as ComboBox;
+
+
+            WrapPanel brandsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+            ComboBox brandComboBox = brandsWrapPanel.Children[1] as ComboBox;
+
+
+            WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+            ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
+
+
+            WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
+            ComboBox specsComboBox = specsWrapPanel.Children[1] as ComboBox;
+
+            WrapPanel serialNumberWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+            TextBox serialNumberTextBox = serialNumberWrapPanel.Children[1] as TextBox;
+
+
+            WrapPanel quantityWrapPanel = itemsStackPanel.Children[13] as WrapPanel;
+            TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+
+
+            WrapPanel priceWrapPanel = itemsStackPanel.Children[14] as WrapPanel;
+            TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
+
+
+            WrapPanel currencyWrapPanel = itemsStackPanel.Children[15] as WrapPanel;
+            ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
+
+
+            WrapPanel stockTypeWrapPanel = itemsStackPanel.Children[16] as WrapPanel;
+            ComboBox stockTypeComboBox = stockTypeWrapPanel.Children[1] as ComboBox;
+
+
             if (workForm.SelectedIndex==0)
             {
                 
@@ -1364,6 +1426,14 @@ namespace _01electronics_inventory
                     if (rfpRequestorTeamComboBox.Items.Cast<ComboBoxItem>().Any(f => f.Tag.Equals(requestorTeamItem.Tag)))
                         continue;
                     rfpRequestorTeamComboBox.Items.Add(requestorTeamItem);
+
+                    choiceComboBox.IsEnabled = false;
+                    categoryComboBox.IsEnabled = false;
+                    typecomboBox.IsEnabled = false;
+                    brandComboBox.IsEnabled = false;
+                    modelComboBox.IsEnabled = false;
+                    specsComboBox.IsEnabled = false;
+                    quantityTextBox.IsEnabled = false;
                 }
             }
             else
@@ -1380,7 +1450,22 @@ namespace _01electronics_inventory
                 rfpIdComboBox.Items.Clear();
                 rfpItemDescriptionComboBox.Items.Clear();
 
+                choiceComboBox.IsEnabled = true;
+                categoryComboBox.IsEnabled = true;
+                quantityTextBox.IsEnabled = true;
+
             }
+            choiceComboBox.SelectedIndex = -1;
+            categoryComboBox.SelectedIndex = -1;
+            typecomboBox.SelectedIndex = -1;
+            brandComboBox.SelectedIndex = -1;
+            modelComboBox.SelectedIndex = -1;
+            specsComboBox.SelectedIndex = -1;
+            serialNumberTextBox.Clear();
+            quantityTextBox.Clear();
+            priceTextBox.Clear();
+            currencyComboBox.SelectedIndex = -1;
+            stockTypeComboBox.SelectedIndex = -1;
           
         }
 
@@ -1544,7 +1629,7 @@ namespace _01electronics_inventory
             // border.Background = new SolidColorBrush(Color.FromRgb(237, 237, 237));
             border.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
             border.Width = 500;
-            border.Height = 500;
+            border.Height = 600;
             border.Margin = new Thickness(10);
             border.Effect = new DropShadowEffect { ShadowDepth = 2, BlurRadius = 5, Color = Colors.LightGray };
 
@@ -1564,6 +1649,7 @@ namespace _01electronics_inventory
             removeItemButton.Content = "REMOVE";
             removeItemButton.Width = 100;
             removeItemButton.Style = (Style)FindResource("buttonBrowseStyle");
+            removeItemButton.Margin=new Thickness(0);
             removeItemButton.Click += OnButtonClickRemoveItem; 
             removeItemButton.Background = Brushes.Red;
 
@@ -2895,7 +2981,7 @@ namespace _01electronics_inventory
             addEntryPermitPage.materialEntryPermit.GetItems().Clear();
             materialReservations.Clear();
 
-            if(viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION)
+            if (viewAddCondition == COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION)
             {
                 int rfpItemCount = 1;
 
@@ -3038,7 +3124,7 @@ namespace _01electronics_inventory
                         RFP rfp = (RFP)rfpItemDescriptionLabel.Tag;
                         //rfp.rfpItems.Clear();
                         //if (!rfp.InitializeRFP(rfp.GetRFPRequestorTeamId(), rfp.GetRFPSerial(), rfp.GetRFPVersion()))
-                            //return;
+                        //return;
                         if (choiceComboBox.SelectedIndex == 1)
                         {
                             specsItem = (ComboBoxItem)specsComboBox.SelectedItem;
@@ -4080,15 +4166,229 @@ namespace _01electronics_inventory
                     if (!reservation.IssueMultipleReservations(materialReservations))
                         return;
                 }
-           
 
-               
+
+
             }
             else
             {
+                for (int i = 0; i < itemsWrapPanel.Children.Count-1; i++)
+                {
+                    Border itemBorder = itemsWrapPanel.Children[i] as Border;
+
+
+                    StackPanel itemsStackPanel = itemBorder.Child as StackPanel;
+
+                    WrapPanel workFormWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+                    ComboBox workFormComboBox = workFormWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel rfpRequestorTeamWrapPanel = itemsStackPanel.Children[3] as WrapPanel;
+                    ComboBox rfpRequestorTeamComboBox = rfpRequestorTeamWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel rfpIdWrapPanel = itemsStackPanel.Children[4] as WrapPanel;
+                    ComboBox rfpIdComboBox = rfpIdWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel rfpItemDescription = itemsStackPanel.Children[5] as WrapPanel;
+                    TextBlock rfpItemDescriptionLabel = rfpItemDescription.Children[0] as TextBlock;
+                    ComboBox rfpItemdescriptionComboBox = rfpItemDescription.Children[1] as ComboBox;
+
+                    WrapPanel choiceWrapPanel = itemsStackPanel.Children[6] as WrapPanel;
+                    ComboBox choiceComboBox = choiceWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel categoryWrapPanel = itemsStackPanel.Children[7] as WrapPanel;
+                    ComboBox categoryComboBox = categoryWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel typeWrapPanel = itemsStackPanel.Children[8] as WrapPanel;
+                    ComboBox typecomboBox = typeWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel brandsWrapPanel = itemsStackPanel.Children[9] as WrapPanel;
+                    ComboBox brandComboBox = brandsWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel modelWrapPanel = itemsStackPanel.Children[10] as WrapPanel;
+                    ComboBox modelComboBox = modelWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel specsWrapPanel = itemsStackPanel.Children[11] as WrapPanel;
+                    ComboBox specsComboBox = specsWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel productSerialWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+                    TextBox productSerialTextBox = productSerialWrapPanel.Children[1] as TextBox;
+
+                    WrapPanel quantityWrapPanel = itemsStackPanel.Children[13] as WrapPanel;
+                    TextBox quantityTextBox = quantityWrapPanel.Children[1] as TextBox;
+
+                    WrapPanel priceWrapPanel = itemsStackPanel.Children[14] as WrapPanel;
+                    TextBox priceTextBox = priceWrapPanel.Children[1] as TextBox;
+
+                    WrapPanel currencyWrapPanel = itemsStackPanel.Children[15] as WrapPanel;
+                    ComboBox currencyComboBox = currencyWrapPanel.Children[1] as ComboBox;
+
+                    WrapPanel stockTypeWrapPanel = itemsStackPanel.Children[16] as WrapPanel;
+                    ComboBox stockTypeComboBox = stockTypeWrapPanel.Children[1] as ComboBox;
+
+                    if (categoryComboBox.SelectedIndex == -1)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Category is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (typecomboBox.SelectedIndex == -1)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Type is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (brandComboBox.SelectedIndex == -1)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Brand is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (modelComboBox.SelectedIndex == -1)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Model is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (choiceComboBox.SelectedIndex == 1)
+                        if (specsComboBox.SelectedIndex == -1)
+                        {
+                            System.Windows.Forms.MessageBox.Show("Specs is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            return;
+                        }
+                    if (quantityTextBox.Text == "")
+                    {
+                        System.Windows.Forms.MessageBox.Show("Quantity is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (priceTextBox.Text == "")
+                    {
+                        System.Windows.Forms.MessageBox.Show("Price is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (currencyComboBox.SelectedIndex == -1)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Currency is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (stockTypeComboBox.SelectedIndex == -1)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Stock is empty!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    ComboBoxItem categoryItem = (ComboBoxItem)categoryComboBox.SelectedItem;
+                    ComboBoxItem typeItem = (ComboBoxItem)typecomboBox.SelectedItem;
+                    ComboBoxItem brandItem = (ComboBoxItem)brandComboBox.SelectedItem;
+                    ComboBoxItem modelItem = (ComboBoxItem)modelComboBox.SelectedItem;
+
+                    ComboBoxItem currencyItem = (ComboBoxItem)currencyComboBox.SelectedItem;
+                    ComboBoxItem stockTypeItem = (ComboBoxItem)stockTypeComboBox.SelectedItem;
+
+                    ComboBoxItem specsItem = (ComboBoxItem)specsComboBox.SelectedItem;
+
+
+                    if (workFormComboBox.SelectedIndex == 0)
+                    {
+                        ComboBoxItem descriptionItem = (ComboBoxItem)rfpItemdescriptionComboBox.SelectedItem;
+                        RFP_ITEM_MAX_STRUCT rfpItem = (RFP_ITEM_MAX_STRUCT)descriptionItem.Tag;
+                        rfpItem.product_category.category_id = Convert.ToInt32(categoryItem.Tag);
+                        rfpItem.product_category.category_name = categoryItem.Content.ToString();
+                        rfpItem.product_type.type_id = Convert.ToInt32(typeItem.Tag);
+                        rfpItem.product_type.product_name = typeItem.Content.ToString();
+                        rfpItem.product_brand.brand_id = Convert.ToInt32(brandItem.Tag);
+                        rfpItem.product_brand.brand_name = brandItem.Content.ToString();
+                        rfpItem.product_model.model_id = Convert.ToInt32(modelItem.Tag);
+                        rfpItem.product_model.model_name = modelItem.Content.ToString();
+                        RFP rfp = (RFP)rfpItemDescriptionLabel.Tag;
+                        //rfp.rfpItems.Clear();
+                        //if (!rfp.InitializeRFP(rfp.GetRFPRequestorTeamId(), rfp.GetRFPSerial(), rfp.GetRFPVersion()))
+                        //return;
+                        if (choiceComboBox.SelectedIndex == 1)
+                        {
+                            specsItem = (ComboBoxItem)specsComboBox.SelectedItem;
+                            rfpItem.product_specs.spec_id = Convert.ToInt32(specsItem.Tag);
+                            rfpItem.product_specs.spec_name = specsItem.Content.ToString();
+                            rfpItem.is_company_product = true;
+                            rfpItem.item_description = $@"{categoryItem.Content.ToString()} - {typeItem.Content.ToString()} - {brandItem.Content.ToString()} - {modelItem.Content.ToString()} - {specsItem.Content.ToString()}";
+
+                        }
+                        else
+                        {
+                            rfpItem.is_company_product = false;
+                            rfpItem.item_description = $@"{categoryItem.Content.ToString()} - {typeItem.Content.ToString()} - {brandItem.Content.ToString()} - {modelItem.Content.ToString()} ";
+                        }
+
+                        //RFP_ITEM_MAX_STRUCT oldRfpItem = rfp.rfpItems.Find(f => f.rfp_item_number == rfpItem.rfp_item_number);
+                        //int itemIndex = rfp.rfpItems.IndexOf(oldRfpItem);
+                        //rfp.rfpItems.Remove(oldRfpItem);
+                        //rfp.rfpItems.Insert(itemIndex, rfpItem);
+                        //oldRfp.rfpItems.Clear();
+
+                        //if (!oldRfp.InitializeRFP(rfp.GetRFPRequestorTeamId(), rfp.GetRFPSerial(), rfp.GetRFPVersion()))
+                        //    return;
+                        //if (!rfp.EditRFPItems(ref oldRfp.rfpItems))
+                        //    return;
+
+
+
+                        INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT entryPermitItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                        entryPermitItem.product_category = rfpItem.product_category;
+                        entryPermitItem.product_type = rfpItem.product_type;
+                        entryPermitItem.product_brand = rfpItem.product_brand;
+                        entryPermitItem.product_model = rfpItem.product_model;
+                        entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
+                        entryPermitItem.quantity = Convert.ToInt32(Convert.ToDecimal(quantityTextBox.Text.ToString()));
+                        entryPermitItem.item_price = Convert.ToDecimal(priceTextBox.Text.ToString());
+                        entryPermitItem.item_currency.currencyId = Convert.ToInt32(currencyItem.Tag.ToString());
+                        entryPermitItem.rfp_info.rfpRequestorTeam = rfp.GetRFPRequestorTeamId();
+                        entryPermitItem.rfp_info.rfpSerial = rfp.GetRFPSerial();
+                        entryPermitItem.rfp_info.rfpVersion = rfp.GetRFPVersion();
+                        entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
+                        entryPermitItem.is_released = false;
+                        entryPermitItem.stock_type.stock_type_id = Convert.ToInt32(stockTypeItem.Tag.ToString());
+                        entryPermitItem.rfp_info.rfp_item_description = rfpItem.item_description;
+                        entryPermitItem.rfp_item.measure_unit_id = rfpItem.measure_unit_id;
+                        entryPermitItem.rfp_item.item_notes = rfpItem.item_notes;
+                        entryPermitItem.product_serial_number = productSerialTextBox.Text;
+
+
+                        if (choiceComboBox.SelectedIndex == 1)
+                        {
+                            entryPermitItem.product_specs = rfpItem.product_specs;
+                            entryPermitItem.is_company_product = true;
+                        }
+
+                        addEntryPermitPage.materialEntryPermit.AddItem(entryPermitItem);
+
+
+                    }
+                    else
+                    {
+
+                        INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT entryPermitItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
+                        entryPermitItem.product_category.category_id = Convert.ToInt32(categoryItem.Tag);
+                        entryPermitItem.product_category.category_name = categoryItem.Content.ToString();
+                        entryPermitItem.product_type.type_id = Convert.ToInt32(typeItem.Tag);
+                        entryPermitItem.product_type.product_name = typeItem.Content.ToString();
+                        entryPermitItem.product_brand.brand_id = Convert.ToInt32(brandItem.Tag);
+                        entryPermitItem.product_brand.brand_name = brandItem.Content.ToString();
+                        entryPermitItem.product_model.model_id = Convert.ToInt32(modelItem.Tag);
+                        entryPermitItem.product_model.model_name = modelItem.Content.ToString();
+                        entryPermitItem.quantity = Convert.ToInt32(Convert.ToDecimal(quantityTextBox.Text.ToString()));
+                        entryPermitItem.item_price = Convert.ToDecimal(priceTextBox.Text.ToString());
+                        entryPermitItem.item_currency.currencyId = Convert.ToInt32(currencyItem.Tag.ToString());
+                        entryPermitItem.is_released = false;
+                        entryPermitItem.stock_type.stock_type_id = Convert.ToInt32(stockTypeItem.Tag.ToString());
+                        entryPermitItem.product_serial_number = productSerialTextBox.Text;
+                        if (choiceComboBox.SelectedIndex == 1)
+                        {
+                            entryPermitItem.product_specs.spec_id = Convert.ToInt32(specsItem.Tag);
+                            entryPermitItem.product_specs.spec_name = specsItem.Content.ToString();
+                            entryPermitItem.is_company_product = true;
+                        }
+
+                    }
+                }
                 if (!addEntryPermitPage.materialEntryPermit.UpdateMaterialEntryPermit(oldMaterialEntryPermit))
                     return;
             }
+            
            
             EntryPermitUploadFilesPage = new EntryPermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, addEntryPermitPage, entryPermitWindow, ref addEntryPermitPage.materialEntryPermit);
 
@@ -4139,16 +4439,33 @@ namespace _01electronics_inventory
             itemNumber--;
             int position=itemsWrapPanel.Children.IndexOf(mainBorder);
             itemsWrapPanel.Children.Remove(mainBorder);
-            itemsWrapPanel.Children.RemoveRange(position,1);
-            int itemNumberr = 1;
-            for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i+=2)
+            if(viewAddCondition!=COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION)
             {
-                Border itemsBorder = itemsWrapPanel.Children[i] as Border;
-                StackPanel maxItemsStackPanel = itemsBorder.Child as StackPanel;
-                Label header = maxItemsStackPanel.Children[0] as Label;
-                header.Content = $"Item {itemNumberr}";
-                itemNumberr++;
+                itemsWrapPanel.Children.RemoveRange(position, 1);
+                int itemNumberr = 1;
+                for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i += 2)
+                {
+                    Border itemsBorder = itemsWrapPanel.Children[i] as Border;
+                    StackPanel maxItemsStackPanel = itemsBorder.Child as StackPanel;
+                    Label header = maxItemsStackPanel.Children[0] as Label;
+                    header.Content = $"Item {itemNumberr}";
+                    itemNumberr++;
+                }
             }
+            else
+            {
+                for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i ++)
+                {
+                    int itemNumberr = 1;
+                    Border itemsBorder = itemsWrapPanel.Children[i] as Border;
+                    StackPanel maxItemsStackPanel = itemsBorder.Child as StackPanel;
+                    Label header = maxItemsStackPanel.Children[0] as Label;
+                    header.Content = $"Item {itemNumberr}";
+                    itemNumberr++;
+                }
+
+            }
+           
         }
         /// <summary>
         /// ///////////////////////////////////////////// ON MOUSE LEFT BUTTON DOWN /////////////////////
