@@ -210,6 +210,7 @@ namespace _01electronics_inventory
                     reservedserial.reserved_by_id = loggedUser.GetEmployeeId();
                     reservedserial.reservation_date = DateTime.Now;
                     reservedserial.hold_until = DateTime.Now;
+                    reservedserial.rfp_item = rfpItem;
                     reservedSerials.Add(reservedserial);
                 }
 

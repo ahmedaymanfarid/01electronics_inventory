@@ -1840,7 +1840,7 @@ namespace _01electronics_inventory
         private void AddButtonClick(object sender, RoutedEventArgs e)
         {
             MaterialEntryPermit material = null;
-            AddEntryPermitWindow entryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,viewAddCondition,ref material,this);
+            AddEntryPermitWindow entryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION,ref material,this);
 
             entryPermitWindow.Show();
         }
