@@ -761,6 +761,8 @@ namespace _01electronics_inventory
 
                         //Button generateSerialsButton = generateSerialsMainStackPanel.Children[4] as Button;
 
+                        choiceComboBox.IsEnabled = true;
+                        categoryComboBox.IsEnabled = true;
                         if (oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpSerial == 0)
                         {
                             workFormComboBox.SelectedIndex = 1;
@@ -828,7 +830,8 @@ namespace _01electronics_inventory
                            
                             rfpIdComboBox.SelectedItem= rfpIdComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => ((RFP_MIN_STRUCT)f.Tag).rfpID == oldMaterialEntryPermit.GetItems()[counter].rfp_info.rfpID);
 
-                            rfpItemdescriptionComboBox.SelectedItem= rfpItemdescriptionComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => ((RFP_ITEM_MAX_STRUCT)f.Tag).rfp_item_number == oldMaterialEntryPermit.GetItems()[counter].rfp_item_number);
+                            rfpItemdescriptionComboBox.Items.Add(itemDescriptionItem);
+                            rfpItemdescriptionComboBox.SelectedItem= rfpItemdescriptionComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => ((PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT)f.Tag).item_description == oldMaterialEntryPermit.GetItems()[counter].rfp_item.item_description);
 
 
 
@@ -872,7 +875,8 @@ namespace _01electronics_inventory
                         currencyComboBox.SelectedItem = currencyComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].item_currency.currencyId);
 
                         stockTypeComboBox.SelectedItem= stockTypeComboBox.Items.Cast<ComboBoxItem>().FirstOrDefault(f => Convert.ToInt32(f.Tag) == oldMaterialEntryPermit.GetItems()[counter].stock_type.stock_type_id);
-
+                        choiceComboBox.IsEnabled = true;
+                        categoryComboBox.IsEnabled = true;
 
                         //if (oldMaterialEntryPermit.GetItems()[counter].product_serial_number != null)
                         //{
@@ -1171,10 +1175,12 @@ namespace _01electronics_inventory
             serialNumberTextBox.Width = 240;
             // quantityTextBox.IsEnabled = false;
             serialNumberTextBox.Name = "serialNumberTextBox";
-
-
             var seriaNumberWrapPanel = new WrapPanel();
-            seriaNumberWrapPanel.Visibility = Visibility.Collapsed;
+            if (viewAddCondition!=COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION)
+                seriaNumberWrapPanel.Visibility = Visibility.Collapsed;
+            else
+                seriaNumberWrapPanel.Visibility = Visibility.Visible;
+
             seriaNumberWrapPanel.Children.Add(serialNumber);
             seriaNumberWrapPanel.Children.Add(serialNumberTextBox);
 
@@ -1240,6 +1246,7 @@ namespace _01electronics_inventory
             quantityTextBox.Style = (Style)FindResource("textBoxStyle");
             quantityTextBox.Margin = new Thickness(0);
             quantityTextBox.Width = 240;
+            quantityTextBox.TextChanged += OnTextChangeQuantityTextBox;
            // quantityTextBox.IsEnabled = false;
             quantityTextBox.Name = "quantityTextBox";
 
@@ -1341,6 +1348,37 @@ namespace _01electronics_inventory
             }
 
 
+        }
+
+        private void OnTextChangeQuantityTextBox(object sender, TextChangedEventArgs e)
+        {
+            TextBox quantityTextBox = (TextBox)sender;
+            WrapPanel quantityWrapPanel = quantityTextBox.Parent as WrapPanel;
+            StackPanel itemsStackPanel = quantityWrapPanel.Parent as StackPanel;
+            Border itemBorder = itemsStackPanel.Parent as Border;
+            int index = itemsWrapPanel.Children.IndexOf(itemBorder);
+            WrapPanel serialsWrapPanel = itemsStackPanel.Children[12] as WrapPanel;
+            TextBox serialsTextBox = serialsWrapPanel.Children[1] as TextBox;
+
+            WrapPanel workFormWrapPanel = itemsStackPanel.Children[2] as WrapPanel;
+            ComboBox workFormComboBox = workFormWrapPanel.Children[1] as ComboBox;
+            if (viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION)
+            {
+                Border generateSerialBorder = itemsWrapPanel.Children[index+1] as Border;
+                StackPanel generateSerialStackPanel = generateSerialBorder.Child as StackPanel;
+                ScrollViewer generatedSerialsScrollViewer = generateSerialStackPanel.Children[3] as ScrollViewer;
+                StackPanel generatedSerials = generatedSerialsScrollViewer.Content as StackPanel;
+                generatedSerials.Children.Clear();
+            }
+            else if(viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION)
+            {
+                if (quantityTextBox.Text!="" && Convert.ToDecimal(quantityTextBox.Text) > 1 && serialsTextBox.Text !="" && workFormComboBox.SelectedIndex!=0 )
+                {
+                    System.Windows.Forms.MessageBox.Show("Quantity Should not exceed 1 as long as there's serial number ", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    quantityTextBox.Clear();
+                }
+                   
+            }
         }
 
         private void OnTextChangedSearchTextBox(object sender, TextChangedEventArgs e)
@@ -2053,6 +2091,8 @@ namespace _01electronics_inventory
 
                     brandComboBox.IsEnabled = true;
                     modelComboBox.IsEnabled = false;
+                    //ComboBoxItem categoryItem = (ComboBoxItem)categoryComboBox.SelectedItem;
+                    //ComboBoxItem productItem = (ComboBoxItem)typeComboBox.SelectedItem ;
                     if (!commonQueries.GetGenericProductBrands(genericProducts[typeComboBox.SelectedIndex].type_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericBrands))
                         return;
 
@@ -2111,13 +2151,18 @@ namespace _01electronics_inventory
             genericModels.Clear();
             companyModels.Clear();
 
-            if (brandComboBox.SelectedIndex != -1)
+            if (brandComboBox.SelectedIndex != -1 )
             {
                 if (choiceComboBox.SelectedIndex != -1 && choiceComboBox.SelectedIndex == 0)
                 {
 
 
                     modelComboBox.IsEnabled = true;
+                    //ComboBoxItem categoryItem =(ComboBoxItem) categoryComboBox.SelectedItem ;
+                    //ComboBoxItem productItem = (ComboBoxItem)typeComboBox.SelectedItem ;
+                    //ComboBoxItem brandItem = (ComboBoxItem)brandComboBox.SelectedItem;
+
+                    if(genericBrands.Count!=0)
                     if (!commonQueries.GetGenericBrandModels(genericProducts[typeComboBox.SelectedIndex].type_id, genericBrands[brandComboBox.SelectedIndex].brand_id, genericCategories[categoryComboBox.SelectedIndex].category_id, ref genericModels))
                         return;
 
@@ -2556,7 +2601,7 @@ namespace _01electronics_inventory
 
 
                 //}
-                if (rfp.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION)
+                if (rfp.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && viewAddCondition!=COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
                 {
 
                     ComboBoxItem descriptionItem = new ComboBoxItem();
@@ -2565,13 +2610,13 @@ namespace _01electronics_inventory
                     itemDescriptionComboBox.Items.Add(descriptionItem);
 
                 }
-                else if(viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION||viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
-                {
-                    ComboBoxItem descriptionItem = new ComboBoxItem();
-                    descriptionItem.Content = rfp.rfpItems[i].item_description;
-                    descriptionItem.Tag = rfp.rfpItems[i];
-                    itemDescriptionComboBox.Items.Add(descriptionItem);
-                }
+                //else if(viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_EDIT_CONDITION||viewAddCondition==COMPANY_WORK_MACROS.ENTRY_PERMIT_VIEW_CONDITION)
+                //{
+                //    ComboBoxItem descriptionItem = new ComboBoxItem();
+                //    descriptionItem.Content = rfp.rfpItems[i].item_description;
+                //    descriptionItem.Tag = rfp.rfpItems[i];
+                //    itemDescriptionComboBox.Items.Add(descriptionItem);
+                //}
 
 
             }
@@ -3260,13 +3305,13 @@ namespace _01electronics_inventory
                             TextBox serialNumber = serialWrapPanel.Children[1] as TextBox;
                             entryPermitItem.product_serial_number = serialNumber.Text;
                             ComboBox serialStockCategory = serialWrapPanel.Children[2] as ComboBox;
-                            DatePicker datePicker = serialWrapPanel.Children[3] as DatePicker;
+                            //DatePicker datePicker = serialWrapPanel.Children[3] as DatePicker;
                             if (serialStockCategory.SelectedIndex == -1)
                             {
                                 System.Windows.Forms.MessageBox.Show("Serial type is not specified!", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                 return;
                             }
-                            entryPermitItem.valid_until = (DateTime)datePicker.SelectedDate;
+                            entryPermitItem.valid_until = DateTime.Now;
                             addEntryPermitPage.materialEntryPermit.AddItem(entryPermitItem);
 
                             entryPermitItem = new INVENTORY_STRUCTS.ENTRY_PERMIT_ITEM_MAX_STRUCT();
@@ -3283,7 +3328,7 @@ namespace _01electronics_inventory
                             entryPermitItem.item_currency.currencyId = Convert.ToInt32(currencyItem.Tag.ToString());
                             entryPermitItem.is_released = false;
                             entryPermitItem.stock_type.stock_type_id = Convert.ToInt32(stockTypeItem.Tag.ToString());
-                            entryPermitItem.valid_until = (DateTime)datePicker.SelectedDate;
+                            entryPermitItem.valid_until = DateTime.Now;
 
                             if (choiceComboBox.SelectedIndex == 1)
                             {
@@ -4346,7 +4391,8 @@ namespace _01electronics_inventory
                         entryPermitItem.rfp_item.measure_unit_id = rfpItem.measure_unit_id;
                         entryPermitItem.rfp_item.item_notes = rfpItem.item_notes;
                         entryPermitItem.product_serial_number = productSerialTextBox.Text;
-
+                        if (entryPermitItem.product_serial_number != "")
+                             entryPermitItem.product_model.has_serial_number = true;
 
                         if (choiceComboBox.SelectedIndex == 1)
                         {
@@ -4382,9 +4428,13 @@ namespace _01electronics_inventory
                             entryPermitItem.product_specs.spec_name = specsItem.Content.ToString();
                             entryPermitItem.is_company_product = true;
                         }
-
+                        if(i< oldMaterialEntryPermit.GetItems().Count)
+                        entryPermitItem.entry_permit_item_serial = oldMaterialEntryPermit.GetItems()[i].entry_permit_item_serial;
+                        addEntryPermitPage.materialEntryPermit.AddItem(entryPermitItem);
                     }
                 }
+                addEntryPermitPage.materialEntryPermit.SetEntryPermitSerialid(oldMaterialEntryPermit.GetEntryPermitSerial());
+
                 if (!addEntryPermitPage.materialEntryPermit.UpdateMaterialEntryPermit(oldMaterialEntryPermit))
                     return;
             }
@@ -4454,9 +4504,10 @@ namespace _01electronics_inventory
             }
             else
             {
+                int itemNumberr = 1;
                 for (int i = 0; i < itemsWrapPanel.Children.Count - 1; i ++)
                 {
-                    int itemNumberr = 1;
+                   
                     Border itemsBorder = itemsWrapPanel.Children[i] as Border;
                     StackPanel maxItemsStackPanel = itemsBorder.Child as StackPanel;
                     Label header = maxItemsStackPanel.Children[0] as Label;
