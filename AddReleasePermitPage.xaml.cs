@@ -127,16 +127,14 @@ namespace _01electronics_inventory
         }
         private void FillRFPRequestorTeamComboBox()
         {
-            WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
-            ComboBox rfpRequstersComboBox = rfpPanel.Children[1] as ComboBox;
+            
 
-            requstersFiltered.ForEach(a => rfpRequstersComboBox.Items.Add(a.requestor_team.team_name));
+            requstersFiltered.ForEach(a => rfpRequesters.Items.Add(a.requestor_team.team_name));
         }
         private void FillOrderIDsComboBox()
         {
-            WrapPanel orderPanel = mainPanel.Children[2] as WrapPanel;
-            ComboBox orderSerialsComboBox = orderPanel.Children[1] as ComboBox;
-            workOrders.ForEach(a => orderSerialsComboBox.Items.Add(a.order_id));
+          
+            workOrders.ForEach(a => orderSerials.Items.Add(a.order_id));
         }
       
 
@@ -145,9 +143,9 @@ namespace _01electronics_inventory
 
         }
 
-        private void LabelMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void OnMouseDownItemsInfoLabel(object sender, MouseButtonEventArgs e)
         {
-            if (orderChecked.IsChecked != true && rfpChecked.IsChecked != true) {
+            if (workFormComboBox.SelectedIndex==-1) {
 
                 System.Windows.Forms.MessageBox.Show("You have to choose rfp or order", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
@@ -175,100 +173,91 @@ namespace _01electronics_inventory
 
         }
 
-        private void rfpCheckedChecked(object sender, RoutedEventArgs e)
-        {
-            orderChecked.IsChecked = false;
-            mainBorder.Visibility = Visibility.Visible;
+        //private void rfpCheckedChecked(object sender, RoutedEventArgs e)
+        //{
+        //    orderChecked.IsChecked = false;
+        //    mainBorder.Visibility = Visibility.Visible;
 
-            WrapPanel rfpRequestorTeamWrapPanel=mainPanel.Children[0] as WrapPanel;
-            rfpRequestorTeamWrapPanel.Visibility = Visibility.Visible;
+        //    WrapPanel rfpRequestorTeamWrapPanel=mainPanel.Children[0] as WrapPanel;
+        //    rfpRequestorTeamWrapPanel.Visibility = Visibility.Visible;
 
-            WrapPanel rfpIDWrapPanel = mainPanel.Children[1] as WrapPanel;
-            rfpIDWrapPanel.Visibility = Visibility.Visible;
+        //    WrapPanel rfpIDWrapPanel = mainPanel.Children[1] as WrapPanel;
+        //    rfpIDWrapPanel.Visibility = Visibility.Visible;
 
-            WrapPanel orderIdWrapPanel = mainPanel.Children[2] as WrapPanel;
-            orderIdWrapPanel.Visibility = Visibility.Collapsed;
+        //    WrapPanel orderIdWrapPanel = mainPanel.Children[2] as WrapPanel;
+        //    orderIdWrapPanel.Visibility = Visibility.Collapsed;
 
-            WrapPanel orderContactWrapPanel = mainPanel.Children[3] as WrapPanel;
-            orderContactWrapPanel.Visibility = Visibility.Collapsed;
+        //    WrapPanel orderContactWrapPanel = mainPanel.Children[3] as WrapPanel;
+        //    orderContactWrapPanel.Visibility = Visibility.Collapsed;
 
-            WrapPanel orderEndingChoice = mainPanel.Children[4] as WrapPanel;
-            orderEndingChoice.Visibility = Visibility.Collapsed;
+        //    WrapPanel orderEndingChoice = mainPanel.Children[4] as WrapPanel;
+        //    orderEndingChoice.Visibility = Visibility.Collapsed;
 
-            ComboBox orderSerialsComboBox = orderIdWrapPanel.Children[1] as ComboBox;
-            orderSerialsComboBox.SelectedIndex = -1;
-
-
-            addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
-
-            if (parentWindow.isView == true)
-            {
-               // addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
-            }
+        //    ComboBox orderSerialsComboBox = orderIdWrapPanel.Children[1] as ComboBox;
+        //    orderSerialsComboBox.SelectedIndex = -1;
 
 
-        }
+        //    addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
 
-        private void orderCheckedChecked(object sender, RoutedEventArgs e)
-        {
-            rfpChecked.IsChecked = false;
-            mainBorder.Visibility = Visibility.Visible;
-
-            WrapPanel rfpRequestorPanel = mainPanel.Children[0] as WrapPanel;
-            rfpRequestorPanel.Visibility = Visibility.Collapsed;
-
-            WrapPanel rfpIDPanel = mainPanel.Children[1] as WrapPanel;
-            rfpIDPanel.Visibility = Visibility.Collapsed;
-
-            WrapPanel orderSerialPanel = mainPanel.Children[2] as WrapPanel;
-            orderSerialPanel.Visibility = Visibility.Visible;
-
-            WrapPanel orderContactPanel = mainPanel.Children[3] as WrapPanel;
-            orderContactPanel.Visibility = Visibility.Visible;
-
-            WrapPanel chooseToBeClosedWith = mainPanel.Children[4] as WrapPanel;
-            chooseToBeClosedWith.Visibility = Visibility.Visible;
+        //    if (parentWindow.isView == true)
+        //    {
+        //       // addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
+        //    }
 
 
-            //addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
+        //}
 
-            if (parentWindow.isView == true) {
-                //addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
-            }
-        }
+        //private void orderCheckedChecked(object sender, RoutedEventArgs e)
+        //{
+        //    rfpChecked.IsChecked = false;
+        //    mainBorder.Visibility = Visibility.Visible;
+
+        //    WrapPanel rfpRequestorPanel = mainPanel.Children[0] as WrapPanel;
+        //    rfpRequestorPanel.Visibility = Visibility.Collapsed;
+
+        //    WrapPanel rfpIDPanel = mainPanel.Children[1] as WrapPanel;
+        //    rfpIDPanel.Visibility = Visibility.Collapsed;
+
+        //    WrapPanel orderSerialPanel = mainPanel.Children[2] as WrapPanel;
+        //    orderSerialPanel.Visibility = Visibility.Visible;
+
+        //    WrapPanel orderContactPanel = mainPanel.Children[3] as WrapPanel;
+        //    orderContactPanel.Visibility = Visibility.Visible;
+
+        //    WrapPanel chooseToBeClosedWith = mainPanel.Children[4] as WrapPanel;
+        //    chooseToBeClosedWith.Visibility = Visibility.Visible;
+
+
+        //    //addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
+
+        //    if (parentWindow.isView == true) {
+        //        //addReleasePermitItem.ReleasePermitUploadFilesPage = new ReleasePermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, addReleasePermitItem, parentWindow.releasePermitPage, parentWindow, ref parentWindow.materialReleasePermit);
+        //    }
+        //}
 
         private void rfpRequestersSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            WrapPanel rfpRequestorTeamWrapPanel = mainPanel.Children[0] as WrapPanel;
-            ComboBox rfpsRequstersTeamComboBox= rfpRequestorTeamWrapPanel.Children[1] as ComboBox;
+           
 
-            WrapPanel rfpIDWrapPanel = mainPanel.Children[1] as WrapPanel;
-            ComboBox rfpIDComboBox = rfpIDWrapPanel.Children[1] as ComboBox;
-
-            if (!commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpsRequstersTeamComboBox.SelectedIndex].requestor_team.team_id))
+            if (!commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpRequesters.SelectedIndex].requestor_team.team_id))
                 return;
-            rfpIDComboBox.Items.Clear();
+            rfpSerials.Items.Clear();
 
-            rfps.ForEach(a => rfpIDComboBox.Items.Add(a.rfpID));
+            rfps.ForEach(a => rfpSerials.Items.Add(a.rfpID));
 
 
         }
 
         private bool InitializeCompanyContacts()
         {
-            WrapPanel orderPanel = mainPanel.Children[2] as WrapPanel;
-            WrapPanel orderContacts = mainPanel.Children[3] as WrapPanel;
+        
 
-            ComboBox ordersComboBox= orderPanel.Children[1] as ComboBox;
-            ComboBox companyContactsComboBox = orderContacts.Children[1] as ComboBox;
-
-
-            workOrder.InitializeWorkOrderInfo(workOrders[ordersComboBox.SelectedIndex].order_serial);
+            workOrder.InitializeWorkOrderInfo(workOrders[contactComboBox.SelectedIndex].order_serial);
 
             companyContacts.Clear();
-            companyContactsComboBox.Items.Clear();
-            companyContactsComboBox.IsEnabled = true;
-            if (orderChecked.IsChecked == true)
+            contactComboBox.Items.Clear();
+            contactComboBox.IsEnabled = true;
+            if (workFormComboBox.SelectedIndex ==1)
             {
                 if (!commonQueries.GetCompanyContacts(workOrder.GetCompanySerial(), ref companyContacts))
                     return false;
@@ -276,7 +265,7 @@ namespace _01electronics_inventory
           
             for (int i = 0; i < companyContacts.Count(); i++)
             {
-                companyContactsComboBox.Items.Add(companyContacts[i].contact.contact_name);
+                contactComboBox.Items.Add(companyContacts[i].contact.contact_name);
             }
             return true;
         }
@@ -286,9 +275,9 @@ namespace _01electronics_inventory
             serialProducts.Clear();
             workOrder.SetOrderIssueDateToToday();
 
-            WrapPanel orderPanel = mainPanel.Children[2] as WrapPanel;
+          
 
-            ComboBox ordersComboBox = orderPanel.Children[1] as ComboBox;
+            ComboBox ordersComboBox = sender as ComboBox;
 
             if (ordersComboBox.SelectedIndex != -1)
             {
@@ -356,8 +345,8 @@ namespace _01electronics_inventory
         }
         private void OnSelectionChangedRfpIdComboBox(object sender, SelectionChangedEventArgs e)
         {
-            WrapPanel rfpPanel = mainPanel.Children[0] as WrapPanel;
-            ComboBox rfpSerialsComboBox = rfpPanel.Children[1] as ComboBox;
+        
+            ComboBox rfpSerialsComboBox = sender as ComboBox;
 
             serialProducts.Clear();
 
@@ -446,23 +435,23 @@ namespace _01electronics_inventory
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnUnCheckRFPCheckBox(object sender, RoutedEventArgs e) {
+        //private void OnUnCheckRFPCheckBox(object sender, RoutedEventArgs e) {
 
-            rfpPanel.Visibility = Visibility.Collapsed;
-            rfpIdPanel.Visibility = Visibility.Collapsed;   
-            mainBorder.Visibility = Visibility.Collapsed;
-        }
+        //    rfpPanel.Visibility = Visibility.Collapsed;
+        //    rfpIdPanel.Visibility = Visibility.Collapsed;   
+        //    mainBorder.Visibility = Visibility.Collapsed;
+        //}
 
-        private void OnUncheckOrderCheckBox(object sender, RoutedEventArgs e)
-        {
+        //private void OnUncheckOrderCheckBox(object sender, RoutedEventArgs e)
+        //{
 
-            orderPanel.Visibility = Visibility.Collapsed;
-            orderContactPanel.Visibility=Visibility.Collapsed;
-            chooseToBeClosedWith.Visibility=Visibility.Collapsed;
-            serviceReportCheckBox.IsChecked=false;
-            receivalNoteCheckBox.IsChecked=false;
-            mainBorder.Visibility=Visibility.Collapsed;
-        }
+        //    orderPanel.Visibility = Visibility.Collapsed;
+        //    orderContactPanel.Visibility=Visibility.Collapsed;
+        //    chooseToBeClosedWith.Visibility=Visibility.Collapsed;
+        //    serviceReportCheckBox.IsChecked=false;
+        //    receivalNoteCheckBox.IsChecked=false;
+        //    mainBorder.Visibility=Visibility.Collapsed;
+        //}
 
         /// <summary>
         /// ///////////////////////////////////// ON BUTTON CLICK //////////////////
@@ -477,13 +466,13 @@ namespace _01electronics_inventory
 
         private void OnButtonClickNext(object sender, RoutedEventArgs e)
         {
-            if (orderChecked.IsChecked != true && rfpChecked.IsChecked != true)
+            if (workFormComboBox.SelectedIndex==-1)
             {
 
                 System.Windows.Forms.MessageBox.Show("You have to choose rfp or order", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
-            if(orderChecked.IsChecked == true && serviceReportCheckBox.IsChecked==false && receivalNoteCheckBox.IsChecked == false )
+            if(workFormComboBox.SelectedIndex == 1 && serviceReportCheckBox.IsChecked==false && receivalNoteCheckBox.IsChecked == false )
             {
                 System.Windows.Forms.MessageBox.Show("Please choose ending it with receival note or service report", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
@@ -516,6 +505,34 @@ namespace _01electronics_inventory
             parentWindow.serviceReport = false;
             parentWindow.rfp = false;
             serviceReportCheckBox.IsChecked = false;
+        }
+
+        private void OnSelectionChangedWorkForm(object sender, SelectionChangedEventArgs e)
+        {
+            if(workFormComboBox.SelectedIndex !=-1)
+            {
+                if(workFormComboBox.SelectedIndex==0)
+                {
+                    rfpPanel.Visibility = Visibility.Visible;
+                    rfpIdPanel.Visibility = Visibility.Visible;
+
+
+                    orderPanel.Visibility = Visibility.Collapsed;
+                    orderContactPanel.Visibility = Visibility.Collapsed;
+                    chooseToBeClosedWith.Visibility = Visibility.Collapsed;
+
+                }
+                else
+                {
+                    rfpPanel.Visibility = Visibility.Collapsed;
+                    rfpIdPanel.Visibility = Visibility.Collapsed;
+
+                    orderPanel.Visibility = Visibility.Visible;
+                    orderContactPanel.Visibility = Visibility.Visible;
+                    chooseToBeClosedWith.Visibility = Visibility.Visible;
+                }
+            }
+
         }
     }
 }

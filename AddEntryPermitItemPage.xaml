@@ -60,7 +60,7 @@
 
         <ScrollViewer Grid.Row="2" x:Name="itemsScrollViewer">
 
-            <WrapPanel x:Name="itemsWrapPanel" Margin="24">
+            <WrapPanel x:Name="itemsWrapPanel" Margin="24" MaxWidth="1500">
                
                 
 

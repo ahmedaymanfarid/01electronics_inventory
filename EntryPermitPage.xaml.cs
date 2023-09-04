@@ -1,4 +1,5 @@
 ﻿using _01electronics_library;
+using Spire.Doc.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,8 @@ namespace _01electronics_inventory
             loggedInUser = mLoggedInUser;
             materialEntryPermits = new List<INVENTORY_STRUCTS.ENTRY_PERMIT_MAX_STRUCT>();
             InitializeComponent();
-
+            if (loggedInUser.GetEmployeeTeamId() != COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
+                addButton.IsEnabled = false;
             InitializeUiElements();
         }
 
@@ -205,6 +207,7 @@ namespace _01electronics_inventory
                 viewButton.Content = "VIEW";
 
                 expand.Children.Add(viewButton);
+                if(loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
                 expand.Children.Add(editButton);
 
                 card.RowDefinitions.Add(new RowDefinition());

@@ -224,6 +224,11 @@ namespace _01electronics_inventory
             {
                 for (int i = 0; i < companyProductCategoryList.Count; i++)
                 {
+                    if (companyProductCategoryList[i].category_id == 0)
+                    {
+                        companyProductCategoryList.RemoveAt(i);
+                    }
+                    else
                     categoryCompanyComboBox.Items.Add(companyProductCategoryList[i].category_name);
                 }
             }
@@ -239,7 +244,10 @@ namespace _01electronics_inventory
                 modelCompanyTextBlock.Items.Clear();
                 for (int i = 0; i < companyProductList.Count; i++)
                 {
-                    typeCompanyComboBox.Items.Add(companyProductList[i].product_name);
+                    if (companyProductList[i].type_id == 0)
+                        companyProductList.RemoveAt(i);
+                    else
+                      typeCompanyComboBox.Items.Add(companyProductList[i].product_name);
                 }
             }
         }
@@ -253,6 +261,9 @@ namespace _01electronics_inventory
                 modelCompanyTextBlock.Items.Clear();
                 for (int i = 0; i < companyProductBrandList.Count; i++)
                 {
+                    if(companyProductBrandList[i].brand_id==0)
+                        companyProductBrandList.RemoveAt(i);
+                    else
                     brandCompanyComboBox.Items.Add(companyProductBrandList[i].brand_name);
                 }
             }
@@ -266,6 +277,9 @@ namespace _01electronics_inventory
                 modelCompanyTextBlock.Items.Clear();
                 for (int i = 0; i < companyProductModelList.Count; i++)
                 {
+                    if (companyProductModelList[i].model_id==0)
+                        companyProductModelList.RemoveAt(i);
+                    else
                     modelCompanyTextBlock.Items.Add(companyProductModelList[i].model_name);
                 }
             }
@@ -281,6 +295,9 @@ namespace _01electronics_inventory
                 modelTextBlock.Items.Clear();
                 for (int i = 0; i < genericCategoryList.Count; i++)
                 {
+                    if (genericCategoryList[i].category_id==0)
+                        genericCategoryList.RemoveAt(i);
+                    else
                     categoryComboBox.Items.Add(genericCategoryList[i].category_name);
                 }
             }
@@ -296,6 +313,9 @@ namespace _01electronics_inventory
                 modelTextBlock.Items.Clear();
                 for (int i = 0; i < genericProductTypeList.Count; i++)
                 {
+                    if (genericProductTypeList[i].type_id==0)
+                        genericProductTypeList.RemoveAt(i);
+                    else
                     typeComboBox.Items.Add(genericProductTypeList[i].product_name);
                 }
             }
@@ -312,6 +332,9 @@ namespace _01electronics_inventory
                 modelTextBlock.Items.Clear();
                 for (int i = 0; i < genericProductBrandsList.Count; i++)
                 {
+                    if (genericProductBrandsList[i].brand_id==0)
+                        genericProductBrandsList.RemoveAt(i);
+                    else
                     brandComboBox.Items.Add(genericProductBrandsList[i].brand_name);
                 }
             }
@@ -325,6 +348,9 @@ namespace _01electronics_inventory
                 modelTextBlock.Items.Clear();
                 for (int i = 0; i < genericProductModelList.Count; i++)
                 {
+                    if (genericProductModelList[i].model_id==0)
+                        genericProductModelList.RemoveAt(i);
+                    else
                     modelTextBlock.Items.Add(genericProductModelList[i].model_name);
                 }
             }
@@ -336,6 +362,9 @@ namespace _01electronics_inventory
             specsComboBox.Items.Clear();
             for (int i = 0; i < companyModelSpecs.Count; i++)
             {
+                if (companyModelSpecs[i].spec_id==0)
+                    companyModelSpecs.RemoveAt(i);
+                else
                 specsComboBox.Items.Add(companyModelSpecs[i].spec_name);
             }
         }

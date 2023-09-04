@@ -732,15 +732,15 @@ namespace _01electronics_inventory
             addReleasePermitWindow.releasePermitPage.MaterialRecieverComboBox.IsEnabled = false;
 
 
-            addReleasePermitWindow.releasePermitPage.rfpChecked.IsEnabled = false;
-            addReleasePermitWindow.releasePermitPage.orderChecked.IsEnabled = false;
+            //addReleasePermitWindow.releasePermitPage.rfpChecked.IsEnabled = false;
+            //addReleasePermitWindow.releasePermitPage.orderChecked.IsEnabled = false;
 
-            addReleasePermitWindow.releasePermitPage.mainPanel.IsEnabled = false;
+            //addReleasePermitWindow.releasePermitPage.mainPanel.IsEnabled = false;
 
             if (releaseItems[0].rfp_info.rfpSerial != 0)
             {
 
-                addReleasePermitWindow.releasePermitPage.rfpChecked.IsChecked = true;
+                //addReleasePermitWindow.releasePermitPage.rfpChecked.IsChecked = true;
 
 
                 addReleasePermitWindow.releasePermitPage.rfpRequesters.SelectedItem = addReleasePermitWindow.releasePermitPage.requstersFiltered.FirstOrDefault(a => a.requestor_team.team_id == releaseItems[0].rfp_info.rfpRequestorTeam).requestor_team.team_name;
@@ -751,7 +751,7 @@ namespace _01electronics_inventory
             else
             {
 
-                addReleasePermitWindow.releasePermitPage.orderChecked.IsChecked = true;
+                //addReleasePermitWindow.releasePermitPage.orderChecked.IsChecked = true;
 
                 addReleasePermitWindow.releasePermitPage.orderSerials.SelectedItem = addReleasePermitWindow.releasePermitPage.workOrders.FirstOrDefault(a => a.order_serial == releaseItems[0].workOrder_serial).order_id;
 

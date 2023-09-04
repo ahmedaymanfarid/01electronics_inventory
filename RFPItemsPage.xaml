@@ -86,7 +86,7 @@
                     <Label Grid.Column="4" Name="availableQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Available Quantity"/>
                     <Label Grid.Column="5" Name="reservedQuantityHeader" Style="{StaticResource tableSubHeaderItem}" Content="Reserved Quantity"/>
                     <Label Grid.Column="6" Name="serialsHeader" Style="{StaticResource tableSubHeaderItem}" Content="Serial Numbers"/>
-                    <CheckBox Grid.Column="9" Name="selectItemsCheckBox" Foreground="#FFFFFF" Style="{StaticResource miniCheckBoxStyle}" Content="Select All" Visibility="Collapsed" Checked="OnCheckSelectAllCheckBox" Unchecked="OnUnCheckSelectAllCheckBox"/>
+                    <CheckBox Grid.Column="9" Name="selectItemsCheckBox" Foreground="#FFFFFF" Style="{StaticResource miniCheckBoxStyle}" Content="Select All"  Visibility="Collapsed" Checked="OnCheckSelectAllCheckBox" Unchecked="OnUnCheckSelectAllCheckBox"/>
 
                 </Grid>
 
