@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:_01electronics_inventory"
         mc:Ignorable="d"
         Background="#EDEDED"
-        Title="AddGenericProductWindow" Height="600" Width="900">
+        Title="AddGenericProductWindow" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="90"/>

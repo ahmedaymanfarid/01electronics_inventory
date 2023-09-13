@@ -98,16 +98,22 @@ namespace _01electronics_inventory
                 edit = true;
             InitializeMeasureUnits();
             InitializeRFPsItemsStatus();
-
+            InitializeGenericBrands();
             InitializeUIElements();
             edit=false;
             reservedRFPSerialNumber.Clear();
         }
 
+        private void InitializeGenericBrands()
+        {
+            if (!commonQueries.GetGenericBrands(ref genericBrands))
+                return;
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// GET FUNCTIONS
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         private void InitializeUIElements()
         {
             if (viewAddCondition == COMPANY_WORK_MACROS.RFP_ADD_CONDITION)
@@ -180,7 +186,8 @@ namespace _01electronics_inventory
                 itemsGrid.Children.Add(itemsHeaderGrid);
                 if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                 {
-                    selectItemsCheckBox.Visibility = Visibility.Visible;
+                    selectItemsCheckBox.Visibility = Visibility.Collapsed;
+                    finishButton.IsEnabled = false;
                 }
 
 
@@ -289,11 +296,12 @@ namespace _01electronics_inventory
                             ComboBox vendorComboBox = new ComboBox();
                             vendorComboBox.Style = (Style)FindResource("miniComboBoxStyle");
 
-                            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                            if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
                                 vendorComboBox.IsEnabled = false;
                             else if (loggedInUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedInUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedInUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID||loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID))
                             {
                                 vendorComboBox.IsEnabled = false;
+                                
                             }
                             FillVendorsCombo(ref vendorComboBox);
                             //vendorComboBox.SelectedIndex = genericBrands.FindIndex(x1 => x1.vendor_id == rfp.rfpItems[i].item_vendors[k].vendor_id);
@@ -302,74 +310,74 @@ namespace _01electronics_inventory
                             innerGrid.Children.Add(vendorComboBox);
                             Grid.SetColumn(vendorComboBox, 0);
 
-                            if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && k == rfp.rfpItems[i].item_vendors.Count - 1 || viewAddCondition != COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
-                            {
-                                // if (loggedinUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
-                                // {
-                                Image addVendorImage = new Image();
-                                addVendorImage.Source = new BitmapImage(new Uri(@"Icons\plus_icon.jpg", UriKind.Relative));
-                                addVendorImage.Height = 20;
-                                addVendorImage.Width = 20;
-                                addVendorImage.MouseLeftButtonDown += OnClickAddVendor;
+                            //if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && k == rfp.rfpItems[i].item_vendors.Count - 1 || viewAddCondition != COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                            //{
+                            //    // if (loggedinUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+                            //    // {
+                            //    Image addVendorImage = new Image();
+                            //    addVendorImage.Source = new BitmapImage(new Uri(@"Icons\plus_icon.jpg", UriKind.Relative));
+                            //    addVendorImage.Height = 20;
+                            //    addVendorImage.Width = 20;
+                            //    addVendorImage.MouseLeftButtonDown += OnClickAddVendor;
 
-                                innerGrid.Children.Add(addVendorImage);
-                                Grid.SetColumn(addVendorImage, 2);
-                                // }
-                            }
+                            //    innerGrid.Children.Add(addVendorImage);
+                            //    Grid.SetColumn(addVendorImage, 2);
+                            //    // }
+                            //}
 
-                            if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition != COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
-                            {
-                                if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
-                                {
-                                    Image removeVendorImage = new Image();
-                                    removeVendorImage.Source = new BitmapImage(new Uri(@"Icons\red_cross_icon.jpg", UriKind.Relative));
-                                    removeVendorImage.Height = 20;
-                                    removeVendorImage.Width = 20;
-                                    removeVendorImage.MouseLeftButtonDown += OnClickRemoveVendor;
+                            //if (viewAddCondition != COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition != COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
+                            //{
+                            //    if (loggedInUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+                            //    {
+                            //        Image removeVendorImage = new Image();
+                            //        removeVendorImage.Source = new BitmapImage(new Uri(@"Icons\red_cross_icon.jpg", UriKind.Relative));
+                            //        removeVendorImage.Height = 20;
+                            //        removeVendorImage.Width = 20;
+                            //        removeVendorImage.MouseLeftButtonDown += OnClickRemoveVendor;
 
-                                    innerGrid.Children.Add(removeVendorImage);
-                                    Grid.SetColumn(removeVendorImage, 1);
-                                }
-                            }
+                            //        innerGrid.Children.Add(removeVendorImage);
+                            //        Grid.SetColumn(removeVendorImage, 1);
+                            //    }
+                            //}
 
                             vendorsGrid.Children.Add(innerGrid);
                             Grid.SetRow(innerGrid, k);
                         }
                     
-                    if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || viewAddCondition == COMPANY_WORK_MACROS.RFP_EDIT_CONDITION)
-                        {
-                        //if (loggedinUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
-                        //{
-                        vendorsGrid.RowDefinitions.Add(new RowDefinition());
+                    //if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION || (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION && rfp.rfpItems[i].item_status.status_id!=COMPANY_WORK_MACROS.RFP_PENDING))
+                    //    {
+                    //    //if (loggedinUser.GetEmployeeId() == rfp.GetRFPRequestor().GetEmployeeId())
+                    //    //{
+                    //    vendorsGrid.RowDefinitions.Add(new RowDefinition());
 
-                        Grid innerGrid = new Grid();
-                        innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
-                        innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
-                        innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+                    //    Grid innerGrid = new Grid();
+                    //    innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(200) });
+                    //    innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+                    //    innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
 
-                        ComboBox vendorComboBox = new ComboBox();
-                        vendorComboBox.Style = (Style)FindResource("miniComboBoxStyle");
+                    //    ComboBox vendorComboBox = new ComboBox();
+                    //    vendorComboBox.Style = (Style)FindResource("miniComboBoxStyle");
+                    //    vendorComboBox.IsEnabled = false;
+                    //    FillVendorsCombo(ref vendorComboBox);
 
-                        FillVendorsCombo(ref vendorComboBox);
+                    //    innerGrid.Children.Add(vendorComboBox);
+                    //    Grid.SetColumn(vendorComboBox, 0);
 
-                        innerGrid.Children.Add(vendorComboBox);
-                        Grid.SetColumn(vendorComboBox, 0);
+                    //    Image addVendorImage = new Image();
+                    //    addVendorImage.Source = new BitmapImage(new Uri(@"Icons\plus_icon.jpg", UriKind.Relative));
+                    //    addVendorImage.Height = 20;
+                    //    addVendorImage.Width = 20;
+                    //    addVendorImage.MouseLeftButtonDown += OnClickAddVendor;
 
-                        Image addVendorImage = new Image();
-                        addVendorImage.Source = new BitmapImage(new Uri(@"Icons\plus_icon.jpg", UriKind.Relative));
-                        addVendorImage.Height = 20;
-                        addVendorImage.Width = 20;
-                        addVendorImage.MouseLeftButtonDown += OnClickAddVendor;
+                    //    innerGrid.Children.Add(addVendorImage);
+                    //    Grid.SetColumn(addVendorImage, 2);
 
-                        innerGrid.Children.Add(addVendorImage);
-                        Grid.SetColumn(addVendorImage, 2);
-
-                        vendorsGrid.Children.Add(innerGrid);
-                        addVendorImage.Visibility = Visibility.Collapsed;
-                        vendorComboBox.IsEnabled = false;
+                    //    vendorsGrid.Children.Add(innerGrid);
+                    //    addVendorImage.Visibility = Visibility.Collapsed;
+                    //    vendorComboBox.IsEnabled = false;
                           
-                            //}
-                        }
+                    //        //}
+                    //    }
 
                         subGrid.Children.Add(vendorsGrid);
                         Grid.SetColumn(vendorsGrid, 2);
@@ -436,22 +444,22 @@ namespace _01electronics_inventory
                         subGrid.Children.Add(notesTextBox);
                         Grid.SetColumn(notesTextBox, 8);
 
-                        if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
-                        {
-                            // if (loggedinUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedinUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedinUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
-                            // {
-                            CheckBox currentCheckBox = new CheckBox();
-                            currentCheckBox.Style = (Style)FindResource("miniCheckBoxStyle");
-                            currentCheckBox.Checked += OnCheckItemCheckBox;
-                            currentCheckBox.Unchecked += OnUncheckItemCheckBox;
+                        //if (viewAddCondition == COMPANY_WORK_MACROS.RFP_VIEW_CONDITION)
+                        //{
+                        //    // if (loggedinUser.GetEmployeeTeamId() == COMPANY_ORGANISATION_MACROS.PROCUREMENT_TEAM_ID || (loggedinUser.GetEmployeePositionId() == COMPANY_ORGANISATION_MACROS.MANAGER_POSTION && loggedinUser.GetEmployeeDepartmentId() == COMPANY_ORGANISATION_MACROS.SOFTWARE_DEVELOPMENT_DEPARTMENT_ID))
+                        //    // {
+                        //    CheckBox currentCheckBox = new CheckBox();
+                        //    currentCheckBox.Style = (Style)FindResource("miniCheckBoxStyle");
+                        //    currentCheckBox.Checked += OnCheckItemCheckBox;
+                        //    currentCheckBox.Unchecked += OnUncheckItemCheckBox;
 
-                            subGrid.Children.Add(currentCheckBox);
-                            Grid.SetColumn(currentCheckBox, 9);
+                        //    subGrid.Children.Add(currentCheckBox);
+                        //    Grid.SetColumn(currentCheckBox, 9);
 
 
 
-                            //  }
-                        }
+                        //    //  }
+                        //}
                         int availableQantity = 0;
                         if (rfp.rfpItems[i].is_company_product)
                         {
@@ -460,7 +468,7 @@ namespace _01electronics_inventory
                         }
                         else if (rfp.rfpItems[i].product_category.category_id == 0 && rfp.rfpItems[i].product_category.category_name != null || rfp.rfpItems[i].product_category.category_id != 0)
                         {
-                            if (!stock.GetAvailableQuantityItem(rfp.rfpItems[i].product_category.category_id, rfp.rfpItems[i].product_type.type_id, rfp.rfpItems[i].product_brand.brand_id, rfp.rfpItems[i].product_model.model_id, rfp.rfpItems[i].product_specs.spec_id, false, ref availableQantity))
+                            if (!stock.GetAvailableQuantityItem(rfp.rfpItems[i].product_category.category_id, rfp.rfpItems[i].product_type.type_id, rfp.rfpItems[i].product_brand.brand_id, rfp.rfpItems[i].product_model.model_id, rfp.rfpItems[i].product_specs.spec_id, true, ref availableQantity))
                                 return;
                         }
                        
@@ -489,18 +497,20 @@ namespace _01electronics_inventory
 
                         viewSerial.TextWrapping = TextWrapping.Wrap;
                         viewSerial.FontSize = 16;
-                        if (reservedRFPSerialNumber.Count != 0)
+                        if (reservedRFPSerialNumber.Any(f=>f.serial_number!=""))
                         {
                             for (int k = 0; k < reservedRFPSerialNumber.Count; k++)
                             {
                                 viewSerial.Text += reservedRFPSerialNumber[k].serial_number + '\n';
                             }
+                           reservredQuantity.Text = reservedRFPSerialNumber.Count.ToString();
                         }
                         else
                         {
                             viewSerial.Text = "View Serials";
+                            reservredQuantity.Text = reservedRFPSerialNumber.Find(f=>f.quantity!=0).quantity.ToString();
                         }
-                        reservredQuantity.Text = reservedRFPSerialNumber.Count.ToString();
+                     
 
 
                         serialButton.Style = (Style)FindResource("buttonStyle2");
@@ -536,7 +546,16 @@ namespace _01electronics_inventory
                         //     Grid.SetRow(tempGrid, rfp.rfpItems[i].item_number + 1);
                         //
                         // }
-
+                        if(rfp.rfpItems[i].item_status.status_id==COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED|| rfp.rfpItems[i].item_status.status_id==COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                        {
+                           serialButton.IsEnabled = false;
+                           editButton.IsEnabled = false;
+                           quantityTextBox.IsEnabled = false;
+                           unitComboBox.IsEnabled = false;
+                           notesTextBox.IsEnabled = false;
+                          //vendorComboBox.IsEnabled = false;
+                           
+                        }
                         itemsGrid.Children.Add(subGrid);
                         Grid.SetRow(subGrid, rfp.rfpItems[i].rfp_item_number);
 
@@ -726,7 +745,8 @@ namespace _01electronics_inventory
                                 reserve.rfp_item_notes = rfp.rfpItems[j].item_notes;
                                 reserve.rfp_item_description = rfp.rfpItems[j].item_description;
                                 reserve.rfp_item_no = rfp.rfpItems[j].rfp_item_number;
-                                reserve.rfp_measure_unit.unit_id = rfp.rfpItems[j].measure_unit_id;
+                                reserve.rfp_item.measure_unit_id = rfp.rfpItems[j].measure_unit_id;
+                                reserve.rfp_item.measure_unit = rfp.rfpItems[j].measure_unit;
                                 reserve.quantity = Convert.ToInt32(reservedQuantity.Text);
                                 reserve.reservation_date=DateTime.Now;
                                 reserve.hold_until=DateTime.Now.AddDays(5);
@@ -1564,6 +1584,7 @@ namespace _01electronics_inventory
         private void OnBtnClickAddDescriptionn(object sender, RoutedEventArgs e)
         {
             Button addButtonn = (Button)sender;
+            addButtonn.IsEnabled = false;
             int itemNo = Int32.Parse(addButtonn.Tag.ToString());
             Grid parent = (Grid)addButtonn.Parent;
             //Button viewSerialButton = parent.Children[8] as Button;
@@ -1603,6 +1624,7 @@ namespace _01electronics_inventory
         private void OnBtnClickViewsSerials(object sender, RoutedEventArgs e)
         {
             Button viewSerialButton = (Button)sender;
+            viewSerialButton.IsEnabled = false;
             TextBlock serialsTextBlock = viewSerialButton.Content as TextBlock;
             viewSerialsButton = viewSerialButton as Object;
             selectedSerials.Clear();
@@ -1626,6 +1648,7 @@ namespace _01electronics_inventory
             Button addButton = (Button)mailObject;
 
             Button viewSerialButton = viewSerialsButton as Button;
+            viewSerialButton.IsEnabled = true;
             Grid viewSerialsButtonParent = viewSerialButton.Parent as Grid;
             TextBlock serialsTextBlock = viewSerialButton.Content as TextBlock;
             if (selectedSerials.Count != 0)
@@ -1662,10 +1685,12 @@ namespace _01electronics_inventory
                 saveChangesButton.IsEnabled = true;
 
             Button addButton = (Button)mailObject;
+            addButton.IsEnabled = true;
             Grid addButtonParent = addButton.Parent as Grid;
             TextBox availableQuantityTextBox = addButtonParent.Children[6] as TextBox;
             TextBlock description = addButton.Content as TextBlock;
-
+            Grid vendorGrid = addButtonParent.Children[2] as Grid;
+          
 
 
             Button viewSerialButton = addButtonParent.Children[8] as Button;
@@ -1682,7 +1707,8 @@ namespace _01electronics_inventory
             }
             else
             {
-
+                rfp.rfpItems[itemNo-1].item_vendors.Clear();
+                vendorGrid.Visibility = Visibility.Collapsed;
                 description.Text = rfp.rfpItems[itemNo - 1].item_description;
                 description.TextWrapping = TextWrapping.Wrap;
                 addButton.Content = description;
@@ -1706,9 +1732,30 @@ namespace _01electronics_inventory
                 }
                 else
                 {
-                    if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_type.type_id, 0, true, ref availbleQuanity))
+                    if (!stock.GetAvailableQuantityItem(rfp.rfpItems[itemNo - 1].product_category.category_id, rfp.rfpItems[itemNo - 1].product_type.type_id, rfp.rfpItems[itemNo - 1].product_brand.brand_id, rfp.rfpItems[itemNo - 1].product_model.model_id, 0, true, ref availbleQuanity))
                         return;
 
+                    if (rfp.rfpItems[itemNo - 1].product_model.has_serial_number)
+                    {
+                        viewSerialButton.IsEnabled = true;
+                        reservedQuantity.IsEnabled = false;
+                    }
+                    else
+                    {
+                        if(availbleQuanity==0)
+                        {
+                            reservedQuantity.IsEnabled = false;
+                            viewSerialButton.IsEnabled = false;
+                            reservedQuantity.Clear();
+                            reservedQuantity.Text = "0";
+                        }
+                        else
+                        {
+                            reservedQuantity.IsEnabled = true;
+                            viewSerialButton.IsEnabled = false;
+                            reservedQuantity.Clear();
+                        }
+                    }
                 }
                 availableQuantityTextBox.Text = availbleQuanity.ToString();
                 availableQuantityTextBox.Tag = availbleQuanity;
@@ -1771,6 +1818,7 @@ namespace _01electronics_inventory
 
                 if (reservedQuantityTextBox.Text != "" && Convert.ToInt32(reservedQuantityTextBox.Text) != 0)
                 {
+                    
 
                     if (Convert.ToInt32(reservedQuantityTextBox.Text) > Convert.ToDecimal(neededQuantity.Text))
                     {

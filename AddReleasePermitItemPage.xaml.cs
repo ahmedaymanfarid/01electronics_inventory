@@ -1225,13 +1225,13 @@ namespace _01electronics_inventory
             LocationsWrapPanel.Children.Add(card);
 
 
-            if (addReleasePermitPage.rfpChecked.IsChecked == true)
+            if (addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
             {
 
                 rfpCheckBox.IsChecked = true;
             }
 
-            else if (addReleasePermitPage.orderChecked.IsChecked == true)
+            else if (addReleasePermitPage.workFormComboBox.SelectedIndex ==1)
             {
 
                 orderCheckBox.IsChecked = true;
@@ -2548,7 +2548,7 @@ namespace _01electronics_inventory
             ///////////////////////////////////////////////////////////////////////
             ///YOU NEED TO SET ORDER / RFP STATUS, AND SET RELEASE PERMIT STATUS
             ///////////////////////////////////////////////////////////////////////
-            if (parentWindow.releasePermitPage.orderChecked.IsChecked == true)
+            if (parentWindow.releasePermitPage.workFormComboBox.SelectedIndex == 1)
             {
                 if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                     status = COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL;
@@ -2562,7 +2562,7 @@ namespace _01electronics_inventory
             //parentWindow.releasePermitPage.materialReleasePermit.GetReleaseItems().ForEach(a => a.release_permit_item_status = status);
             parentWindow.releasePermitPage.workOrder.GetOrderProductsList().ToList().ForEach(a => a.product_status.status_id = status);
 
-            if (parentWindow.releasePermitPage.orderChecked.IsChecked == true)
+            if (parentWindow.releasePermitPage.workFormComboBox.SelectedIndex == 1)
             {
                 if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                     parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL);
@@ -2806,9 +2806,9 @@ namespace _01electronics_inventory
 
 
 
-                            WrapPanel ordersPanel = parentWindow.releasePermitPage.mainPanel.Children[2] as WrapPanel;
+                    
 
-                            ComboBox ordersComboBox = ordersPanel.Children[1] as ComboBox;
+                            ComboBox ordersComboBox = parentWindow.releasePermitPage.orderSerials as ComboBox;
 
                             if (ordersComboBox.SelectedIndex != -1)
                             {
@@ -3057,9 +3057,9 @@ namespace _01electronics_inventory
                             ComboBox locationsComboBox = orderLocationGrid.Children[1] as ComboBox;
 
 
-                            WrapPanel ordersPanel = parentWindow.releasePermitPage.mainPanel.Children[1] as WrapPanel;
+                            
 
-                            ComboBox ordersComboBox = ordersPanel.Children[0] as ComboBox;
+                            ComboBox ordersComboBox = parentWindow.releasePermitPage.orderSerials as ComboBox;
 
 
                             if (ordersComboBox.SelectedIndex != -1)

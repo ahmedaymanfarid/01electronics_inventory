@@ -426,11 +426,11 @@ namespace _01electronics_inventory
         {
             statusComboBox.Items.Clear();
 
-            if (!GetRFPStatuses())
-                return false;
+            //if (!GetRFPStatuses())
+            //    return false;
 
-            for (int i = 0; i < rfp_status.Count; i++)
-                statusComboBox.Items.Add(rfp_status[i].status_name);
+            for (int i = 0; i < rfpStatuses.Count; i++)
+                statusComboBox.Items.Add(rfpStatuses[i].status_name);
 
             return true;
         }
@@ -439,11 +439,11 @@ namespace _01electronics_inventory
         {
             itemStatusComboBox.Items.Clear();
 
-            if (!GetRFPStatuses())
-                return false;
+            //if (!GetRFPStatuses())
+            //    return false;
 
-            for (int i = 0; i < rfpItemsStatus.Count; i++)
-                itemStatusComboBox.Items.Add(rfpItemsStatus[i].status_name);
+            for (int i = 0; i < rfpStatuses.Count; i++)
+                itemStatusComboBox.Items.Add(rfpStatuses[i].status_name);
 
             itemStatusComboBox.SelectedIndex = -1;
 
@@ -547,7 +547,7 @@ namespace _01electronics_inventory
                 if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].status_id)
                     continue;
 
-                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
+                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpStatuses[itemStatusComboBox.SelectedIndex].status_id) == -1)
                     continue;
 
                 if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfps[i].work_form != workFormComboBox.SelectedIndex)
@@ -843,7 +843,7 @@ namespace _01electronics_inventory
                 if (statusCheckBox.IsChecked == true && statusComboBox.SelectedIndex != -1 && rfps[i].rfp_status_id != rfpStatuses[statusComboBox.SelectedIndex].status_id)
                     continue;
 
-                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id) == -1)
+                if (itemStatusCheckBox.IsChecked == true && itemStatusComboBox.SelectedIndex != -1 && rfps[i].rfps_items.FindIndex(x => x.item_status.status_id == rfpStatuses[itemStatusComboBox.SelectedIndex].status_id) == -1)
                     continue;
 
                 if (workFormCheckBox.IsChecked == true && workFormComboBox.SelectedIndex != -1 && rfps[i].work_form != filteredWorkFormList[workFormComboBox.SelectedIndex].work_form_id && rfps[i].work_form > 0 && rfps[i].work_form < 4)
@@ -930,7 +930,7 @@ namespace _01electronics_inventory
 
                 for (int j = 0; j < rfps[i].rfps_items.Count; j++)
                 {
-                    if (itemStatusCheckBox.IsChecked == true && rfps[i].rfps_items[j].item_status.status_id != rfpItemsStatus[itemStatusComboBox.SelectedIndex].status_id)
+                    if (itemStatusCheckBox.IsChecked == true && rfps[i].rfps_items[j].item_status.status_id != rfpStatuses[itemStatusComboBox.SelectedIndex].status_id)
                         continue;
 
                     if (counter == 0)
@@ -985,8 +985,8 @@ namespace _01electronics_inventory
                     }
                     else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
                     {
-                        itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA500"));
-                        itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA500"));
+                        itemBorderIcon.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF620D"));
+                        itemBorderIcon.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF620D"));
 
                     }
                     else if (rfps[i].rfps_items[j].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_SITE)
@@ -1193,7 +1193,7 @@ namespace _01electronics_inventory
 
 
                 // if (loggedInUser.GetEmployeeId() != rfps[i].requestor_id && rfps[i].rfps_items.FindIndex(x1 => x1.status_name.status_id != 1) == -1 && rfps[i].rfps_items.FindIndex(x1 => x1.item_availablilty_status.status_id != 1) == -1)
-                if (canEdit)
+                if (canEdit && loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
                 {
                     expanderStackPanel.Children.Add(editButton);
                 }
@@ -1991,20 +1991,20 @@ namespace _01electronics_inventory
                 //    requestorComboBox.Items.Add(tmpRequestorsTeamsList[index].employee_name);
                 //    tmpRequestors.Add(tmpRequestorsTeamsList[index]);
                 //}
-                if (teamComboBox.Items.Count == 1)
-                {
-                    teamCheckBox.IsChecked = true;
-                    teamCheckBox.IsEnabled = false;
-                    teamComboBox.SelectedIndex = 0;
-                    teamComboBox.IsEnabled = false;
-                }
-                else
-                {
-                    teamCheckBox.IsChecked = true;
-                    teamCheckBox.IsEnabled = false;
-                    teamComboBox.SelectedIndex = 0;
-                    requestorComboBox.IsEnabled = false;
-                }
+                //if (teamComboBox.Items.Count == 1)
+                //{
+                //    teamCheckBox.IsChecked = true;
+                //    teamCheckBox.IsEnabled = false;
+                //    teamComboBox.SelectedIndex = 0;
+                //    teamComboBox.IsEnabled = false;
+                //}
+                //else
+                //{
+                //    teamCheckBox.IsChecked = true;
+                //    teamCheckBox.IsEnabled = false;
+                //    teamComboBox.SelectedIndex = 0;
+                //    requestorComboBox.IsEnabled = false;
+                //}
                 //requestorComboBox.SelectedIndex = 0;
                 //requestorCheckBox.IsChecked = true;
                 //requestorCheckBox.IsEnabled = false;
@@ -2069,11 +2069,11 @@ namespace _01electronics_inventory
                 InitializeTeamCombo();
                 InitializeRequestorCombo();
                 teamCheckBox.IsEnabled = true;
-                teamComboBox.IsEnabled = true;
+                teamComboBox.IsEnabled = false;
                 requestorCheckBox.IsEnabled = true;
                 requestorComboBox.IsEnabled = false;
-                teamCheckBox.IsChecked = true;
-                teamComboBox.SelectedIndex = 0;
+                //teamCheckBox.IsChecked = true;
+                //teamComboBox.SelectedIndex = 0;
                 requestorCheckBox.IsChecked = false;
             }
 
@@ -2582,8 +2582,8 @@ namespace _01electronics_inventory
         }
         private void OnButtonClickedRFPs(object sender, MouseButtonEventArgs e)
         {
-            RFPsPage rfpPage = new RFPsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
-            this.NavigationService.Navigate(rfpPage);
+            //RFPsPage rfpPage = new RFPsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            //this.NavigationService.Navigate(rfpPage);
         }
         private void OnButtonClickedWorkOrders(object sender, RoutedEventArgs e)
         {

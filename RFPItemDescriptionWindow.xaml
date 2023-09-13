@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_01electronics_inventory"
         mc:Ignorable="d"
-        Title="RFPItemDescriptionWindow" Height="700" Width="900">
+        Title="RFPItemDescriptionWindow" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="90"/>
@@ -66,7 +66,7 @@
                                 <ComboBox Style="{StaticResource comboBoxStyleCard}" Name="modelTextBlock"/>
                             </WrapPanel>
                         </Border>
-                        <Button Grid.Row="2" Style="{StaticResource buttonStyle}" Content="Add New Generic Item" Click="OnButtonClickAddGenericItem" Width="220" IsEnabled="False" x:Name="addGenericProductButton"/>
+                        <Button Grid.Row="2" Style="{StaticResource buttonStyle}" Content="Add New Generic Item" Click="OnButtonClickAddGenericItem" Width="400" IsEnabled="False" x:Name="addGenericProductButton" Margin="20,0,0,0"/>
                     </WrapPanel>
                 </ScrollViewer>
                 <Grid Grid.Row="2" Background="#105A97">
