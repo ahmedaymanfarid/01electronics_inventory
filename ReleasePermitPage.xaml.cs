@@ -1438,7 +1438,7 @@ namespace _01electronics_inventory
 
                 }
 
-                addReleasePermitWindow.releasePermitItemPage.LocationsWrapPanel.Children.Add(card);
+                addReleasePermitWindow.releasePermitItemPage.checkedItemsWrapPanel.Children.Add(card);
 
             }
 

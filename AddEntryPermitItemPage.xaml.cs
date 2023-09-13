@@ -3394,6 +3394,7 @@ namespace _01electronics_inventory
                             entryPermitItem.product_type = rfpItem.product_type;
                             entryPermitItem.product_brand = rfpItem.product_brand;
                             entryPermitItem.product_model = rfpItem.product_model;
+                            entryPermitItem.product_model.has_serial_number = true;
                             entryPermitItem.rfp_item_number = rfpItem.rfp_item_number;
                             entryPermitItem.quantity = Convert.ToInt32(Convert.ToDecimal(quantityTextBox.Text.ToString()));
                             entryPermitItem.item_price = Convert.ToDecimal(priceTextBox.Text.ToString());
@@ -3471,6 +3472,7 @@ namespace _01electronics_inventory
                             entryPermitItem.product_brand.brand_name = brandItem.Content.ToString();
                             entryPermitItem.product_model.model_id = Convert.ToInt32(modelItem.Tag);
                             entryPermitItem.product_model.model_name = modelItem.Content.ToString();
+                            entryPermitItem.product_model.has_serial_number = true;
                             entryPermitItem.quantity = Convert.ToInt32(Convert.ToDecimal(quantityTextBox.Text.ToString()));
                             entryPermitItem.item_price = Convert.ToDecimal(priceTextBox.Text.ToString());
                             entryPermitItem.item_currency.currencyId = Convert.ToInt32(currencyItem.Tag.ToString());
@@ -4346,6 +4348,7 @@ namespace _01electronics_inventory
                         reservationItem.hold_until = addEntryPermitPage.materialEntryPermit.GetItems()[i].valid_until;
                         reservationItem.rfp_item_description = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_info.rfp_item_description;
                         reservationItem.rfp_item.measure_unit_id = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_item.measure_unit_id;
+                        reservationItem.rfp_item.product_model.has_serial_number= addEntryPermitPage.materialEntryPermit.GetItems()[i].product_model.has_serial_number;
                         reservationItem.rfp_item_notes = addEntryPermitPage.materialEntryPermit.GetItems()[i].rfp_item.item_notes;
 
                         materialReservations.Add(reservationItem);
