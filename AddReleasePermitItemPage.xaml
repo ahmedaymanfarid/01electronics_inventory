@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:_01electronics_inventory"
       mc:Ignorable="d" 
-      Title="AddReleasePermitItemPage">
+      Title="AddReleasePermitItemPage" >
 
     <Grid>
 
@@ -15,7 +15,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
             <RowDefinition />
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
@@ -39,6 +39,8 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
 
@@ -49,8 +51,21 @@
                 <Label Content="Items Info" Style="{StaticResource selectedSecondaryTabLabelItem}"/>
             </Border>
             <Border Grid.Column="2" Style="{StaticResource unselectedSecondaryTabBorder}" >
+                <Label Content="Summary" Style="{StaticResource unselectedSecondaryTabLabelItem}"/>
+            </Border>
+            <Border Grid.Column="3" Style="{StaticResource unselectedSecondaryTabBorder}" >
                 <Label Content="Release Permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="LabelMouseLeftButtonDown" />
             </Border>
+            <Grid Grid.Column="4"  Visibility="Collapsed">
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image Source="./icons/release.png" HorizontalAlignment="Stretch" Margin="10,0,0,0"/>
+                <Border CornerRadius="20" Background="#105A97" Width="30" Height="30" Margin="40,30,0,0" >
+                    <Label Content="0" Foreground="White" Padding="6,6,0,0" x:Name="checkedItemsCounterLabel"/>
+                </Border>
+            </Grid>
+          
 
         </Grid>
 
@@ -61,12 +76,24 @@
                     <RowDefinition/>
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" x:Name="Home" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="24">
+                <Border Grid.Row="0"   HorizontalAlignment="Left"  Margin="24" BorderBrush="#105A97" BorderThickness="1" Width="600" Height="500" Background="White" x:Name="itemsBorder">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" Opacity="0.1"/>
+                    </Border.Effect>
 
 
-                </StackPanel>
+                    <StackPanel>
+                        <Label Style="{StaticResource labelStyle}" Content="WORK FORM" Width="600" Background="#105A97" Foreground="White" Padding="250,10,0,10" x:Name="workFormLabel"/>
+                        <ScrollViewer Height="400" >
+                            <StackPanel x:Name="Home">
 
-                <WrapPanel Grid.Row="1" x:Name="LocationsWrapPanel" Margin="0,15,0,0">
+                            </StackPanel>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+                
+
+                <WrapPanel Grid.Row="1" x:Name="checkedItemsWrapPanel" Margin="0,15,0,0">
 
 
                 </WrapPanel>
@@ -85,8 +112,8 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" Click="OnBackButtonClick" IsEnabled="true" Margin="24"/>
-            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnNextButtonOnClick" Content="Next" IsEnabled="False"  Margin="24"/>
-            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnFinishButtonClick" IsEnabled="True" Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnNextButtonOnClick" Content="Next" IsEnabled="True"  Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnFinishButtonClick" IsEnabled="False" Margin="24"/>
             <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Click="OnCancelButtonClick" Content="Cancel"  Margin="24"/>
             <Button Grid.Column="4" Style="{StaticResource buttonStyle}" Name="addReEntry"  Content="ADD REENTRY"  Margin="24" Visibility="Collapsed"/>
             <Button Grid.Column="5" Style="{StaticResource buttonStyle}" Name="addRecieval" Content="ADD RECIEVAL"  Margin="24" Visibility="Collapsed"/>

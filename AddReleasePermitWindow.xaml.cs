@@ -35,6 +35,7 @@ namespace _01electronics_inventory
         public AddReleasePermitPage releasePermitPage;
         public MaterialReleasePermits materialReleasePermit;
         public AddReleasePermitItemPage releasePermitItemPage;
+        public AddReleasePermitSummary releasePermitSummary;
         public bool serviceReport;
         public bool rfp;
 
@@ -52,11 +53,13 @@ namespace _01electronics_inventory
             InitializeComponent();
             isView=mIsView;
             workOrder = new WorkOrder();
+            materialReleasePermit = new MaterialReleasePermits();
             rfps = new RFP();
             func1=function;
             
             releasePermitPage = new AddReleasePermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
             releasePermitItemPage = new AddReleasePermitItemPage(ref  commonQueries, ref commonFunctions,ref integrityChecks,ref loggedInUser, this);
+            releasePermitSummary = new AddReleasePermitSummary(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
             if (isView == true)
                 materialReleasePermit = mMaterialReleasePermit;
 

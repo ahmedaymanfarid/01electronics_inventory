@@ -68,9 +68,10 @@ namespace _01electronics_inventory
             rfpItems = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
             serialProducts = new List<int>();
             parentWindow = mParentWindow;
-            materialReleasePermit = new MaterialReleasePermits();
+            materialReleasePermit =parentWindow.materialReleasePermit;
             rfp = parentWindow.rfps;
             workOrder = parentWindow.workOrder;
+            addReleasePermitItem = parentWindow.releasePermitItemPage;
             //addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
 
             InitializeComponent();
@@ -91,7 +92,7 @@ namespace _01electronics_inventory
         }
         private void GetRFPsRequestorTeams()
         {
-            if (!commonQueries.GetRFPRequestors(ref requsters))
+            if (!commonQueries.GetRFPRequestorsForStockItems(ref requsters))
                 return;
 
             for (int i = 0; i < requsters.Count; i++)
@@ -134,7 +135,14 @@ namespace _01electronics_inventory
         private void FillOrderIDsComboBox()
         {
           
-            workOrders.ForEach(a => orderSerials.Items.Add(a.order_id));
+            for(int i=0;i<workOrders.Count;i++) 
+            {
+                if (workOrders[i].contract_type_id == COMPANY_WORK_MACROS.SUPPLY_ONLY_CONTRACT_TYPE || workOrders[i].contract_type_id == COMPANY_WORK_MACROS.SUPPLY_AND_INSTALL_CONTRACT_TYPE)
+                {
+                    orderSerials.Items.Add(workOrders[i].order_id);
+                }
+            
+            }
         }
       
 
@@ -152,6 +160,7 @@ namespace _01electronics_inventory
             }
 
             materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
+            addReleasePermitItem.InitializeStock();
            // addReleasePermitItem.addReleasePermitPage = this;
             this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
 
@@ -170,6 +179,7 @@ namespace _01electronics_inventory
                 return;
 
             materialReleasePermit.SetMaterialReceiver(employees[MaterialRecieverComboBox.SelectedIndex].employee_id);
+            materialReleasePermit.SetMaterialReceiverName(employees[MaterialRecieverComboBox.SelectedIndex].employee_name);
 
         }
 
@@ -239,7 +249,7 @@ namespace _01electronics_inventory
         {
            
 
-            if (!commonQueries.GetTeamRFPs(ref rfps, requstersFiltered[rfpRequesters.SelectedIndex].requestor_team.team_id))
+            if (!commonQueries.GetTeamRFPsMappedIds(ref rfps, requstersFiltered[rfpRequesters.SelectedIndex].requestor_team.team_id,COMPANY_WORK_MACROS.RFP_AT_STOCK))
                 return;
             rfpSerials.Items.Clear();
 
@@ -252,7 +262,7 @@ namespace _01electronics_inventory
         {
         
 
-            workOrder.InitializeWorkOrderInfo(workOrders[contactComboBox.SelectedIndex].order_serial);
+            workOrder.InitializeWorkOrderInfo(workOrders[orderSerials.SelectedIndex].order_serial);
 
             companyContacts.Clear();
             contactComboBox.Items.Clear();
@@ -349,7 +359,7 @@ namespace _01electronics_inventory
             ComboBox rfpSerialsComboBox = sender as ComboBox;
 
             serialProducts.Clear();
-
+            rfp.rfpItems.Clear();
             
 
             if (rfpSerialsComboBox.SelectedIndex != -1)
@@ -357,7 +367,7 @@ namespace _01electronics_inventory
                     return;
 
 
-            if (!commonQueries.GetRfpItemsMapping(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
+            if (!commonQueries.GetRfpItemsMappingMergedItems(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
                 return;
 
             for (int i = 0; i < rfpItems.Count; i++)
@@ -372,7 +382,7 @@ namespace _01electronics_inventory
 
 
             }
-
+           
 
             for (int i = 0; i < rfpItems.Count; i++)
             {
@@ -423,11 +433,33 @@ namespace _01electronics_inventory
                 }
 
             }
-
+            for(int i = 0;i< rfpItems.Count;i++)
+            {
+                if (rfp.rfpItems.Any(f => f.product_category.category_id == rfpItems[i].product_category.category_id
+                                        && f.product_type.type_id == rfpItems[i].product_type.type_id
+                                        && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
+                                        && f.product_model.model_id == rfpItems[i].product_model.model_id
+                                        && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id))
+                {
+                    PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItemmin = new PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT();
+                    rfpItemmin = rfpItems[i];
+                    rfpItemmin.rfp_item_number = rfp.rfpItems.Find(f => f.product_category.category_id == rfpItems[i].product_category.category_id
+                                        && f.product_type.type_id == rfpItems[i].product_type.type_id
+                                        && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
+                                        && f.product_model.model_id == rfpItems[i].product_model.model_id
+                                        && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id).rfp_item_number;
+                    rfpItems.RemoveAt(i);
+                    rfpItems.Insert(i, rfpItemmin);
+                }
+            }
             materialReleasePermit.SetRfp(rfp);
             materialReleasePermit.SetWorkOrder(null);
 
-
+            parentWindow.releasePermitItemPage.checkedItemsCounterLabel.Content = "0";
+            parentWindow.releasePermitItemPage.checkedItemsCounter = 0;
+            parentWindow.releasePermitItemPage.checkedRFPItems.Clear();
+            parentWindow.releasePermitItemPage.checkedOrderItems.Clear();
+            parentWindow.releasePermitItemPage.selectedItems.Clear();
 
         }
         /// <summary>
@@ -479,6 +511,7 @@ namespace _01electronics_inventory
             }
 
             materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
+            parentWindow.releasePermitItemPage.InitializeStock();
             // addReleasePermitItem.addReleasePermitPage = this;
 
             this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
