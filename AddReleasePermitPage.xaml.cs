@@ -367,7 +367,7 @@ namespace _01electronics_inventory
                     return;
 
 
-            if (!commonQueries.GetRfpItemsMapping(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
+            if (!commonQueries.GetRfpItemsMappingMergedItems(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
                 return;
 
             for (int i = 0; i < rfpItems.Count; i++)
@@ -382,7 +382,7 @@ namespace _01electronics_inventory
 
 
             }
-
+           
 
             for (int i = 0; i < rfpItems.Count; i++)
             {
@@ -433,7 +433,25 @@ namespace _01electronics_inventory
                 }
 
             }
-
+            for(int i = 0;i< rfpItems.Count;i++)
+            {
+                if (rfp.rfpItems.Any(f => f.product_category.category_id == rfpItems[i].product_category.category_id
+                                        && f.product_type.type_id == rfpItems[i].product_type.type_id
+                                        && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
+                                        && f.product_model.model_id == rfpItems[i].product_model.model_id
+                                        && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id))
+                {
+                    PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItemmin = new PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT();
+                    rfpItemmin = rfpItems[i];
+                    rfpItemmin.rfp_item_number = rfp.rfpItems.Find(f => f.product_category.category_id == rfpItems[i].product_category.category_id
+                                        && f.product_type.type_id == rfpItems[i].product_type.type_id
+                                        && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
+                                        && f.product_model.model_id == rfpItems[i].product_model.model_id
+                                        && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id).rfp_item_number;
+                    rfpItems.RemoveAt(i);
+                    rfpItems.Insert(i, rfpItemmin);
+                }
+            }
             materialReleasePermit.SetRfp(rfp);
             materialReleasePermit.SetWorkOrder(null);
 

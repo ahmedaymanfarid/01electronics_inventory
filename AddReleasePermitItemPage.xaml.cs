@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
@@ -68,6 +69,8 @@ namespace _01electronics_inventory
        public  List<PROCUREMENT_STRUCTS.RFP_MAX_STRUCT> checkedRFPItems;
         List<INVENTORY_STRUCTS.ENTRY_PERMIT_MAX_STRUCT> entryPermitList;
         public List<CheckBox> selectedItems;
+        CheckBox rfpItemCheckBoxHolder;
+        public CheckBox orderItemHolder;
 
         private WorkOrder workOrder;
         private RFP rfp;
@@ -120,7 +123,8 @@ namespace _01electronics_inventory
             selectedItems = new List<CheckBox>();
             checkedItemsCounter = 0;
             isRFP = false;
-            
+            rfpItemCheckBoxHolder = new CheckBox();
+            orderItemHolder = new CheckBox();
             GetAllEntryPermits();
             InitializeStock();
             GetGenericItems();
@@ -199,7 +203,8 @@ namespace _01electronics_inventory
                                   $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
                                   $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} -" +
                                   $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} ";
+                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Reserved Quantity: {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} - " +
+                                  $"To Be Released Quantity:  ";
                             }
 
                             else
@@ -207,7 +212,8 @@ namespace _01electronics_inventory
                                 rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} -" +
                                                 $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
                                                 $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} ";
+                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} - "
+                                                + $"To Be Released Quantity:  ";
                             }
 
                             rfpItem.Content = rfpItemContent;
@@ -370,8 +376,10 @@ namespace _01electronics_inventory
                     workFormLabel.Content = "RFP Items";
                     if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
                     {
-                        for (int i = 0; i < parentWindow.materialReleasePermit.GetRfp().rfpItems.Count; i++)
+                        for (int i = 0; i < parentWindow.releasePermitPage.rfpItems.Count; i++)
                         {
+                            
+
                             CheckBox rfpItem = new CheckBox();
                             rfpItem.Style = (Style)FindResource("checkBoxStyle");
                             rfpItem.Margin = new Thickness(10);
@@ -382,26 +390,32 @@ namespace _01electronics_inventory
                             rfpItemContent.Tag = Home.Children.Count;
                             rfpItemContent.TextWrapping = TextWrapping.Wrap;
 
-                            if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].is_company_product)
+                            if (parentWindow.releasePermitPage.rfpItems[i].is_company_product)
                             {
-                                rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} -" +
-                                  $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity}";
+
+                                rfpItemContent.Text = $"{parentWindow.releasePermitPage.rfpItems[i].product_category.category_name} - " +
+                                  $"{parentWindow.releasePermitPage.rfpItems[i].product_type.product_name} - " +
+                                  $"{parentWindow.releasePermitPage.rfpItems[i].product_brand.brand_name} -" +
+                                  $" {parentWindow.releasePermitPage.rfpItems[i].product_model.model_name} - " +
+                                  $"{parentWindow.releasePermitPage.rfpItems[i].product_specs.spec_name} -"+
+                                  $"\nReserved Quantity: {parentWindow.releasePermitPage.rfpItems[i].item_quantity} " +
+                                  $"\nTo Be Released Quantity:  ";
                             }
 
                             else
                             {
-                                rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} -" +
-                                                $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity}";
+                                rfpItemContent.Text = $"{parentWindow.releasePermitPage.rfpItems[i].product_category.category_name} -" +
+                                                $" {parentWindow.releasePermitPage.rfpItems[i].product_type.product_name} - " +
+                                                $"{parentWindow.releasePermitPage.rfpItems[i].product_brand.brand_name} - " +
+                                                $"{parentWindow.releasePermitPage.rfpItems[i].product_model.model_name} -"+
+                                                $"\nReserved Quantity: {parentWindow.releasePermitPage.rfpItems[i].item_quantity} " +
+                                                $"\nTo Be Released Quantity:  ";
                             }
 
                             rfpItem.Content = rfpItemContent;
-                            rfpItem.Tag = parentWindow.materialReleasePermit.GetRfp().rfpItems[i];
-                            if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                            rfpItem.Tag = parentWindow.releasePermitPage.rfpItems[i];
+                           
+                            if (parentWindow.releasePermitPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
                                 Home.Children.Add(rfpItem);
                         }
                     }
@@ -427,7 +441,9 @@ namespace _01electronics_inventory
                             $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
                             $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
                             $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  - Needed Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity}";
+                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  -" +
+                            $"\nNeeded Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity}"+
+                            $"\nTo Be Released Quantity:  ";
 
                         workOrderItem.Content = workOrderItemContent;
                         if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
@@ -732,7 +748,7 @@ namespace _01electronics_inventory
             PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT orderProduct = (PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT)workOrderItemCheckBox.Tag;
             SALES_STRUCTS.WORK_ORDER_MAX_STRUCT workOrder = checkedOrderItems.Find(f => f.products.Contains(orderProduct));
             checkedOrderItems.Remove(workOrder);
-
+            orderItemHolder = null;
             for (int i = 0; i < checkedItemsWrapPanel.Children.Count; i++)
             {
                 Border workOrderBorder = checkedItemsWrapPanel.Children[i] as Border;
@@ -747,6 +763,7 @@ namespace _01electronics_inventory
         private void OnCheckWorkOrderItem(object sender, RoutedEventArgs e)
         {
             CheckBox workOrderCheckedItemCheckBox = (CheckBox)sender;
+            orderItemHolder = workOrderCheckedItemCheckBox;
             SALES_STRUCTS.WORK_ORDER_MAX_STRUCT workOrder = new SALES_STRUCTS.WORK_ORDER_MAX_STRUCT();
             workOrder.order_serial = addReleasePermitPage.materialReleasePermit.GetWorkOrder().GetOrderSerial();
             workOrder.products = new List<PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT>();
@@ -760,10 +777,10 @@ namespace _01electronics_inventory
         {
             CheckBox rfpItemCheckBox = (CheckBox)sender;
             int position = Home.Children.IndexOf(rfpItemCheckBox);
-            RFP_ITEM_MAX_STRUCT rfpItem = (RFP_ITEM_MAX_STRUCT)rfpItemCheckBox.Tag;
-            RFP_MAX_STRUCT rfp = checkedRFPItems.Find(f => f.rfps_items.Contains(rfpItem));
+            RFP_ITEM_MIN_STRUCT rfpItem = (RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag;
+            RFP_MAX_STRUCT rfp = checkedRFPItems.Find(f => f.rfps_items_min.Contains(rfpItem));
             checkedRFPItems.Remove(rfp);
-            
+            rfpItemCheckBoxHolder = null;
             for(int i = 0;i<checkedItemsWrapPanel.Children.Count;i++)
             {
                 Border rfpItemBorder = checkedItemsWrapPanel.Children[i] as Border;
@@ -785,9 +802,10 @@ namespace _01electronics_inventory
             rfp.rfp_serial = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPSerial();
             rfp.requestor_team_id = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPRequestorTeamId();
             rfp.rfp_version = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPVersion();
-            rfp.rfps_items = new List<RFP_ITEM_MAX_STRUCT>();
-            rfp.rfps_items.Add((RFP_ITEM_MAX_STRUCT)rfpItemCheckBox.Tag);
+            rfp.rfps_items_min = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+            rfp.rfps_items_min.Add((PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag);
             checkedRFPItems.Add(rfp);
+            rfpItemCheckBoxHolder = rfpItemCheckBox;
             int position = Home.Children.IndexOf(rfpItemCheckBox);
             CreateSelectedItemsCard(true , position+1 , rfpItemCheckBox);
             for(int i=0;i<Home.Children.Count;i++)
@@ -837,7 +855,8 @@ namespace _01electronics_inventory
 
                 checkedItemStackPanel.Children.Add(itemScrollViewer);
 
-                PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT rfpItem =(PROCUREMENT_STRUCTS.RFP_ITEM_MAX_STRUCT)checkedCheckBox.Tag;
+                PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItem =(PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)checkedCheckBox.Tag;
+                TextBlock checkedCheckBoxContent =(TextBlock)checkedCheckBox.Content;
                 for(int i = 0; i < entryPermitList.Count;i++)
                 {
                     for(int j = 0; j < entryPermitList[i].items.Count;j++)
@@ -850,7 +869,7 @@ namespace _01electronics_inventory
                             rfpItem.product_specs.spec_id == entryPermitList[i].items[j].product_specs.spec_id)
                         {
                             
-                            if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number==null)
+                            if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number=="")
                             {
                                 CheckBox entryPermitItemCheckBox = new CheckBox();
                                 entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
@@ -882,19 +901,34 @@ namespace _01electronics_inventory
                                 reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
                                 reservedQuantityLabel.Margin = new Thickness(0);
                                 reservedQuantityLabel.Width = 170;
-                                reservedQuantityLabel.Content = "Released Quantity:";
+                                reservedQuantityLabel.Content = "Reserved Quantity:";
 
                                 TextBox reservedQuantity = new TextBox();
                                 reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
                                 reservedQuantity.Margin=new Thickness(0);
-                                reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
+                                reservedQuantity.Text = rfpItem.item_quantity.ToString();
+                                reservedQuantity.Tag = rfpItem.item_quantity.ToString();
                                 reservedQuantity.IsEnabled = false;
+
+                                Label toBeReleasedQuantity = new Label();
+                                toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
+                                toBeReleasedQuantity.Margin = new Thickness(0);
+                                toBeReleasedQuantity.Width = 180;
+                                toBeReleasedQuantity.Content = "To Be Released Quantity:";
+
+                                TextBox toBeReleasedQuantityTextBox = new TextBox();
+                                toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                toBeReleasedQuantityTextBox.Margin = new Thickness(0);
+                                toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
+                                toBeReleasedQuantityTextBox.IsEnabled = false;
 
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
+                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
 
                                 entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
                                 innerStackPanel.Children.Add(entryPermitItemCheckBox);
@@ -923,7 +957,7 @@ namespace _01electronics_inventory
 
                                 entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
                                 entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                                
+                                entryPermitItemCheckBox.Content = entryPermitItemContentWrapPanel;
 
                                 if (entryPermitList[i].items[j].rfp_info.rfpRequestorTeam == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()
                                     && entryPermitList[i].items[j].rfp_info.rfpSerial == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPSerial()
@@ -932,12 +966,15 @@ namespace _01electronics_inventory
                                     entryPermitItemCheckBox.IsChecked = true;
                                     
                                 }
-                                else if(entryPermitList[i].items[j].product_serial_number == rfpItem.product_serial_number && rfpItem.item_status.status_id==COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                                else if (parentWindow.materialReleasePermit.GetRfp().rfpItems.Any(f=>f.product_serial_number== entryPermitList[i].items[j].product_serial_number && (f.product_category.category_id == entryPermitList[i].items[j].product_category.category_id)
+                                                                                                  &&( f.product_type.type_id == entryPermitList[i].items[j].product_type.type_id)
+                                                                                                  && (f.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id)
+                                                                                                  && (f.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)) && rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
                                 {
                                     entryPermitItemCheckBox.IsChecked = true;
                                 }
-                                   
-                                entryPermitItemCheckBox.Content = entryPermitItemContentWrapPanel;
+
+                                
                                 innerStackPanel.Children.Add(entryPermitItemCheckBox);
                                 //else
                                 //{
@@ -1087,7 +1124,7 @@ namespace _01electronics_inventory
                           orderProduct.productSpec.spec_id == entryPermitList[i].items[j].product_specs.spec_id)
                         {
 
-                            if (!entryPermitList[i].items[j].product_model.has_serial_number || entryPermitList[i].items[j].product_serial_number==null)
+                            if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number=="")
                             {
                                 CheckBox entryPermitItemCheckBox = new CheckBox();
                                 entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
@@ -1095,11 +1132,12 @@ namespace _01electronics_inventory
                                 entryPermitItemCheckBox.Width = 500;
                                 entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
                                 entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+                                entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
 
                                 WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                                entryPermitItemCheckBoxContentWrapPanel.Tag = orderProduct;
                                 TextBlock entryPermitCheckBoxContent = new TextBlock();
                                 entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
-
                                 entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
 
                                 Label availableQuantityLabel = new Label();
@@ -1122,14 +1160,29 @@ namespace _01electronics_inventory
                                 TextBox reservedQuantity = new TextBox();
                                 reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
                                 reservedQuantity.Margin = new Thickness(0);
-                                reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
+                                reservedQuantity.Text=orderProduct.productQuantity.ToString();
+                                reservedQuantity.Tag=orderProduct;
                                 reservedQuantity.IsEnabled = false;
+
+                                Label toBeReleasedQuantity = new Label();
+                                toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
+                                toBeReleasedQuantity.Margin = new Thickness(0);
+                                toBeReleasedQuantity.Width = 180;
+                                toBeReleasedQuantity.Content = "To Be Released Quantity:";
+
+                                TextBox toBeReleasedQuantityTextBox = new TextBox();
+                                toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                toBeReleasedQuantityTextBox.Margin = new Thickness(0);
+                                toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
+                                toBeReleasedQuantityTextBox.IsEnabled = false;
 
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
                                 entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
+                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
 
                                 entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
                                 innerStackPanel.Children.Add(entryPermitItemCheckBox);
@@ -1168,9 +1221,70 @@ namespace _01electronics_inventory
             itemsScroll.ScrollToBottom();
         }
 
-        private void OnTextChangedReservedQuantity(object sender, TextChangedEventArgs e)
+       
+
+        private void OnTextChangedToBeReleasedQuantity(object sender, TextChangedEventArgs e)
         {
+            TextBox toBeReleasedTextBox = (TextBox)sender;
+            if(toBeReleasedTextBox.Text !="")
+            {
+               
+                
+                if (!int.TryParse(toBeReleasedTextBox.Text, out int value))
+                {
+                    toBeReleasedTextBox.Text = string.Empty;
+                    System.Windows.Forms.MessageBox.Show("Please enter numbers not characters.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+
+                }
+                else
+                {
+                    WrapPanel contentWrapPanel = (WrapPanel)toBeReleasedTextBox.Parent;
+                    TextBox reservedTextBox = (TextBox)contentWrapPanel.Children[4];
+                    decimal reservedQuantity = decimal.Parse(reservedTextBox.Text);
+                    int toBereleasedQuantity = int.Parse(toBeReleasedTextBox.Text);
+                    if(toBereleasedQuantity>reservedQuantity)
+                    {
+                        toBeReleasedTextBox.Text = string.Empty;
+                        System.Windows.Forms.MessageBox.Show("Released quantity exceeded the reserved quantity.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                    else if(toBereleasedQuantity<=reservedQuantity)
+                    {
+                        reservedQuantity -= toBereleasedQuantity;
+                        reservedTextBox.Text = reservedQuantity.ToString();
+                        TextBlock checkBoxContent = (TextBlock)orderItemHolder.Content;
+                        string[] splitedContent = checkBoxContent.Text.Split('\n');
+                        splitedContent[1]="Reserved Quantity: " + reservedQuantity.ToString();
+                        splitedContent[2] = "To Be Released Quantity: " + toBereleasedQuantity;
+                        checkBoxContent.Text = String.Join("\n", splitedContent);
+                    }
+                    toBeReleasedTextBox.Tag = toBereleasedQuantity;
+                }
+            }
+            else 
+            {
+                int toBereleasedQuantity = int.Parse(toBeReleasedTextBox.Tag.ToString());
+                WrapPanel contentWrapPanel = (WrapPanel)toBeReleasedTextBox.Parent;
+                TextBox reservedTextBox = (TextBox)contentWrapPanel.Children[4];
+                decimal reservedQuantity = decimal.Parse(reservedTextBox.Text);
+                reservedQuantity += toBereleasedQuantity;
+                if (reservedQuantity <= decimal.Parse(reservedTextBox.Tag.ToString()))
+                {
+                    reservedTextBox.Text = reservedQuantity.ToString();
+                    TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
+                    string[] splitedContent = checkBoxContent.Text.Split('\n');
+                    splitedContent[1] = "Reserved Quantity: " + reservedQuantity.ToString();
+                    splitedContent[2] = "To Be Released Quantity: 0";
+                    checkBoxContent.Text = String.Join("\n", splitedContent);
+                }
+
+
+            }
+          
  
+
+
         }
 
         private void OnUnCheckEnrtyPermitItem(object sender, RoutedEventArgs e)
@@ -1180,10 +1294,30 @@ namespace _01electronics_inventory
             //TextBox reservedQuantity = entryCheckBoxContent.Children[4] as TextBox;
             //reservedQuantity.IsEnabled = false;
             //reservedQuantity.Clear();
-            checkedItemsCounter--;
-            checkedItemsCounterLabel.Content = checkedItemsCounter;
+         
+            //checkedItemsCounterLabel.Content = checkedItemsCounter;
             CheckBox checkedItem = (CheckBox)sender;
-            selectedItems.Remove(checkedItem);
+            if(isRFP)
+            {
+                WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
+                if (checkedItemContent.Children.Count > 2)
+                {
+                    TextBox toBeReleasedQuantity = (TextBox)checkedItemContent.Children[6];
+                    toBeReleasedQuantity.IsEnabled = false;
+                    selectedItems.Remove(checkedItem);
+                }
+                else
+                {
+                    checkedItemsCounter--;
+                    //checkedItemsCounterLabel.Content = checkedItemsCounter;
+                    TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
+                    string[] splitedContent = checkBoxContent.Text.Split('\n');
+                    splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
+                    checkBoxContent.Text = String.Join("\n", splitedContent);
+                    selectedItems.Remove(checkedItem);
+                }
+            }
+         
         }
 
         private void OnCheckEntryPermitItem(object sender, RoutedEventArgs e)
@@ -1192,10 +1326,51 @@ namespace _01electronics_inventory
             // WrapPanel entryCheckBoxContent = entryPermitItemCheckBox.Content as WrapPanel;
             // TextBox reservedQuantity = entryCheckBoxContent.Children[4] as TextBox;
             // reservedQuantity.IsEnabled = true;
-            checkedItemsCounter++;
-            checkedItemsCounterLabel.Content = checkedItemsCounter;
+           
             CheckBox checkedItem = (CheckBox)sender;
-            selectedItems.Add(checkedItem);
+            if(isRFP)
+            {
+                WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
+                if(checkedItem.Content!=null)
+                if (checkedItemContent.Children.Count > 2)
+                {
+                    TextBox toBeReleasedQuantity =(TextBox) checkedItemContent.Children[6];
+                    toBeReleasedQuantity.IsEnabled = true;
+                    selectedItems.Add(checkedItem);
+                }
+                else
+                {
+                    checkedItemsCounter++;
+                    //checkedItemsCounterLabel.Content = checkedItemsCounter;
+                    TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
+                    string[] splitedContent = checkBoxContent.Text.Split('\n');
+                    splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
+                    checkBoxContent.Text = String.Join("\n", splitedContent);
+                    selectedItems.Add(checkedItem);
+                }
+            }
+            else
+            {
+                WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
+                if (checkedItem.Content != null)
+                    if (checkedItemContent.Children.Count > 2)
+                    {
+                        TextBox toBeReleasedQuantity = (TextBox)checkedItemContent.Children[6];
+                        toBeReleasedQuantity.IsEnabled = true;
+                        selectedItems.Add(checkedItem);
+                    }
+                    else
+                    {
+                        checkedItemsCounter++;
+                        //checkedItemsCounterLabel.Content = checkedItemsCounter;
+                        TextBlock checkBoxContent = (TextBlock)orderItemHolder.Content;
+                        string[] splitedContent = checkBoxContent.Text.Split('\n');
+                        splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
+                        checkBoxContent.Text = String.Join("\n", splitedContent);
+                        selectedItems.Add(checkedItem);
+                    }
+            }
+           
            
         }
 
@@ -3243,7 +3418,7 @@ namespace _01electronics_inventory
         }
 
         /// ////////////////////////////////////////////       
-        //TEXT CHANGE FUNCTIONS
+        //TEXT CHANGE FUNCTIONS 
         ////////////////////////////////////////////////
         private void QuantityTextBoxTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -3301,7 +3476,7 @@ namespace _01electronics_inventory
         private void OnNextButtonOnClick(object sender, RoutedEventArgs e)
         {
             parentWindow.releasePermitSummary.InitializeSummarySheet();
-                this.NavigationService.Navigate(parentWindow.releasePermitSummary);
+            this.NavigationService.Navigate(parentWindow.releasePermitSummary);
         }
 
         private void OnCancelButtonClick(object sender, RoutedEventArgs e)

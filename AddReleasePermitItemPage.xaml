@@ -56,7 +56,7 @@
             <Border Grid.Column="3" Style="{StaticResource unselectedSecondaryTabBorder}" >
                 <Label Content="Release Permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="LabelMouseLeftButtonDown" />
             </Border>
-            <Grid Grid.Column="4"  >
+            <Grid Grid.Column="4"  Visibility="Collapsed">
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
