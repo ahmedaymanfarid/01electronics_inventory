@@ -299,7 +299,7 @@ namespace _01electronics_inventory
                 {
 
 
-                    if (recievalNote.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL &&
+                    if (recievalNote.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED &&
                         recievalNote.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL)
                     {
 

@@ -77,7 +77,7 @@ namespace _01electronics_inventory
         int orderItemNumber;
         public int checkedItemsCounter;
         public bool isRFP;
-
+        int viewAddCondition;
         public AddReleasePermitItemPage(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, AddReleasePermitWindow mReleasePermitWindow)
         {
             commonFunctions = mCommonFunctions;
@@ -125,6 +125,7 @@ namespace _01electronics_inventory
             isRFP = false;
             rfpItemCheckBoxHolder = new CheckBox();
             orderItemHolder = new CheckBox();
+            viewAddCondition = parentWindow.viewAddCondition;
             GetAllEntryPermits();
             InitializeStock();
             GetGenericItems();
@@ -145,7 +146,7 @@ namespace _01electronics_inventory
         }
         public void CheckAddOrView()
         {
-            if (parentWindow.isView == true)
+            if (parentWindow.viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
                 finishButton.IsEnabled = false;
                 addRecieval.Visibility = Visibility.Visible;
@@ -161,300 +162,371 @@ namespace _01electronics_inventory
         }
         public void InitializeStock() 
         {
-           
-            //Label workFormLabel = Home.Children[0] as Label;
-            if(checkedRFPItems.Count > 0)
-            {
-               
-                if (addReleasePermitPage.workFormComboBox.SelectedIndex != -1 && addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
-                {
-                    if (!checkedRFPItems.Any(f => f.rfp_serial == parentWindow.materialReleasePermit.GetRfp().GetRFPSerial() && f.rfp_version == parentWindow.materialReleasePermit.GetRfp().GetRFPVersion() && f.requestor_team_id == parentWindow.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()))
-                    {
-                        Home.Children.Clear();
-                        checkedItemsWrapPanel.Children.Clear();
-                        checkedOrderItems.Clear();
-                    }
-                    else
-                    {
-                        checkedOrderItems.Clear();
-                        return;
-                    }
-                       
-                    
-                    workFormLabel.Content = "RFP Items";
-                    if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
-                    {
-                        for (int i = 0; i < parentWindow.materialReleasePermit.GetRfp().rfpItems.Count; i++)
-                        {
-
-                            CheckBox rfpItem = new CheckBox();
-                            rfpItem.Style = (Style)FindResource("checkBoxStyle");
-                            rfpItem.Margin = new Thickness(10);
-                            rfpItem.Width = 500;
-                            rfpItem.Checked += OnCheckRFPItem;
-                            rfpItem.Unchecked += OnUncheckRFPItem;
-                            TextBlock rfpItemContent = new TextBlock();
-                            rfpItemContent.Tag = Home.Children.Count;
-                            rfpItemContent.TextWrapping = TextWrapping.Wrap;
-
-                            if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].is_company_product)
-                            {
-                                rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} -" +
-                                  $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Reserved Quantity: {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} - " +
-                                  $"To Be Released Quantity:  ";
-                            }
-
-                            else
-                            {
-                                rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} -" +
-                                                $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} - "
-                                                + $"To Be Released Quantity:  ";
-                            }
-
-                            rfpItem.Content = rfpItemContent;
-                            rfpItem.Tag = parentWindow.materialReleasePermit.GetRfp().rfpItems[i];
-                            if(parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_status.status_id==COMPANY_WORK_MACROS.RFP_AT_STOCK)
-                                Home.Children.Add(rfpItem);
-                        }
-                    }
-
-                }
-                else if (addReleasePermitPage.workFormComboBox.SelectedIndex == 1)
-                {
-                    if (!checkedOrderItems.Any(f => f.order_serial == parentWindow.materialReleasePermit.GetWorkOrder().orderSerial))
-                    {
-                        Home.Children.Clear();
-                        checkedItemsWrapPanel.Children.Clear();
-                        checkedRFPItems.Clear();
-                    }
-                    else
-                    {
-
-                        return;
-                    }
-                    workFormLabel.Content = "Work Order Items";
-                    for (int i = 0; i < parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList().Length; i++)
-                    {
-                        CheckBox workOrderItem = new CheckBox();
-                        workOrderItem.Style = (Style)FindResource("checkBoxStyle");
-                        workOrderItem.Margin = new Thickness(10);
-                        workOrderItem.Width = 500;
-                        workOrderItem.Checked += OnCheckWorkOrderItem;
-                        workOrderItem.Unchecked += OnUncheckWorkOrderItem;
-                        TextBlock workOrderItemContent = new TextBlock();
-                        workOrderItemContent.TextWrapping = TextWrapping.Wrap;
-                        workOrderItemContent.Tag = Home.Children.Count;
-
-
-                        workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
-                            $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity}";
-
-                        workOrderItem.Content = workOrderItemContent;
-                        if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
-                        {
-                            workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i];
-                            Home.Children.Add(workOrderItem);
-                        }
-
-                    }
-                }
-            }
-            else if(checkedOrderItems.Count>0)
+            if(viewAddCondition==COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
                 if (addReleasePermitPage.workFormComboBox.SelectedIndex != -1 && addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
                 {
-                    if (!checkedRFPItems.Any(f => f.rfp_serial == parentWindow.materialReleasePermit.GetRfp().GetRFPSerial() && f.rfp_version == parentWindow.materialReleasePermit.GetRfp().GetRFPVersion() && f.requestor_team_id == parentWindow.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()))
+                    workFormLabel.Content = "RFP Items";
+                    CheckBox rfpItem = new CheckBox();
+                    rfpItem.Style = (Style)FindResource("checkBoxStyle");
+                    rfpItem.Margin = new Thickness(10);
+                    rfpItem.Width = 500;
+                    rfpItem.Checked += OnCheckRFPItem;
+                    rfpItem.Unchecked += OnUncheckRFPItem;
+                    TextBlock rfpItemContent = new TextBlock();
+                    rfpItemContent.Tag = Home.Children.Count;
+                    rfpItemContent.TextWrapping = TextWrapping.Wrap;
+                    rfpItem.IsEnabled = false;
+                    if (parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemcompanyCategory.category_id!=0)
                     {
-                        Home.Children.Clear();
-                        checkedItemsWrapPanel.Children.Clear();
-                        checkedOrderItems.Clear();
+                        rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemcompanyCategory.category_name} - " +
+                          $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialitemCompanyproduct.product_name} - " +
+                          $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemCompanyBrand.brand_name} -" +
+                          $" {parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemCompanyModel.model_name} - " +
+                          $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemCompanySpecs.spec_name} - Reserved Quantity: {parentWindow.materialReleasePermit.GetReleaseItems()[0].entered_quantity} - " +
+                          $"To Be Released Quantity:{parentWindow.materialReleasePermit.GetReleaseItems()[0].released_quantity_release}  ";
                     }
+
                     else
                     {
-                        checkedOrderItems.Clear();
-                        return;
+                        rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemGenericCategory.category_name} -" +
+                                        $" {parentWindow.materialReleasePermit.GetReleaseItems()[0].materialitemGenericproduct.product_name} - " +
+                                        $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemGenericBrand.brand_name} - " +
+                                        $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].materialItemGenericModel.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetReleaseItems()[0].entered_quantity} - "
+                                        + $"To Be Released Quantity: {parentWindow.materialReleasePermit.GetReleaseItems()[0].released_quantity_release} ";
                     }
-                    workFormLabel.Content = "RFP Items";
-                    if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
-                    {
-                        for (int i = 0; i < parentWindow.materialReleasePermit.GetRfp().rfpItems.Count; i++)
-                        {
-                            CheckBox rfpItem = new CheckBox();
-                            rfpItem.Style = (Style)FindResource("checkBoxStyle");
-                            rfpItem.Margin = new Thickness(10);
-                            rfpItem.Width = 500;
-                            rfpItem.Checked += OnCheckRFPItem;
-                            rfpItem.Unchecked += OnUncheckRFPItem;
-                            TextBlock rfpItemContent = new TextBlock();
-                            rfpItemContent.Tag = Home.Children.Count;
-                            rfpItemContent.TextWrapping = TextWrapping.Wrap;
 
-                            if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].is_company_product)
-                            {
-                                rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} -" +
-                                  $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - " +
-                                  $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity}";
-                            }
-
-                            else
-                            {
-                                rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} -" +
-                                                $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} - " +
-                                                $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} ";
-                            }
-
-                            rfpItem.Content = rfpItemContent;
-                            rfpItem.Tag = parentWindow.materialReleasePermit.GetRfp().rfpItems[i];
-                            if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
-                                Home.Children.Add(rfpItem);
-                        }
-                    }
+                    rfpItem.Content = rfpItemContent;
+                    rfpItem.Tag = parentWindow.materialReleasePermit.GetReleaseItems()[0];
+                    Home.Children.Add(rfpItem);
+                    rfpItem.IsChecked = true;
 
                 }
-                else if (addReleasePermitPage.workFormComboBox.SelectedIndex == 1)
+                else
                 {
-                    if (!checkedOrderItems.Any(f => f.order_serial == parentWindow.materialReleasePermit.GetWorkOrder().orderSerial))
-                    {
-                        Home.Children.Clear();
-                        checkedItemsWrapPanel.Children.Clear();
-                        checkedRFPItems.Clear();
-                    }
-                    else
-                    {
-                       
-                        return;
-                    }
-                       
-                    workFormLabel.Content = "Work Order Items";
-                    for (int i = 0; i < parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList().Length; i++)
-                    {
-                        CheckBox workOrderItem = new CheckBox();
-                        workOrderItem.Style = (Style)FindResource("checkBoxStyle");
-                        workOrderItem.Margin = new Thickness(10);
-                        workOrderItem.Width = 500;
-                        workOrderItem.Checked += OnCheckWorkOrderItem;
-                        workOrderItem.Unchecked += OnUncheckWorkOrderItem;
-                        TextBlock workOrderItemContent = new TextBlock();
-                        workOrderItemContent.TextWrapping = TextWrapping.Wrap;
-                        workOrderItemContent.Tag = Home.Children.Count;
+                    workFormLabel.Content = "WorkOrder Items";
+                    CheckBox workOrderItem = new CheckBox();
+                    workOrderItem.Style = (Style)FindResource("checkBoxStyle");
+                    workOrderItem.Margin = new Thickness(10);
+                    workOrderItem.Width = 500;
+                    workOrderItem.Checked += OnCheckWorkOrderItem;
+                    workOrderItem.Unchecked += OnUncheckWorkOrderItem;
+                    workOrderItem.IsEnabled = false;
+                    TextBlock workOrderItemContent = new TextBlock();
+                    workOrderItemContent.TextWrapping = TextWrapping.Wrap;
+                    workOrderItemContent.Tag = Home.Children.Count;
+                    workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].orderCategory.category_name} - " +
+                               $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].orderproduct.product_name} - " +
+                               $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].orderBrand.brand_name} -" +
+                               $" {parentWindow.materialReleasePermit.GetReleaseItems()[0].orderModel.model_name} - " +
+                               $"{parentWindow.materialReleasePermit.GetReleaseItems()[0].orderSpecs.spec_name}  -" +
+                               $"\nNeeded Quantity : {parentWindow.materialReleasePermit.GetReleaseItems()[0].orderItemQuantity}" +
+                               $"\nTo Be Released Quantity: {parentWindow.materialReleasePermit.GetReleaseItems()[0].released_quantity_release}";
 
-
-                        workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
-                            $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  - Needed Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity} ";
-
-                        workOrderItem.Content = workOrderItemContent;
-                        if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
-                        {
-                            workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i];
-                            Home.Children.Add(workOrderItem);
-                        }
-
-                    }
+                    workOrderItem.Content = workOrderItemContent;
+                    workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[0];
+                    Home.Children.Add(workOrderItem);
+                    workOrderItem.IsChecked = true;
                 }
             }
             else
             {
-                Home.Children.Clear();
-                checkedItemsWrapPanel.Children.Clear();
-                if (addReleasePermitPage.workFormComboBox.SelectedIndex != -1 && addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
+                //Label workFormLabel = Home.Children[0] as Label;
+                if (checkedRFPItems.Count > 0)
                 {
 
-                    workFormLabel.Content = "RFP Items";
-                    if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
+                    if (addReleasePermitPage.workFormComboBox.SelectedIndex != -1 && addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
                     {
-                        for (int i = 0; i < parentWindow.releasePermitPage.rfpItems.Count; i++)
+                        if (!checkedRFPItems.Any(f => f.rfp_serial == parentWindow.materialReleasePermit.GetRfp().GetRFPSerial() && f.rfp_version == parentWindow.materialReleasePermit.GetRfp().GetRFPVersion() && f.requestor_team_id == parentWindow.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()))
                         {
-                            
+                            Home.Children.Clear();
+                            checkedItemsWrapPanel.Children.Clear();
+                            checkedOrderItems.Clear();
+                        }
+                        else
+                        {
+                            checkedOrderItems.Clear();
+                            return;
+                        }
 
-                            CheckBox rfpItem = new CheckBox();
-                            rfpItem.Style = (Style)FindResource("checkBoxStyle");
-                            rfpItem.Margin = new Thickness(10);
-                            rfpItem.Width = 500;
-                            rfpItem.Checked += OnCheckRFPItem;
-                            rfpItem.Unchecked += OnUncheckRFPItem;
-                            TextBlock rfpItemContent = new TextBlock();
-                            rfpItemContent.Tag = Home.Children.Count;
-                            rfpItemContent.TextWrapping = TextWrapping.Wrap;
 
-                            if (parentWindow.releasePermitPage.rfpItems[i].is_company_product)
+                        workFormLabel.Content = "RFP Items";
+                        if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
+                        {
+                            for (int i = 0; i < parentWindow.materialReleasePermit.GetRfp().rfpItems.Count; i++)
                             {
 
-                                rfpItemContent.Text = $"{parentWindow.releasePermitPage.rfpItems[i].product_category.category_name} - " +
-                                  $"{parentWindow.releasePermitPage.rfpItems[i].product_type.product_name} - " +
-                                  $"{parentWindow.releasePermitPage.rfpItems[i].product_brand.brand_name} -" +
-                                  $" {parentWindow.releasePermitPage.rfpItems[i].product_model.model_name} - " +
-                                  $"{parentWindow.releasePermitPage.rfpItems[i].product_specs.spec_name} -"+
-                                  $"\nReserved Quantity: {parentWindow.releasePermitPage.rfpItems[i].item_quantity} " +
-                                  $"\nTo Be Released Quantity:  ";
-                            }
+                                CheckBox rfpItem = new CheckBox();
+                                rfpItem.Style = (Style)FindResource("checkBoxStyle");
+                                rfpItem.Margin = new Thickness(10);
+                                rfpItem.Width = 500;
+                                rfpItem.Checked += OnCheckRFPItem;
+                                rfpItem.Unchecked += OnUncheckRFPItem;
+                                TextBlock rfpItemContent = new TextBlock();
+                                rfpItemContent.Tag = Home.Children.Count;
+                                rfpItemContent.TextWrapping = TextWrapping.Wrap;
 
-                            else
+                                if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].is_company_product)
+                                {
+                                    rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} - " +
+                                      $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
+                                      $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} -" +
+                                      $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - " +
+                                      $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Reserved Quantity: {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} - " +
+                                      $"To Be Released Quantity:  ";
+                                }
+
+                                else
+                                {
+                                    rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} -" +
+                                                    $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
+                                                    $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} - " +
+                                                    $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} - "
+                                                    + $"To Be Released Quantity:  ";
+                                }
+
+                                rfpItem.Content = rfpItemContent;
+                                rfpItem.Tag = parentWindow.materialReleasePermit.GetRfp().rfpItems[i];
+                                if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                                    Home.Children.Add(rfpItem);
+                            }
+                        }
+
+                    }
+                    else if (addReleasePermitPage.workFormComboBox.SelectedIndex == 1)
+                    {
+                        if (!checkedOrderItems.Any(f => f.order_serial == parentWindow.materialReleasePermit.GetWorkOrder().orderSerial))
+                        {
+                            Home.Children.Clear();
+                            checkedItemsWrapPanel.Children.Clear();
+                            checkedRFPItems.Clear();
+                        }
+                        else
+                        {
+
+                            return;
+                        }
+                        workFormLabel.Content = "Work Order Items";
+                        for (int i = 0; i < parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList().Length; i++)
+                        {
+                            CheckBox workOrderItem = new CheckBox();
+                            workOrderItem.Style = (Style)FindResource("checkBoxStyle");
+                            workOrderItem.Margin = new Thickness(10);
+                            workOrderItem.Width = 500;
+                            workOrderItem.Checked += OnCheckWorkOrderItem;
+                            workOrderItem.Unchecked += OnUncheckWorkOrderItem;
+                            TextBlock workOrderItemContent = new TextBlock();
+                            workOrderItemContent.TextWrapping = TextWrapping.Wrap;
+                            workOrderItemContent.Tag = Home.Children.Count;
+
+
+                            workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
+                                $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity}";
+
+                            workOrderItem.Content = workOrderItemContent;
+                            if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
                             {
-                                rfpItemContent.Text = $"{parentWindow.releasePermitPage.rfpItems[i].product_category.category_name} -" +
-                                                $" {parentWindow.releasePermitPage.rfpItems[i].product_type.product_name} - " +
-                                                $"{parentWindow.releasePermitPage.rfpItems[i].product_brand.brand_name} - " +
-                                                $"{parentWindow.releasePermitPage.rfpItems[i].product_model.model_name} -"+
-                                                $"\nReserved Quantity: {parentWindow.releasePermitPage.rfpItems[i].item_quantity} " +
-                                                $"\nTo Be Released Quantity:  ";
+                                workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i];
+                                Home.Children.Add(workOrderItem);
                             }
 
-                            rfpItem.Content = rfpItemContent;
-                            rfpItem.Tag = parentWindow.releasePermitPage.rfpItems[i];
-                           
-                            if (parentWindow.releasePermitPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
-                                Home.Children.Add(rfpItem);
                         }
                     }
-
                 }
-                else if (addReleasePermitPage.workFormComboBox.SelectedIndex == 1)
+                else if (checkedOrderItems.Count > 0)
                 {
-                    workFormLabel.Content = "Work Order Items";
-                    for (int i = 0; i < parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList().Length; i++)
+                    if (addReleasePermitPage.workFormComboBox.SelectedIndex != -1 && addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
                     {
-                        CheckBox workOrderItem = new CheckBox();
-                        workOrderItem.Style = (Style)FindResource("checkBoxStyle");
-                        workOrderItem.Margin = new Thickness(10);
-                        workOrderItem.Width = 500;
-                        workOrderItem.Checked += OnCheckWorkOrderItem;
-                        workOrderItem.Unchecked += OnUncheckWorkOrderItem;
-                        TextBlock workOrderItemContent = new TextBlock();
-                        workOrderItemContent.TextWrapping = TextWrapping.Wrap;
-                        workOrderItemContent.Tag = Home.Children.Count;
-
-
-                        workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
-                            $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
-                            $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  -" +
-                            $"\nNeeded Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity}"+
-                            $"\nTo Be Released Quantity:  ";
-
-                        workOrderItem.Content = workOrderItemContent;
-                        if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
+                        if (!checkedRFPItems.Any(f => f.rfp_serial == parentWindow.materialReleasePermit.GetRfp().GetRFPSerial() && f.rfp_version == parentWindow.materialReleasePermit.GetRfp().GetRFPVersion() && f.requestor_team_id == parentWindow.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()))
                         {
-                            workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i];
-                            Home.Children.Add(workOrderItem);
+                            Home.Children.Clear();
+                            checkedItemsWrapPanel.Children.Clear();
+                            checkedOrderItems.Clear();
+                        }
+                        else
+                        {
+                            checkedOrderItems.Clear();
+                            return;
+                        }
+                        workFormLabel.Content = "RFP Items";
+                        if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
+                        {
+                            for (int i = 0; i < parentWindow.materialReleasePermit.GetRfp().rfpItems.Count; i++)
+                            {
+                                CheckBox rfpItem = new CheckBox();
+                                rfpItem.Style = (Style)FindResource("checkBoxStyle");
+                                rfpItem.Margin = new Thickness(10);
+                                rfpItem.Width = 500;
+                                rfpItem.Checked += OnCheckRFPItem;
+                                rfpItem.Unchecked += OnUncheckRFPItem;
+                                TextBlock rfpItemContent = new TextBlock();
+                                rfpItemContent.Tag = Home.Children.Count;
+                                rfpItemContent.TextWrapping = TextWrapping.Wrap;
+
+                                if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].is_company_product)
+                                {
+                                    rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} - " +
+                                      $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
+                                      $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} -" +
+                                      $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - " +
+                                      $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_specs.spec_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity}";
+                                }
+
+                                else
+                                {
+                                    rfpItemContent.Text = $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_category.category_name} -" +
+                                                    $" {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_type.product_name} - " +
+                                                    $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_brand.brand_name} - " +
+                                                    $"{parentWindow.materialReleasePermit.GetRfp().rfpItems[i].product_model.model_name} - Needed Quantity : {parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_quantity} ";
+                                }
+
+                                rfpItem.Content = rfpItemContent;
+                                rfpItem.Tag = parentWindow.materialReleasePermit.GetRfp().rfpItems[i];
+                                if (parentWindow.materialReleasePermit.GetRfp().rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                                    Home.Children.Add(rfpItem);
+                            }
                         }
 
+                    }
+                    else if (addReleasePermitPage.workFormComboBox.SelectedIndex == 1)
+                    {
+                        if (!checkedOrderItems.Any(f => f.order_serial == parentWindow.materialReleasePermit.GetWorkOrder().orderSerial))
+                        {
+                            Home.Children.Clear();
+                            checkedItemsWrapPanel.Children.Clear();
+                            checkedRFPItems.Clear();
+                        }
+                        else
+                        {
+
+                            return;
+                        }
+
+                        workFormLabel.Content = "Work Order Items";
+                        for (int i = 0; i < parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList().Length; i++)
+                        {
+                            CheckBox workOrderItem = new CheckBox();
+                            workOrderItem.Style = (Style)FindResource("checkBoxStyle");
+                            workOrderItem.Margin = new Thickness(10);
+                            workOrderItem.Width = 500;
+                            workOrderItem.Checked += OnCheckWorkOrderItem;
+                            workOrderItem.Unchecked += OnUncheckWorkOrderItem;
+                            TextBlock workOrderItemContent = new TextBlock();
+                            workOrderItemContent.TextWrapping = TextWrapping.Wrap;
+                            workOrderItemContent.Tag = Home.Children.Count;
+
+
+                            workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
+                                $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  - Needed Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity} ";
+
+                            workOrderItem.Content = workOrderItemContent;
+                            if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
+                            {
+                                workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i];
+                                Home.Children.Add(workOrderItem);
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    Home.Children.Clear();
+                    checkedItemsWrapPanel.Children.Clear();
+                    if (addReleasePermitPage.workFormComboBox.SelectedIndex != -1 && addReleasePermitPage.workFormComboBox.SelectedIndex == 0)
+                    {
+
+                        workFormLabel.Content = "RFP Items";
+                        if (addReleasePermitPage.rfpSerials.SelectedIndex != -1)
+                        {
+                            for (int i = 0; i < parentWindow.releasePermitPage.rfpItems.Count; i++)
+                            {
+
+
+                                CheckBox rfpItem = new CheckBox();
+                                rfpItem.Style = (Style)FindResource("checkBoxStyle");
+                                rfpItem.Margin = new Thickness(10);
+                                rfpItem.Width = 500;
+                                rfpItem.Checked += OnCheckRFPItem;
+                                rfpItem.Unchecked += OnUncheckRFPItem;
+                                TextBlock rfpItemContent = new TextBlock();
+                                rfpItemContent.Tag = Home.Children.Count;
+                                rfpItemContent.TextWrapping = TextWrapping.Wrap;
+
+                                if (parentWindow.releasePermitPage.rfpItems[i].is_company_product)
+                                {
+
+                                    rfpItemContent.Text = $"{parentWindow.releasePermitPage.rfpItems[i].product_category.category_name} - " +
+                                      $"{parentWindow.releasePermitPage.rfpItems[i].product_type.product_name} - " +
+                                      $"{parentWindow.releasePermitPage.rfpItems[i].product_brand.brand_name} -" +
+                                      $" {parentWindow.releasePermitPage.rfpItems[i].product_model.model_name} - " +
+                                      $"{parentWindow.releasePermitPage.rfpItems[i].product_specs.spec_name} -" +
+                                      $"\nReserved Quantity: {parentWindow.releasePermitPage.rfpItems[i].item_quantity} " +
+                                      $"\nTo Be Released Quantity:  ";
+                                }
+
+                                else
+                                {
+                                    rfpItemContent.Text = $"{parentWindow.releasePermitPage.rfpItems[i].product_category.category_name} -" +
+                                                    $" {parentWindow.releasePermitPage.rfpItems[i].product_type.product_name} - " +
+                                                    $"{parentWindow.releasePermitPage.rfpItems[i].product_brand.brand_name} - " +
+                                                    $"{parentWindow.releasePermitPage.rfpItems[i].product_model.model_name} -" +
+                                                    $"\nReserved Quantity: {parentWindow.releasePermitPage.rfpItems[i].item_quantity} " +
+                                                    $"\nTo Be Released Quantity:  ";
+                                }
+
+                                rfpItem.Content = rfpItemContent;
+                                rfpItem.Tag = parentWindow.releasePermitPage.rfpItems[i];
+
+                                if (parentWindow.releasePermitPage.rfpItems[i].item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                                    Home.Children.Add(rfpItem);
+                            }
+                        }
+
+                    }
+                    else if (addReleasePermitPage.workFormComboBox.SelectedIndex == 1)
+                    {
+                        workFormLabel.Content = "Work Order Items";
+                        for (int i = 0; i < parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList().Length; i++)
+                        {
+                            CheckBox workOrderItem = new CheckBox();
+                            workOrderItem.Style = (Style)FindResource("checkBoxStyle");
+                            workOrderItem.Margin = new Thickness(10);
+                            workOrderItem.Width = 500;
+                            workOrderItem.Checked += OnCheckWorkOrderItem;
+                            workOrderItem.Unchecked += OnUncheckWorkOrderItem;
+                            TextBlock workOrderItemContent = new TextBlock();
+                            workOrderItemContent.TextWrapping = TextWrapping.Wrap;
+                            workOrderItemContent.Tag = Home.Children.Count;
+
+
+                            workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
+                                $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  -" +
+                                $"\nNeeded Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity}" +
+                                $"\nTo Be Released Quantity:  ";
+
+                            workOrderItem.Content = workOrderItemContent;
+                            if (parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_id != 0 && parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_status.status_id < COMPANY_WORK_MACROS.ORDER_PENDING_ClIENT_RECIEVAL)
+                            {
+                                workOrderItem.Tag = parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i];
+                                Home.Children.Add(workOrderItem);
+                            }
+
+
+                        }
                     }
                 }
             }
+           
             
 
            
@@ -799,11 +871,11 @@ namespace _01electronics_inventory
             checkedItemsCounterLabel.Content = checkedItemsCounter;
             CheckBox rfpItemCheckBox = (CheckBox)sender;
             RFP_MAX_STRUCT rfp = new RFP_MAX_STRUCT();
-            rfp.rfp_serial = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPSerial();
-            rfp.requestor_team_id = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPRequestorTeamId();
-            rfp.rfp_version = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPVersion();
-            rfp.rfps_items_min = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
-            rfp.rfps_items_min.Add((PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag);
+            rfp.rfp_serial = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpSerial;
+            rfp.requestor_team_id = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpRequestorTeam;
+            rfp.rfp_version = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpVersion;
+            //rfp.rfps_items_min = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+            //rfp.rfps_items_min.Add((PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag);
             checkedRFPItems.Add(rfp);
             rfpItemCheckBoxHolder = rfpItemCheckBox;
             int position = Home.Children.IndexOf(rfpItemCheckBox);
@@ -816,471 +888,823 @@ namespace _01electronics_inventory
             }
 
         }
-        public void CreateSelectedItemsCard(bool isRFP , int itemNumber , CheckBox checkedCheckBox)
+        public void CreateSelectedItemsCard(bool isRFP, int itemNumber, CheckBox checkedCheckBox)
         {
-            if (isRFP)
+            if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-                this.isRFP= true;
-                Border itemsBorder = new Border();
-                itemsBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                itemsBorder.Margin = new Thickness(24);
-                itemsBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
-                itemsBorder.BorderThickness = new Thickness(1);
-                itemsBorder.Width = 600;
-                itemsBorder.Height = 500;
-                itemsBorder.Background = Brushes.White;
-                itemsBorder.Tag = itemNumber;
-                DropShadowEffect dropShadowEffect = new DropShadowEffect();
-                dropShadowEffect.ShadowDepth = 1;
-                dropShadowEffect.Opacity = 0.1;
-                itemsBorder.Effect = dropShadowEffect;
-                Label workFormLabel = new Label();
-                workFormLabel.Content = $"RFP Item #{itemNumber}";
-                workFormLabel.Width = 600;
-                workFormLabel.Background = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
-                workFormLabel.Foreground = Brushes.White;
-                workFormLabel.Padding = new Thickness(250, 10, 0, 10);
-                workFormLabel.Style = (Style)FindResource("labelStyle");
-
-                StackPanel checkedItemStackPanel = new StackPanel();
-                itemsBorder.Child=checkedItemStackPanel;
-
-                checkedItemStackPanel.Children.Add(workFormLabel);
-               
-
-                ScrollViewer itemScrollViewer = new ScrollViewer();
-                StackPanel innerStackPanel = new StackPanel();
-                itemScrollViewer.Content = innerStackPanel;
-                itemScrollViewer.Height = 400;
-
-                checkedItemStackPanel.Children.Add(itemScrollViewer);
-
-                PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItem =(PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)checkedCheckBox.Tag;
-                TextBlock checkedCheckBoxContent =(TextBlock)checkedCheckBox.Content;
-                for(int i = 0; i < entryPermitList.Count;i++)
+                if (isRFP)
                 {
-                    for(int j = 0; j < entryPermitList[i].items.Count;j++)
+                    this.isRFP = true;
+                    Border itemsBorder = new Border();
+                    itemsBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                    itemsBorder.Margin = new Thickness(24);
+                    itemsBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    itemsBorder.BorderThickness = new Thickness(1);
+                    itemsBorder.Width = 600;
+                    itemsBorder.Height = 500;
+                    itemsBorder.Background = Brushes.White;
+                    itemsBorder.Tag = itemNumber;
+                    DropShadowEffect dropShadowEffect = new DropShadowEffect();
+                    dropShadowEffect.ShadowDepth = 1;
+                    dropShadowEffect.Opacity = 0.1;
+                    itemsBorder.Effect = dropShadowEffect;
+                    Label workFormLabel = new Label();
+                    workFormLabel.Content = $"RFP Item #{checkedItemsWrapPanel.Children.Count + 1}";
+                    workFormLabel.Width = 600;
+                    workFormLabel.Background = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    workFormLabel.Foreground = Brushes.White;
+                    workFormLabel.Padding = new Thickness(250, 10, 0, 10);
+                    workFormLabel.Style = (Style)FindResource("labelStyle");
+
+                    StackPanel checkedItemStackPanel = new StackPanel();
+                    itemsBorder.Child = checkedItemStackPanel;
+                    checkedItemStackPanel.Children.Add(workFormLabel);
+                    ScrollViewer scrollViewer = new ScrollViewer();
+                    StackPanel innerStackPanel = new StackPanel();
+                    
+                    scrollViewer.Content = innerStackPanel;
+                    scrollViewer.Height = 400;
+                    checkedItemStackPanel.Children.Add(scrollViewer);
+                    INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM orderProduct = (INVENTORY_STRUCTS.MATERIAL_RELEASE_PERMIT_ITEM)checkedCheckBox.Tag;
+                    for (int i = 0; i < parentWindow.materialReleasePermit.GetReleaseItems().Count; i++)
                     {
-                        if (
-                            rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
-                            rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
-                            rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
-                            rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id &&
-                            rfpItem.product_specs.spec_id == entryPermitList[i].items[j].product_specs.spec_id)
+                        if (parentWindow.materialReleasePermit.GetReleaseItems()[i].entryPermit_product_serial_number == "")
                         {
+                            CheckBox entryPermitItemCheckBox = new CheckBox();
+                            entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                            entryPermitItemCheckBox.Margin = new Thickness(10);
+                            entryPermitItemCheckBox.Width = 500;
+                            entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                            entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+                            entryPermitItemCheckBox.Tag = parentWindow.materialReleasePermit.GetReleaseItems()[i];
+
+                            WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                            entryPermitItemCheckBoxContentWrapPanel.Tag = orderProduct;
+                            TextBlock entryPermitCheckBoxContent = new TextBlock();
+                            entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
+                            entryPermitCheckBoxContent.Text = $@"Entry Permit {parentWindow.materialReleasePermit.GetReleaseItems()[i].material_entry_permit_id} :{parentWindow.materialReleasePermit.GetReleaseItems()[i].orderCategory.category_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderproduct.product_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderBrand.brand_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderModel.model_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderSpecs.spec_name} ";
+
+                            Label availableQuantityLabel = new Label();
+                            availableQuantityLabel.Style = (Style)FindResource("labelStyle");
+                            availableQuantityLabel.Margin = new Thickness(0);
+                            availableQuantityLabel.Content = "Quantity:";
+
+                            TextBox availableQuantityTextBox = new TextBox();
+                            availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                            availableQuantityTextBox.Margin = new Thickness(0);
+                            availableQuantityTextBox.Text = parentWindow.materialReleasePermit.GetReleaseItems()[i].entered_quantity.ToString();
+                            availableQuantityTextBox.IsEnabled = false;
+
+                            Label reservedQuantityLabel = new Label();
+                            reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
+                            reservedQuantityLabel.Margin = new Thickness(0);
+                            reservedQuantityLabel.Width = 170;
+                            reservedQuantityLabel.Content = "Reserved Quantity:";
+
+                            TextBox reservedQuantity = new TextBox();
+                            reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
+                            reservedQuantity.Margin = new Thickness(0);
+                            reservedQuantity.Text = orderProduct.entered_quantity.ToString();
+                            reservedQuantity.Tag = orderProduct;
+                            reservedQuantity.IsEnabled = false;
+
+                            Label toBeReleasedQuantity = new Label();
+                            toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
+                            toBeReleasedQuantity.Margin = new Thickness(0);
+                            toBeReleasedQuantity.Width = 180;
+                            toBeReleasedQuantity.Content = "To Be Released Quantity:";
+
+                            TextBox toBeReleasedQuantityTextBox = new TextBox();
+                            toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                            toBeReleasedQuantityTextBox.Margin = new Thickness(0);
+                            toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
+                            toBeReleasedQuantityTextBox.IsEnabled = false;
+                            toBeReleasedQuantityTextBox.Text = parentWindow.materialReleasePermit.GetReleaseItems()[i].released_quantity_release.ToString();
+
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
+                            entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
+
+                            entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
+                            innerStackPanel.Children.Add(entryPermitItemCheckBox);
                             
-                            if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number=="")
-                            {
-                                CheckBox entryPermitItemCheckBox = new CheckBox();
-                                entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
-                                entryPermitItemCheckBox.Margin = new Thickness(10);
-                                entryPermitItemCheckBox.Width = 500;
-                                entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
-                                entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
-                                entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
+                            entryPermitItemCheckBox.IsChecked = true;
+                            entryPermitItemCheckBox.IsEnabled = false;
+                            toBeReleasedQuantityTextBox.IsEnabled = false;
+                        }
+                        else
+                        {
+                            WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                            TextBlock entryPermitContent = new TextBlock();
+                            entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                            entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
+                            entryPermitContent.Text = $@"Entry Permit {parentWindow.materialReleasePermit.GetReleaseItems()[i].material_entry_permit_id}: {parentWindow.materialReleasePermit.GetReleaseItems()[i].materialItemcompanyCategory.category_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].materialitemCompanyproduct.product_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].materialItemCompanyBrand.brand_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].materialItemCompanyModel.model_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].materialItemCompanySpecs.spec_name} ";
 
-                                WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
-                                entryPermitItemCheckBoxContentWrapPanel.Tag = rfpItem;
-                                TextBlock entryPermitCheckBoxContent = new TextBlock();
-                                entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
+                            Label serialNumber = new Label();
+                            serialNumber.Style = (Style)FindResource("labelStyle");
+                            serialNumber.Margin = new Thickness(0);
+                            serialNumber.Width = 200;
+                            serialNumber.Content = $"Serial Number :{parentWindow.materialReleasePermit.GetReleaseItems()[i].entryPermit_product_serial_number} ";
 
-                                entryPermitCheckBoxContent.Text =$@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                                Label availableQuantityLabel = new Label();
-                                availableQuantityLabel.Style = (Style)FindResource("labelStyle");
-                                availableQuantityLabel.Margin= new Thickness(0);
-                                availableQuantityLabel.Content = "Quantity:";
-
-                                TextBox availableQuantityTextBox = new TextBox();
-                                availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                                availableQuantityTextBox.Margin= new Thickness(0);
-                                availableQuantityTextBox.Text= entryPermitList[i].items[j].quantity.ToString();
-                                availableQuantityTextBox.IsEnabled = false;
-
-                                Label reservedQuantityLabel = new Label();
-                                reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
-                                reservedQuantityLabel.Margin = new Thickness(0);
-                                reservedQuantityLabel.Width = 170;
-                                reservedQuantityLabel.Content = "Reserved Quantity:";
-
-                                TextBox reservedQuantity = new TextBox();
-                                reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
-                                reservedQuantity.Margin=new Thickness(0);
-                                reservedQuantity.Text = rfpItem.item_quantity.ToString();
-                                reservedQuantity.Tag = rfpItem.item_quantity.ToString();
-                                reservedQuantity.IsEnabled = false;
-
-                                Label toBeReleasedQuantity = new Label();
-                                toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
-                                toBeReleasedQuantity.Margin = new Thickness(0);
-                                toBeReleasedQuantity.Width = 180;
-                                toBeReleasedQuantity.Content = "To Be Released Quantity:";
-
-                                TextBox toBeReleasedQuantityTextBox = new TextBox();
-                                toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                                toBeReleasedQuantityTextBox.Margin = new Thickness(0);
-                                toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
-                                toBeReleasedQuantityTextBox.IsEnabled = false;
-
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
-
-                                entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
-                                innerStackPanel.Children.Add(entryPermitItemCheckBox);
-                            }
-                            else
-                            {
-                                CheckBox entryPermitItemCheckBox = new CheckBox();
-                                entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
-                                entryPermitItemCheckBox.Margin = new Thickness(10);
-                                entryPermitItemCheckBox.Width = 500;
-                                entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
-                                entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
-                                entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
-
-                                WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                                entryPermitItemContentWrapPanel.Tag = rfpItem;
-                                TextBlock entryPermitContent = new TextBlock();
-                                entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                                entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                                Label serialNumber = new Label();
-                                serialNumber.Style = (Style)FindResource("labelStyle");
-                                serialNumber.Margin = new Thickness(10, 0, 0, 20);
-                                serialNumber.Width = 300;
-                                serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
-
-                                entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                                entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                                entryPermitItemCheckBox.Content = entryPermitItemContentWrapPanel;
-
-                                if (entryPermitList[i].items[j].rfp_info.rfpRequestorTeam == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()
-                                    && entryPermitList[i].items[j].rfp_info.rfpSerial == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPSerial()
-                                    && entryPermitList[i].items[j].rfp_info.rfpVersion == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPVersion())
-                                {
-                                    entryPermitItemCheckBox.IsChecked = true;
-                                    
-                                }
-                                else if (parentWindow.materialReleasePermit.GetRfp().rfpItems.Any(f=>f.product_serial_number== entryPermitList[i].items[j].product_serial_number && (f.product_category.category_id == entryPermitList[i].items[j].product_category.category_id)
-                                                                                                  &&( f.product_type.type_id == entryPermitList[i].items[j].product_type.type_id)
-                                                                                                  && (f.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id)
-                                                                                                  && (f.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)) && rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
-                                {
-                                    entryPermitItemCheckBox.IsChecked = true;
-                                }
-
-                                
-                                innerStackPanel.Children.Add(entryPermitItemCheckBox);
-                                //else
-                                //{
-                                //    WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                                //    TextBlock entryPermitContent = new TextBlock();
-                                //    entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                                //    entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
-                                //    entryPermitContent.Width = 500;
-                                //    entryPermitContent.HorizontalAlignment = HorizontalAlignment.Center;
-                                //    entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                                //    Label serialNumber = new Label();
-                                //    serialNumber.Style = (Style)FindResource("labelStyle");
-                                //    serialNumber.Margin = new Thickness(10, 0, 0, 20);
-                                //    serialNumber.Width = 300;
-                                //    serialNumber.Content = $"Serial Number :{rfpItem.product_serial_number} ";
-
-                                //    entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                                //    entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                                //    if (innerStackPanel.Children.Count < rfpItem.item_quantity)
-                                //        innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
-                                //}
-                                   
-
-                            }
+                            entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                            entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                            if (innerStackPanel.Children.Count <= orderProduct.entered_quantity)
+                                innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
 
                         }
-                        //else if(!rfpItem.is_company_product)
-                        //{
-                        //    if(rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
-                        //    rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
-                        //    rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
-                        //    rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)
-                        //    {
-                        //        if (!entryPermitList[i].items[j].product_model.has_serial_number)
-                        //        {
-                        //            CheckBox entryPermitItemCheckBox = new CheckBox();
-                        //            entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
-                        //            entryPermitItemCheckBox.Margin = new Thickness(10);
-                        //            entryPermitItemCheckBox.Width = 500;
-                        //            entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
-                        //            entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
 
-                        //            WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
-                        //            TextBlock entryPermitCheckBoxContent = new TextBlock();
-                        //            entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
 
-                        //            entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} ";
 
-                        //            Label availableQuantityLabel = new Label();
-                        //            availableQuantityLabel.Style = (Style)FindResource("labelStyle");
-                        //            availableQuantityLabel.Margin = new Thickness(0);
-                        //            availableQuantityLabel.Content = "Quantity:";
 
-                        //            TextBox availableQuantityTextBox = new TextBox();
-                        //            availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                        //            availableQuantityTextBox.Margin = new Thickness(0);
-                        //            availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
-                        //            availableQuantityTextBox.IsEnabled = false;
-
-                        //            Label reservedQuantityLabel = new Label();
-                        //            reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
-                        //            reservedQuantityLabel.Margin = new Thickness(0);
-                        //            reservedQuantityLabel.Width = 170;
-                        //            reservedQuantityLabel.Content = "Realeased Quantity:";
-
-                        //            TextBox reservedQuantity = new TextBox();
-                        //            reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
-                        //            reservedQuantity.Margin = new Thickness(0);
-                        //            reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
-                        //            reservedQuantity.IsEnabled = false;
-
-                        //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
-                        //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
-                        //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
-                        //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
-                        //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
-
-                        //            entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
-                        //            innerStackPanel.Children.Add(entryPermitItemCheckBox);
-                        //        }
-                        //        else
-                        //        {
-                        //            WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                        //            TextBlock entryPermitContent = new TextBlock();
-                        //            entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                        //            entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
-                        //            entryPermitContent.Width = 300;
-                        //            entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                        //            Label serialNumber = new Label();
-                        //            serialNumber.Style = (Style)FindResource("labelStyle");
-                        //            serialNumber.Margin = new Thickness(0);
-                        //            serialNumber.Width = 200;
-                        //            serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
-
-                        //            entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                        //            entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                        //            if (innerStackPanel.Children.Count <= rfpItem.item_quantity)
-                        //                innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
-                        //        }
-                        //    }
-                        //}
                     }
-                }
+                    //else if(!rfpItem.is_company_product)
+                    //{
+                    //    if(rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
+                    //    rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
+                    //    rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
+                    //    rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)
+                    //    {
+                    //        if (!entryPermitList[i].items[j].product_model.has_serial_number)
+                    //        {
+                    //            CheckBox entryPermitItemCheckBox = new CheckBox();
+                    //            entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                    //            entryPermitItemCheckBox.Margin = new Thickness(10);
+                    //            entryPermitItemCheckBox.Width = 500;
+                    //            entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                    //            entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
 
-                checkedItemsWrapPanel.Children.Add(itemsBorder);
+                    //            WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                    //            TextBlock entryPermitCheckBoxContent = new TextBlock();
+                    //            entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
+
+                    //            entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} ";
+
+                    //            Label availableQuantityLabel = new Label();
+                    //            availableQuantityLabel.Style = (Style)FindResource("labelStyle");
+                    //            availableQuantityLabel.Margin = new Thickness(0);
+                    //            availableQuantityLabel.Content = "Quantity:";
+
+                    //            TextBox availableQuantityTextBox = new TextBox();
+                    //            availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                    //            availableQuantityTextBox.Margin = new Thickness(0);
+                    //            availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
+                    //            availableQuantityTextBox.IsEnabled = false;
+
+                    //            Label reservedQuantityLabel = new Label();
+                    //            reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
+                    //            reservedQuantityLabel.Margin = new Thickness(0);
+                    //            reservedQuantityLabel.Width = 170;
+                    //            reservedQuantityLabel.Content = "Realeased Quantity:";
+
+                    //            TextBox reservedQuantity = new TextBox();
+                    //            reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
+                    //            reservedQuantity.Margin = new Thickness(0);
+                    //            reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
+                    //            reservedQuantity.IsEnabled = false;
+
+                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
+                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
+                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
+                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
+                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+
+                    //            entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
+                    //            innerStackPanel.Children.Add(entryPermitItemCheckBox);
+                    //        }
+                    //        else
+                    //        {
+                    //            WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                    //            TextBlock entryPermitContent = new TextBlock();
+                    //            entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                    //            entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
+                    //            entryPermitContent.Width = 300;
+                    //            entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+
+                    //            Label serialNumber = new Label();
+                    //            serialNumber.Style = (Style)FindResource("labelStyle");
+                    //            serialNumber.Margin = new Thickness(0);
+                    //            serialNumber.Width = 200;
+                    //            serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
+
+                    //            entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                    //            entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                    //            if (innerStackPanel.Children.Count <= rfpItem.item_quantity)
+                    //                innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
+                    //        }
+                    //    }
+                    //}
+             
+
+                    checkedItemsWrapPanel.Children.Add(itemsBorder);
+                }
+                else
+                {
+                    this.isRFP = false;
+                    Border itemsBorder = new Border();
+                    itemsBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                    itemsBorder.Margin = new Thickness(24);
+                    itemsBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    itemsBorder.BorderThickness = new Thickness(1);
+                    itemsBorder.Width = 600;
+                    itemsBorder.Height = 500;
+                    itemsBorder.Background = Brushes.White;
+                    itemsBorder.Tag = itemNumber;
+                    DropShadowEffect dropShadowEffect = new DropShadowEffect();
+                    dropShadowEffect.ShadowDepth = 1;
+                    dropShadowEffect.Opacity = 0.1;
+                    itemsBorder.Effect = dropShadowEffect;
+                    Label workFormLabel = new Label();
+                    workFormLabel.Content = $"Work Order Item #{checkedItemsWrapPanel.Children.Count + 1}";
+                    workFormLabel.Width = 600;
+                    workFormLabel.Background = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    workFormLabel.Foreground = Brushes.White;
+                    workFormLabel.Padding = new Thickness(250, 10, 0, 10);
+                    workFormLabel.Style = (Style)FindResource("labelStyle");
+
+                    StackPanel checkedItemStackPanel = new StackPanel();
+                    itemsBorder.Child = checkedItemStackPanel;
+                    checkedItemStackPanel.Children.Add(workFormLabel);
+                    StackPanel innerStackPanel = new StackPanel();
+                    checkedItemStackPanel.Children.Add(innerStackPanel);
+                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT orderProduct = (PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT)checkedCheckBox.Tag;
+                    for (int i = 0; i < parentWindow.materialReleasePermit.GetReleaseItems().Count; i++)
+                    {
+                          if (parentWindow.materialReleasePermit.GetReleaseItems()[i].entryPermit_product_serial_number=="")
+                             {
+                                    CheckBox entryPermitItemCheckBox = new CheckBox();
+                                    entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                                    entryPermitItemCheckBox.Margin = new Thickness(10);
+                                    entryPermitItemCheckBox.Width = 500;
+                                    entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                                    entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+                                    entryPermitItemCheckBox.Tag = parentWindow.materialReleasePermit.GetReleaseItems()[i];
+
+                                    WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                                    entryPermitItemCheckBoxContentWrapPanel.Tag = orderProduct;
+                                    TextBlock entryPermitCheckBoxContent = new TextBlock();
+                                    entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
+                                    entryPermitCheckBoxContent.Text = $@"Entry Permit {parentWindow.materialReleasePermit.GetReleaseItems()[i].material_entry_permit_id} :{parentWindow.materialReleasePermit.GetReleaseItems()[i].orderCategory.category_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderproduct.product_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderBrand.brand_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderModel.model_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderSpecs.spec_name} ";
+
+                                    Label availableQuantityLabel = new Label();
+                                    availableQuantityLabel.Style = (Style)FindResource("labelStyle");
+                                    availableQuantityLabel.Margin = new Thickness(0);
+                                    availableQuantityLabel.Content = "Quantity:";
+
+                                    TextBox availableQuantityTextBox = new TextBox();
+                                    availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                    availableQuantityTextBox.Margin = new Thickness(0);
+                                    availableQuantityTextBox.Text = parentWindow.materialReleasePermit.GetReleaseItems()[i].entered_quantity.ToString();
+                                    availableQuantityTextBox.IsEnabled = false;
+
+                                    Label reservedQuantityLabel = new Label();
+                                    reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
+                                    reservedQuantityLabel.Margin = new Thickness(0);
+                                    reservedQuantityLabel.Width = 170;
+                                    reservedQuantityLabel.Content = "Reserved Quantity:";
+
+                                    TextBox reservedQuantity = new TextBox();
+                                    reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
+                                    reservedQuantity.Margin = new Thickness(0);
+                                    reservedQuantity.Text = orderProduct.productQuantity.ToString();
+                                    reservedQuantity.Tag = orderProduct;
+                                    reservedQuantity.IsEnabled = false;
+
+                                    Label toBeReleasedQuantity = new Label();
+                                    toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
+                                    toBeReleasedQuantity.Margin = new Thickness(0);
+                                    toBeReleasedQuantity.Width = 180;
+                                    toBeReleasedQuantity.Content = "To Be Released Quantity:";
+
+                                    TextBox toBeReleasedQuantityTextBox = new TextBox();
+                                    toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                    toBeReleasedQuantityTextBox.Margin = new Thickness(0);
+                                    toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
+                                    toBeReleasedQuantityTextBox.IsEnabled = false;
+                                    toBeReleasedQuantityTextBox.Text = parentWindow.materialReleasePermit.GetReleaseItems()[i].released_quantity_release.ToString();
+
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
+
+                                    entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
+                                    innerStackPanel.Children.Add(entryPermitItemCheckBox);
+
+                                   entryPermitItemCheckBox.IsChecked = true;
+                            entryPermitItemCheckBox.IsEnabled = false;
+                            toBeReleasedQuantityTextBox.IsEnabled = false;
+                        }
+                         else
+                         {
+                                    WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                                    TextBlock entryPermitContent = new TextBlock();
+                                    entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                                    entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
+                                    entryPermitContent.Text = $@"Entry Permit {parentWindow.materialReleasePermit.GetReleaseItems()[i].material_entry_permit_id}: {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderCategory.category_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderproduct.product_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderBrand.brand_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderModel.model_name} - {parentWindow.materialReleasePermit.GetReleaseItems()[i].orderSpecs.spec_name} ";
+
+                            Label serialNumber = new Label();
+                                    serialNumber.Style = (Style)FindResource("labelStyle");
+                                    serialNumber.Margin = new Thickness(0);
+                            serialNumber.Width = 200;
+                                    serialNumber.Content = $"Serial Number :{parentWindow.materialReleasePermit.GetReleaseItems()[i].entryPermit_product_serial_number} ";
+
+                                    entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                                    entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                                    if (innerStackPanel.Children.Count <= orderProduct.productQuantity)
+                                        innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
+
+                         }
+
+                            
+
+                        
+                    }
+
+
+
+
+                    checkedItemsWrapPanel.Children.Add(itemsBorder);
+                }
+                itemsScroll.ScrollToBottom();
             }
             else
             {
-                this.isRFP = false;
-                Border itemsBorder = new Border();
-                itemsBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                itemsBorder.Margin = new Thickness(24);
-                itemsBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
-                itemsBorder.BorderThickness = new Thickness(1);
-                itemsBorder.Width = 600;
-                itemsBorder.Height = 500;
-                itemsBorder.Background = Brushes.White;
-                itemsBorder.Tag = itemNumber;
-                DropShadowEffect dropShadowEffect = new DropShadowEffect();
-                dropShadowEffect.ShadowDepth = 1;
-                dropShadowEffect.Opacity = 0.1;
-                itemsBorder.Effect = dropShadowEffect;
-                Label workFormLabel = new Label();
-                workFormLabel.Content = $"Work Order Item #{checkedItemsWrapPanel.Children.Count + 1}";
-                workFormLabel.Width = 600;
-                workFormLabel.Background = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
-                workFormLabel.Foreground = Brushes.White;
-                workFormLabel.Padding = new Thickness(250, 10, 0, 10);
-                workFormLabel.Style = (Style)FindResource("labelStyle");
-
-                StackPanel checkedItemStackPanel = new StackPanel();
-                itemsBorder.Child = checkedItemStackPanel;
-                checkedItemStackPanel.Children.Add(workFormLabel);
-                StackPanel innerStackPanel = new StackPanel();
-                checkedItemStackPanel.Children.Add(innerStackPanel);
-                PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT orderProduct =(PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT)checkedCheckBox.Tag;
-                for(int i=0;i<entryPermitList.Count;i++)
+                if (isRFP)
                 {
-                    for(int j = 0; j<entryPermitList[i].items.Count;j++)
+                    this.isRFP = true;
+                    Border itemsBorder = new Border();
+                    itemsBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                    itemsBorder.Margin = new Thickness(24);
+                    itemsBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    itemsBorder.BorderThickness = new Thickness(1);
+                    itemsBorder.Width = 600;
+                    itemsBorder.Height = 500;
+                    itemsBorder.Background = Brushes.White;
+                    itemsBorder.Tag = itemNumber;
+                    DropShadowEffect dropShadowEffect = new DropShadowEffect();
+                    dropShadowEffect.ShadowDepth = 1;
+                    dropShadowEffect.Opacity = 0.1;
+                    itemsBorder.Effect = dropShadowEffect;
+                    Label workFormLabel = new Label();
+                    workFormLabel.Content = $"RFP Item #{itemNumber}";
+                    workFormLabel.Width = 600;
+                    workFormLabel.Background = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    workFormLabel.Foreground = Brushes.White;
+                    workFormLabel.Padding = new Thickness(250, 10, 0, 10);
+                    workFormLabel.Style = (Style)FindResource("labelStyle");
+
+                    StackPanel checkedItemStackPanel = new StackPanel();
+                    itemsBorder.Child = checkedItemStackPanel;
+
+                    checkedItemStackPanel.Children.Add(workFormLabel);
+
+
+                    ScrollViewer itemScrollViewer = new ScrollViewer();
+                    StackPanel innerStackPanel = new StackPanel();
+                    itemScrollViewer.Content = innerStackPanel;
+                    itemScrollViewer.Height = 400;
+
+                    checkedItemStackPanel.Children.Add(itemScrollViewer);
+
+                    PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItem = (PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)checkedCheckBox.Tag;
+                    TextBlock checkedCheckBoxContent = (TextBlock)checkedCheckBox.Content;
+                    for (int i = 0; i < entryPermitList.Count; i++)
                     {
-                        if (orderProduct.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
-                          orderProduct.productType.type_id == entryPermitList[i].items[j].product_type.type_id &&
-                          orderProduct.productBrand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
-                          orderProduct.productModel.model_id == entryPermitList[i].items[j].product_model.model_id &&
-                          orderProduct.productSpec.spec_id == entryPermitList[i].items[j].product_specs.spec_id)
+                        for (int j = 0; j < entryPermitList[i].items.Count; j++)
                         {
-
-                            if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number=="")
+                            if (
+                                rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
+                                rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
+                                rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
+                                rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id &&
+                                rfpItem.product_specs.spec_id == entryPermitList[i].items[j].product_specs.spec_id)
                             {
-                                CheckBox entryPermitItemCheckBox = new CheckBox();
-                                entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
-                                entryPermitItemCheckBox.Margin = new Thickness(10);
-                                entryPermitItemCheckBox.Width = 500;
-                                entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
-                                entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
-                                entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
 
-                                WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
-                                entryPermitItemCheckBoxContentWrapPanel.Tag = orderProduct;
-                                TextBlock entryPermitCheckBoxContent = new TextBlock();
-                                entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
-                                entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+                                if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number == "")
+                                {
+                                    CheckBox entryPermitItemCheckBox = new CheckBox();
+                                    entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                                    entryPermitItemCheckBox.Margin = new Thickness(10);
+                                    entryPermitItemCheckBox.Width = 500;
+                                    entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                                    entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+                                    entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
 
-                                Label availableQuantityLabel = new Label();
-                                availableQuantityLabel.Style = (Style)FindResource("labelStyle");
-                                availableQuantityLabel.Margin = new Thickness(0);
-                                availableQuantityLabel.Content = "Quantity:";
+                                    WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                                    entryPermitItemCheckBoxContentWrapPanel.Tag = rfpItem;
+                                    TextBlock entryPermitCheckBoxContent = new TextBlock();
+                                    entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
 
-                                TextBox availableQuantityTextBox = new TextBox();
-                                availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                                availableQuantityTextBox.Margin = new Thickness(0);
-                                availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
-                                availableQuantityTextBox.IsEnabled = false;
+                                    entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
 
-                                Label reservedQuantityLabel = new Label();
-                                reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
-                                reservedQuantityLabel.Margin = new Thickness(0);
-                                reservedQuantityLabel.Width = 170;
-                                reservedQuantityLabel.Content = "Reserved Quantity:";
+                                    Label availableQuantityLabel = new Label();
+                                    availableQuantityLabel.Style = (Style)FindResource("labelStyle");
+                                    availableQuantityLabel.Margin = new Thickness(0);
+                                    availableQuantityLabel.Content = "Quantity:";
 
-                                TextBox reservedQuantity = new TextBox();
-                                reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
-                                reservedQuantity.Margin = new Thickness(0);
-                                reservedQuantity.Text=orderProduct.productQuantity.ToString();
-                                reservedQuantity.Tag=orderProduct;
-                                reservedQuantity.IsEnabled = false;
+                                    TextBox availableQuantityTextBox = new TextBox();
+                                    availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                    availableQuantityTextBox.Margin = new Thickness(0);
+                                    availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
+                                    availableQuantityTextBox.IsEnabled = false;
 
-                                Label toBeReleasedQuantity = new Label();
-                                toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
-                                toBeReleasedQuantity.Margin = new Thickness(0);
-                                toBeReleasedQuantity.Width = 180;
-                                toBeReleasedQuantity.Content = "To Be Released Quantity:";
+                                    Label reservedQuantityLabel = new Label();
+                                    reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
+                                    reservedQuantityLabel.Margin = new Thickness(0);
+                                    reservedQuantityLabel.Width = 170;
+                                    reservedQuantityLabel.Content = "Reserved Quantity:";
 
-                                TextBox toBeReleasedQuantityTextBox = new TextBox();
-                                toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                                toBeReleasedQuantityTextBox.Margin = new Thickness(0);
-                                toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
-                                toBeReleasedQuantityTextBox.IsEnabled = false;
+                                    TextBox reservedQuantity = new TextBox();
+                                    reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
+                                    reservedQuantity.Margin = new Thickness(0);
+                                    reservedQuantity.Text = rfpItem.item_quantity.ToString();
+                                    reservedQuantity.Tag = rfpItem.item_quantity.ToString();
+                                    reservedQuantity.IsEnabled = false;
 
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
-                                entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
+                                    Label toBeReleasedQuantity = new Label();
+                                    toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
+                                    toBeReleasedQuantity.Margin = new Thickness(0);
+                                    toBeReleasedQuantity.Width = 180;
+                                    toBeReleasedQuantity.Content = "To Be Released Quantity:";
 
-                                entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
-                                innerStackPanel.Children.Add(entryPermitItemCheckBox);
+                                    TextBox toBeReleasedQuantityTextBox = new TextBox();
+                                    toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                    toBeReleasedQuantityTextBox.Margin = new Thickness(0);
+                                    toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
+                                    toBeReleasedQuantityTextBox.IsEnabled = false;
+
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
+
+                                    entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
+                                    innerStackPanel.Children.Add(entryPermitItemCheckBox);
+                                }
+                                else
+                                {
+                                    CheckBox entryPermitItemCheckBox = new CheckBox();
+                                    entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                                    entryPermitItemCheckBox.Margin = new Thickness(10);
+                                    entryPermitItemCheckBox.Width = 500;
+                                    entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                                    entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+                                    entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
+
+                                    WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                                    entryPermitItemContentWrapPanel.Tag = rfpItem;
+                                    TextBlock entryPermitContent = new TextBlock();
+                                    entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                                    entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+
+                                    Label serialNumber = new Label();
+                                    serialNumber.Style = (Style)FindResource("labelStyle");
+                                    serialNumber.Margin = new Thickness(10, 0, 0, 20);
+                                    serialNumber.Width = 300;
+                                    serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
+
+                                    entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                                    entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                                    entryPermitItemCheckBox.Content = entryPermitItemContentWrapPanel;
+
+                                    if (entryPermitList[i].items[j].rfp_info.rfpRequestorTeam == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPRequestorTeamId()
+                                        && entryPermitList[i].items[j].rfp_info.rfpSerial == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPSerial()
+                                        && entryPermitList[i].items[j].rfp_info.rfpVersion == addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPVersion())
+                                    {
+                                        entryPermitItemCheckBox.IsChecked = true;
+
+                                    }
+                                    else if (parentWindow.materialReleasePermit.GetRfp().rfpItems.Any(f => f.product_serial_number == entryPermitList[i].items[j].product_serial_number && (f.product_category.category_id == entryPermitList[i].items[j].product_category.category_id)
+                                                                                                      && (f.product_type.type_id == entryPermitList[i].items[j].product_type.type_id)
+                                                                                                      && (f.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id)
+                                                                                                      && (f.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)) && rfpItem.item_status.status_id == COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                                    {
+                                        entryPermitItemCheckBox.IsChecked = true;
+                                    }
+
+
+                                    innerStackPanel.Children.Add(entryPermitItemCheckBox);
+                                    //else
+                                    //{
+                                    //    WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                                    //    TextBlock entryPermitContent = new TextBlock();
+                                    //    entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                                    //    entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
+                                    //    entryPermitContent.Width = 500;
+                                    //    entryPermitContent.HorizontalAlignment = HorizontalAlignment.Center;
+                                    //    entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+
+                                    //    Label serialNumber = new Label();
+                                    //    serialNumber.Style = (Style)FindResource("labelStyle");
+                                    //    serialNumber.Margin = new Thickness(10, 0, 0, 20);
+                                    //    serialNumber.Width = 300;
+                                    //    serialNumber.Content = $"Serial Number :{rfpItem.product_serial_number} ";
+
+                                    //    entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                                    //    entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                                    //    if (innerStackPanel.Children.Count < rfpItem.item_quantity)
+                                    //        innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
+                                    //}
+
+
+                                }
+
                             }
-                            else
+                            //else if(!rfpItem.is_company_product)
+                            //{
+                            //    if(rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
+                            //    rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
+                            //    rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
+                            //    rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)
+                            //    {
+                            //        if (!entryPermitList[i].items[j].product_model.has_serial_number)
+                            //        {
+                            //            CheckBox entryPermitItemCheckBox = new CheckBox();
+                            //            entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                            //            entryPermitItemCheckBox.Margin = new Thickness(10);
+                            //            entryPermitItemCheckBox.Width = 500;
+                            //            entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                            //            entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+
+                            //            WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                            //            TextBlock entryPermitCheckBoxContent = new TextBlock();
+                            //            entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
+
+                            //            entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} ";
+
+                            //            Label availableQuantityLabel = new Label();
+                            //            availableQuantityLabel.Style = (Style)FindResource("labelStyle");
+                            //            availableQuantityLabel.Margin = new Thickness(0);
+                            //            availableQuantityLabel.Content = "Quantity:";
+
+                            //            TextBox availableQuantityTextBox = new TextBox();
+                            //            availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                            //            availableQuantityTextBox.Margin = new Thickness(0);
+                            //            availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
+                            //            availableQuantityTextBox.IsEnabled = false;
+
+                            //            Label reservedQuantityLabel = new Label();
+                            //            reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
+                            //            reservedQuantityLabel.Margin = new Thickness(0);
+                            //            reservedQuantityLabel.Width = 170;
+                            //            reservedQuantityLabel.Content = "Realeased Quantity:";
+
+                            //            TextBox reservedQuantity = new TextBox();
+                            //            reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
+                            //            reservedQuantity.Margin = new Thickness(0);
+                            //            reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
+                            //            reservedQuantity.IsEnabled = false;
+
+                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
+                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
+                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
+                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
+                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+
+                            //            entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
+                            //            innerStackPanel.Children.Add(entryPermitItemCheckBox);
+                            //        }
+                            //        else
+                            //        {
+                            //            WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                            //            TextBlock entryPermitContent = new TextBlock();
+                            //            entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                            //            entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
+                            //            entryPermitContent.Width = 300;
+                            //            entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+
+                            //            Label serialNumber = new Label();
+                            //            serialNumber.Style = (Style)FindResource("labelStyle");
+                            //            serialNumber.Margin = new Thickness(0);
+                            //            serialNumber.Width = 200;
+                            //            serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
+
+                            //            entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                            //            entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                            //            if (innerStackPanel.Children.Count <= rfpItem.item_quantity)
+                            //                innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
+                            //        }
+                            //    }
+                            //}
+                        }
+                    }
+
+                    checkedItemsWrapPanel.Children.Add(itemsBorder);
+                }
+                else
+                {
+                    this.isRFP = false;
+                    Border itemsBorder = new Border();
+                    itemsBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                    itemsBorder.Margin = new Thickness(24);
+                    itemsBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    itemsBorder.BorderThickness = new Thickness(1);
+                    itemsBorder.Width = 600;
+                    itemsBorder.Height = 500;
+                    itemsBorder.Background = Brushes.White;
+                    itemsBorder.Tag = itemNumber;
+                    DropShadowEffect dropShadowEffect = new DropShadowEffect();
+                    dropShadowEffect.ShadowDepth = 1;
+                    dropShadowEffect.Opacity = 0.1;
+                    itemsBorder.Effect = dropShadowEffect;
+                    Label workFormLabel = new Label();
+                    workFormLabel.Content = $"Work Order Item #{checkedItemsWrapPanel.Children.Count + 1}";
+                    workFormLabel.Width = 600;
+                    workFormLabel.Background = new SolidColorBrush(Color.FromArgb(255, 16, 90, 151));
+                    workFormLabel.Foreground = Brushes.White;
+                    workFormLabel.Padding = new Thickness(250, 10, 0, 10);
+                    workFormLabel.Style = (Style)FindResource("labelStyle");
+
+                    StackPanel checkedItemStackPanel = new StackPanel();
+                    itemsBorder.Child = checkedItemStackPanel;
+                    checkedItemStackPanel.Children.Add(workFormLabel);
+                    StackPanel innerStackPanel = new StackPanel();
+                    checkedItemStackPanel.Children.Add(innerStackPanel);
+                    PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT orderProduct = (PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT)checkedCheckBox.Tag;
+                    for (int i = 0; i < entryPermitList.Count; i++)
+                    {
+                        for (int j = 0; j < entryPermitList[i].items.Count; j++)
+                        {
+                            if (orderProduct.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
+                              orderProduct.productType.type_id == entryPermitList[i].items[j].product_type.type_id &&
+                              orderProduct.productBrand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
+                              orderProduct.productModel.model_id == entryPermitList[i].items[j].product_model.model_id &&
+                              orderProduct.productSpec.spec_id == entryPermitList[i].items[j].product_specs.spec_id)
                             {
-                                WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                                TextBlock entryPermitContent = new TextBlock();
-                                entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                                entryPermitContent.Style = (Style)FindResource("labelStyle");
-                                entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
 
-                                Label serialNumber = new Label();
-                                serialNumber.Style = (Style)FindResource("labelStyle");
-                                serialNumber.Margin = new Thickness(0);
-                                serialNumber.Width = 200;
-                                serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
+                                if (!entryPermitList[i].items[j].product_model.has_serial_number && entryPermitList[i].items[j].product_serial_number == "")
+                                {
+                                    CheckBox entryPermitItemCheckBox = new CheckBox();
+                                    entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
+                                    entryPermitItemCheckBox.Margin = new Thickness(10);
+                                    entryPermitItemCheckBox.Width = 500;
+                                    entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
+                                    entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
+                                    entryPermitItemCheckBox.Tag = entryPermitList[i].items[j];
 
-                                entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                                entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                                if (innerStackPanel.Children.Count <= orderProduct.productQuantity)
-                                    innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
+                                    WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
+                                    entryPermitItemCheckBoxContentWrapPanel.Tag = orderProduct;
+                                    TextBlock entryPermitCheckBoxContent = new TextBlock();
+                                    entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
+                                    entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+
+                                    Label availableQuantityLabel = new Label();
+                                    availableQuantityLabel.Style = (Style)FindResource("labelStyle");
+                                    availableQuantityLabel.Margin = new Thickness(0);
+                                    availableQuantityLabel.Content = "Quantity:";
+
+                                    TextBox availableQuantityTextBox = new TextBox();
+                                    availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                    availableQuantityTextBox.Margin = new Thickness(0);
+                                    availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
+                                    availableQuantityTextBox.IsEnabled = false;
+
+                                    Label reservedQuantityLabel = new Label();
+                                    reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
+                                    reservedQuantityLabel.Margin = new Thickness(0);
+                                    reservedQuantityLabel.Width = 170;
+                                    reservedQuantityLabel.Content = "Reserved Quantity:";
+
+                                    TextBox reservedQuantity = new TextBox();
+                                    reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
+                                    reservedQuantity.Margin = new Thickness(0);
+                                    reservedQuantity.Text = orderProduct.productQuantity.ToString();
+                                    reservedQuantity.Tag = orderProduct;
+                                    reservedQuantity.IsEnabled = false;
+
+                                    Label toBeReleasedQuantity = new Label();
+                                    toBeReleasedQuantity.Style = (Style)FindResource("labelStyle");
+                                    toBeReleasedQuantity.Margin = new Thickness(0);
+                                    toBeReleasedQuantity.Width = 180;
+                                    toBeReleasedQuantity.Content = "To Be Released Quantity:";
+
+                                    TextBox toBeReleasedQuantityTextBox = new TextBox();
+                                    toBeReleasedQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
+                                    toBeReleasedQuantityTextBox.Margin = new Thickness(0);
+                                    toBeReleasedQuantityTextBox.TextChanged += OnTextChangedToBeReleasedQuantity;
+                                    toBeReleasedQuantityTextBox.IsEnabled = false;
+
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantity);
+                                    entryPermitItemCheckBoxContentWrapPanel.Children.Add(toBeReleasedQuantityTextBox);
+
+                                    entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
+                                    innerStackPanel.Children.Add(entryPermitItemCheckBox);
+                                }
+                                else
+                                {
+                                    WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
+                                    TextBlock entryPermitContent = new TextBlock();
+                                    entryPermitContent.TextWrapping = TextWrapping.Wrap;
+                                    entryPermitContent.Style = (Style)FindResource("labelStyle");
+                                    entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
+
+                                    Label serialNumber = new Label();
+                                    serialNumber.Style = (Style)FindResource("labelStyle");
+                                    serialNumber.Margin = new Thickness(0);
+                                    serialNumber.Width = 200;
+                                    serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
+
+                                    entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
+                                    entryPermitItemContentWrapPanel.Children.Add(serialNumber);
+                                    if (innerStackPanel.Children.Count <= orderProduct.productQuantity)
+                                        innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
+
+                                }
 
                             }
 
                         }
-                      
                     }
+
+
+
+
+                    checkedItemsWrapPanel.Children.Add(itemsBorder);
                 }
-
-
-
-
-                checkedItemsWrapPanel.Children.Add(itemsBorder);
+                itemsScroll.ScrollToBottom();
             }
-            itemsScroll.ScrollToBottom();
+           
         }
 
        
 
         private void OnTextChangedToBeReleasedQuantity(object sender, TextChangedEventArgs e)
         {
-            TextBox toBeReleasedTextBox = (TextBox)sender;
-            if(toBeReleasedTextBox.Text !="")
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-               
-                
-                if (!int.TryParse(toBeReleasedTextBox.Text, out int value))
+                TextBox toBeReleasedTextBox = (TextBox)sender;
+                if (toBeReleasedTextBox.Text != "")
                 {
-                    toBeReleasedTextBox.Text = string.Empty;
-                    System.Windows.Forms.MessageBox.Show("Please enter numbers not characters.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return;
 
+
+                    if (!int.TryParse(toBeReleasedTextBox.Text, out int value))
+                    {
+                        toBeReleasedTextBox.Text = string.Empty;
+                        System.Windows.Forms.MessageBox.Show("Please enter numbers not characters.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+
+                    }
+                    else
+                    {
+                        WrapPanel contentWrapPanel = (WrapPanel)toBeReleasedTextBox.Parent;
+                        TextBox reservedTextBox = (TextBox)contentWrapPanel.Children[4];
+                        decimal reservedQuantity = decimal.Parse(reservedTextBox.Text);
+                        int toBereleasedQuantity = int.Parse(toBeReleasedTextBox.Text);
+                        if (toBereleasedQuantity > reservedQuantity)
+                        {
+                            toBeReleasedTextBox.Text = string.Empty;
+                            System.Windows.Forms.MessageBox.Show("Released quantity exceeded the reserved quantity.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            return;
+                        }
+                        else if (toBereleasedQuantity <= reservedQuantity)
+                        {
+                            reservedQuantity -= toBereleasedQuantity;
+                            reservedTextBox.Text = reservedQuantity.ToString();
+                            TextBlock checkBoxContent = (TextBlock)orderItemHolder.Content;
+                            string[] splitedContent = checkBoxContent.Text.Split('\n');
+                            splitedContent[1] = "Reserved Quantity: " + reservedQuantity.ToString();
+                            splitedContent[2] = "To Be Released Quantity: " + toBereleasedQuantity;
+                            checkBoxContent.Text = String.Join("\n", splitedContent);
+                        }
+                        toBeReleasedTextBox.Tag = toBereleasedQuantity;
+                    }
                 }
                 else
                 {
+                    int toBereleasedQuantity = int.Parse(toBeReleasedTextBox.Tag.ToString());
                     WrapPanel contentWrapPanel = (WrapPanel)toBeReleasedTextBox.Parent;
                     TextBox reservedTextBox = (TextBox)contentWrapPanel.Children[4];
                     decimal reservedQuantity = decimal.Parse(reservedTextBox.Text);
-                    int toBereleasedQuantity = int.Parse(toBeReleasedTextBox.Text);
-                    if(toBereleasedQuantity>reservedQuantity)
+                    reservedQuantity += toBereleasedQuantity;
+                    if (reservedQuantity <= decimal.Parse(reservedTextBox.Tag.ToString()))
                     {
-                        toBeReleasedTextBox.Text = string.Empty;
-                        System.Windows.Forms.MessageBox.Show("Released quantity exceeded the reserved quantity.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                        return;
-                    }
-                    else if(toBereleasedQuantity<=reservedQuantity)
-                    {
-                        reservedQuantity -= toBereleasedQuantity;
                         reservedTextBox.Text = reservedQuantity.ToString();
-                        TextBlock checkBoxContent = (TextBlock)orderItemHolder.Content;
+                        TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
                         string[] splitedContent = checkBoxContent.Text.Split('\n');
-                        splitedContent[1]="Reserved Quantity: " + reservedQuantity.ToString();
-                        splitedContent[2] = "To Be Released Quantity: " + toBereleasedQuantity;
+                        splitedContent[1] = "Reserved Quantity: " + reservedQuantity.ToString();
+                        splitedContent[2] = "To Be Released Quantity: 0";
                         checkBoxContent.Text = String.Join("\n", splitedContent);
                     }
-                    toBeReleasedTextBox.Tag = toBereleasedQuantity;
-                }
-            }
-            else 
-            {
-                int toBereleasedQuantity = int.Parse(toBeReleasedTextBox.Tag.ToString());
-                WrapPanel contentWrapPanel = (WrapPanel)toBeReleasedTextBox.Parent;
-                TextBox reservedTextBox = (TextBox)contentWrapPanel.Children[4];
-                decimal reservedQuantity = decimal.Parse(reservedTextBox.Text);
-                reservedQuantity += toBereleasedQuantity;
-                if (reservedQuantity <= decimal.Parse(reservedTextBox.Tag.ToString()))
-                {
-                    reservedTextBox.Text = reservedQuantity.ToString();
-                    TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
-                    string[] splitedContent = checkBoxContent.Text.Split('\n');
-                    splitedContent[1] = "Reserved Quantity: " + reservedQuantity.ToString();
-                    splitedContent[2] = "To Be Released Quantity: 0";
-                    checkBoxContent.Text = String.Join("\n", splitedContent);
-                }
 
 
+                }
             }
+           
           
  
 
@@ -1326,52 +1750,56 @@ namespace _01electronics_inventory
             // WrapPanel entryCheckBoxContent = entryPermitItemCheckBox.Content as WrapPanel;
             // TextBox reservedQuantity = entryCheckBoxContent.Children[4] as TextBox;
             // reservedQuantity.IsEnabled = true;
-           
-            CheckBox checkedItem = (CheckBox)sender;
-            if(isRFP)
+           if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
+
             {
-                WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
-                if(checkedItem.Content!=null)
-                if (checkedItemContent.Children.Count > 2)
+                CheckBox checkedItem = (CheckBox)sender;
+                if (isRFP)
                 {
-                    TextBox toBeReleasedQuantity =(TextBox) checkedItemContent.Children[6];
-                    toBeReleasedQuantity.IsEnabled = true;
-                    selectedItems.Add(checkedItem);
+                    WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
+                    if (checkedItem.Content != null)
+                        if (checkedItemContent.Children.Count > 2)
+                        {
+                            TextBox toBeReleasedQuantity = (TextBox)checkedItemContent.Children[6];
+                            toBeReleasedQuantity.IsEnabled = true;
+                            selectedItems.Add(checkedItem);
+                        }
+                        else
+                        {
+                            checkedItemsCounter++;
+                            //checkedItemsCounterLabel.Content = checkedItemsCounter;
+                            TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
+                            string[] splitedContent = checkBoxContent.Text.Split('\n');
+                            splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
+                            checkBoxContent.Text = String.Join("\n", splitedContent);
+                            selectedItems.Add(checkedItem);
+                        }
                 }
                 else
                 {
-                    checkedItemsCounter++;
-                    //checkedItemsCounterLabel.Content = checkedItemsCounter;
-                    TextBlock checkBoxContent = (TextBlock)rfpItemCheckBoxHolder.Content;
-                    string[] splitedContent = checkBoxContent.Text.Split('\n');
-                    splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
-                    checkBoxContent.Text = String.Join("\n", splitedContent);
-                    selectedItems.Add(checkedItem);
+                    WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
+                    if (checkedItem.Content != null)
+                        if (checkedItemContent.Children.Count > 2)
+                        {
+                            TextBox toBeReleasedQuantity = (TextBox)checkedItemContent.Children[6];
+                            toBeReleasedQuantity.IsEnabled = true;
+                            selectedItems.Add(checkedItem);
+                        }
+                        else
+                        {
+                            checkedItemsCounter++;
+                            //checkedItemsCounterLabel.Content = checkedItemsCounter;
+                            TextBlock checkBoxContent = (TextBlock)orderItemHolder.Content;
+                            string[] splitedContent = checkBoxContent.Text.Split('\n');
+                            splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
+                            checkBoxContent.Text = String.Join("\n", splitedContent);
+                            selectedItems.Add(checkedItem);
+                        }
                 }
+
             }
-            else
-            {
-                WrapPanel checkedItemContent = (WrapPanel)checkedItem.Content;
-                if (checkedItem.Content != null)
-                    if (checkedItemContent.Children.Count > 2)
-                    {
-                        TextBox toBeReleasedQuantity = (TextBox)checkedItemContent.Children[6];
-                        toBeReleasedQuantity.IsEnabled = true;
-                        selectedItems.Add(checkedItem);
-                    }
-                    else
-                    {
-                        checkedItemsCounter++;
-                        //checkedItemsCounterLabel.Content = checkedItemsCounter;
-                        TextBlock checkBoxContent = (TextBlock)orderItemHolder.Content;
-                        string[] splitedContent = checkBoxContent.Text.Split('\n');
-                        splitedContent[2] = "To Be Released Quantity: " + checkedItemsCounter;
-                        checkBoxContent.Text = String.Join("\n", splitedContent);
-                        selectedItems.Add(checkedItem);
-                    }
-            }
-           
-           
+
+
         }
 
         private void OnSelChangedSpecsComboBox(object sender, SelectionChangedEventArgs e)
@@ -3529,11 +3957,11 @@ namespace _01electronics_inventory
                 if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                     parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL);
                 else
-                    parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RECIEVED_BY_EMPLOYEE);
+                    parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED);
             }
 
             else
-                parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RECIEVED_BY_EMPLOYEE);
+                parentWindow.releasePermitPage.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED);
 
 
 
@@ -3651,7 +4079,7 @@ namespace _01electronics_inventory
                             releaseItem.rfp_info.rfpRequestorTeam = parentWindow.releasePermitPage.rfp.GetRFPRequestorTeamId();
 
 
-                            releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL;
+                            releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT;
 
                             releaseItem.rfp_info.rfpSerial = parentWindow.releasePermitPage.rfp.GetRFPSerial();
                             releaseItem.rfp_info.rfpVersion = parentWindow.releasePermitPage.rfp.GetRFPVersion();
@@ -3757,7 +4185,7 @@ namespace _01electronics_inventory
                             if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                                 releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL;
                             else
-                                releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL;
+                                releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT;
 
                             Grid orderLocationGrid = location.Children[2] as Grid;
 
@@ -3892,7 +4320,7 @@ namespace _01electronics_inventory
                         if (rfpCheckBox.IsChecked == true)
                         {
 
-                            releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL;
+                            releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT;
 
                             Grid rfpLocationGrid = location.Children[2] as Grid;
 
@@ -4008,7 +4436,7 @@ namespace _01electronics_inventory
                             if (parentWindow.releasePermitPage.MaterialRecieverComboBox.SelectedIndex == -1 && parentWindow.releasePermitPage.contactComboBox.SelectedIndex != -1)
                                 releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL;
                             else
-                                releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.RECIEVED_BY_EMPLOYEE;
+                                releaseItem.release_permit_item_status = COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED;
 
                             Grid orderLocationGrid = location.Children[2] as Grid;
 
