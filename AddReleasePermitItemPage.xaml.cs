@@ -130,7 +130,7 @@ namespace _01electronics_inventory
             InitializeStock();
             GetGenericItems();
             GetAllWorkOrders();
-            CheckAddOrView();
+            //CheckAddOrView();
             //LocationsWrapPanel.Margin = new Thickness(0,15,0,0);
            
         }
@@ -867,24 +867,50 @@ namespace _01electronics_inventory
 
         private void OnCheckRFPItem(object sender, RoutedEventArgs e)
         {
-            checkedItemsCounter = 0;
-            checkedItemsCounterLabel.Content = checkedItemsCounter;
-            CheckBox rfpItemCheckBox = (CheckBox)sender;
-            RFP_MAX_STRUCT rfp = new RFP_MAX_STRUCT();
-            rfp.rfp_serial = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpSerial;
-            rfp.requestor_team_id = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpRequestorTeam;
-            rfp.rfp_version = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpVersion;
-            //rfp.rfps_items_min = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
-            //rfp.rfps_items_min.Add((PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag);
-            checkedRFPItems.Add(rfp);
-            rfpItemCheckBoxHolder = rfpItemCheckBox;
-            int position = Home.Children.IndexOf(rfpItemCheckBox);
-            CreateSelectedItemsCard(true , position+1 , rfpItemCheckBox);
-            for(int i=0;i<Home.Children.Count;i++)
+            if(viewAddCondition==COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-                CheckBox rfpItemCheckBoxx= (CheckBox)Home.Children[i];
-                if (rfpItemCheckBoxx != rfpItemCheckBox)
-                    rfpItemCheckBoxx.IsChecked = false;
+                checkedItemsCounter = 0;
+                checkedItemsCounterLabel.Content = checkedItemsCounter;
+                CheckBox rfpItemCheckBox = (CheckBox)sender;
+                RFP_MAX_STRUCT rfp = new RFP_MAX_STRUCT();
+                rfp.rfp_serial = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpSerial;
+                rfp.requestor_team_id = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpRequestorTeam;
+                rfp.rfp_version = addReleasePermitPage.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpVersion;
+                //rfp.rfps_items_min = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+                //rfp.rfps_items_min.Add((PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag);
+                checkedRFPItems.Add(rfp);
+                rfpItemCheckBoxHolder = rfpItemCheckBox;
+                int position = Home.Children.IndexOf(rfpItemCheckBox);
+                CreateSelectedItemsCard(true, position + 1, rfpItemCheckBox);
+                for (int i = 0; i < Home.Children.Count; i++)
+                {
+                    CheckBox rfpItemCheckBoxx = (CheckBox)Home.Children[i];
+                    if (rfpItemCheckBoxx != rfpItemCheckBox)
+                        rfpItemCheckBoxx.IsChecked = false;
+                }
+            }
+            else
+            {
+                checkedItemsCounter = 0;
+                checkedItemsCounterLabel.Content = checkedItemsCounter;
+                CheckBox rfpItemCheckBox = (CheckBox)sender;
+                RFP_MAX_STRUCT rfp = new RFP_MAX_STRUCT();
+                rfp.rfp_serial = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPSerial();
+                rfp.requestor_team_id = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPRequestorTeamId();
+                rfp.rfp_version = addReleasePermitPage.materialReleasePermit.GetRfp().GetRFPVersion();
+                rfp.rfps_items_min = new List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT>();
+                rfp.rfps_items_min.Add((PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT)rfpItemCheckBox.Tag);
+                checkedRFPItems.Add(rfp);
+                rfpItemCheckBoxHolder = rfpItemCheckBox;
+                int position = Home.Children.IndexOf(rfpItemCheckBox);
+                CreateSelectedItemsCard(true, position + 1, rfpItemCheckBox);
+                for (int i = 0; i < Home.Children.Count; i++)
+                {
+                    CheckBox rfpItemCheckBoxx = (CheckBox)Home.Children[i];
+                    if (rfpItemCheckBoxx != rfpItemCheckBox)
+                        rfpItemCheckBoxx.IsChecked = false;
+                }
+
             }
 
         }

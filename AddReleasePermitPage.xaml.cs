@@ -85,6 +85,7 @@ namespace _01electronics_inventory
                 MaterialRecieverComboBox.IsEnabled = false;
                 SerialIdTextBox.Text = parentWindow.materialReleasePermit.GetReleaseId();
                 SerialIdTextBox.IsEnabled = false;
+                addContactBtn.Visibility= Visibility.Collapsed;
                 if (parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpSerial ==0)
                 {
                     workFormComboBox.SelectedIndex = 1;
