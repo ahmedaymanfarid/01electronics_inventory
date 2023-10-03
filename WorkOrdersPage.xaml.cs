@@ -942,7 +942,7 @@ namespace _01electronics_inventory
                             Grid.SetColumn(numberLabel, 0);
 
                             Label locationLabel = new Label();
-                            locationLabel.Content = workOrders[i].project_locations[k].district.district_name + ", " + workOrders[i].project_locations[k].state_governorate.state_name + ", " + workOrders[i].project_locations[k].city.city_name + ", " + workOrders[i].project_locations[k].country.country_name;
+                            locationLabel.Content = workOrders[i].project_locations[k].site_location.district.district_name + ", " + workOrders[i].project_locations[k].site_location.state_governorate.state_name + ", " + workOrders[i].project_locations[k].site_location.city.city_name + ", " + workOrders[i].project_locations[k].site_location.country.country_name;
                             locationLabel.Style = (Style)FindResource("tableSubItemLabel");
 
                             projectLocationsGrid.Children.Add(locationLabel);
@@ -962,7 +962,7 @@ namespace _01electronics_inventory
                             Grid.SetColumn(numberLabel, 0);
 
                             Label locationLabel = new Label();
-                            locationLabel.Content = workOrders[i].project_locations[k].district.district_name + ", " + workOrders[i].project_locations[k].state_governorate.state_name + ", " + workOrders[i].project_locations[k].city.city_name + ", " + workOrders[i].project_locations[k].country.country_name;
+                            locationLabel.Content = workOrders[i].project_locations[k].site_location.district.district_name + ", " + workOrders[i].project_locations[k].site_location.state_governorate.state_name + ", " + workOrders[i].project_locations[k].site_location.city.city_name + ", " + workOrders[i].project_locations[k].site_location.country.country_name;
                             locationLabel.Style = (Style)FindResource("tableSubItemLabel");
 
                             projectLocationsGrid.Children.Add(locationLabel);

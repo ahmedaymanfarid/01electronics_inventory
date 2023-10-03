@@ -56,10 +56,11 @@ namespace _01electronics_inventory
            //
             rfps = new RFP();
             func1=function;
-            if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
+            if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE || viewAddCondition==COMPANY_WORK_MACROS.EDIT_RELEASE)
                 materialReleasePermit = mMaterialReleasePermit;
             else
                 materialReleasePermit = new MaterialReleasePermits();
+
             releasePermitPage = new AddReleasePermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
             releasePermitItemPage = new AddReleasePermitItemPage(ref  commonQueries, ref commonFunctions,ref integrityChecks,ref loggedInUser, this);
             releasePermitSummary = new AddReleasePermitSummary(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
