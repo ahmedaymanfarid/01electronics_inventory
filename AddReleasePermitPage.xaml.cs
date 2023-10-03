@@ -47,7 +47,7 @@ namespace _01electronics_inventory
         List<COMPANY_ORGANISATION_MACROS.CONTACT_MIN_LIST_STRUCT> companyContacts;
 
         public List<PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT> rfpItems;
-
+        int viewAddCondition;
 
         public List<int> serialProducts;
 
@@ -72,16 +72,78 @@ namespace _01electronics_inventory
             rfp = parentWindow.rfps;
             workOrder = parentWindow.workOrder;
             addReleasePermitItem = parentWindow.releasePermitItemPage;
+            viewAddCondition = parentWindow.viewAddCondition;
             //addReleasePermitItem = new AddReleasePermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, parentWindow);
-
             InitializeComponent();
+            if (parentWindow.viewAddCondition==COMPANY_WORK_MACROS.VIEW_RELEASE)
+            {
+                ReleaseDatePicker.SelectedDate = parentWindow.materialReleasePermit.GetReleaseDate();
+                ReleaseDatePicker.IsEnabled = false;
+                MaterialRecieverComboBox.Items.Clear();
+                MaterialRecieverComboBox.Items.Add(parentWindow.materialReleasePermit.GetMaterialReceiver().employee_name);
+                MaterialRecieverComboBox.SelectedIndex = 0;
+                MaterialRecieverComboBox.IsEnabled = false;
+                SerialIdTextBox.Text = parentWindow.materialReleasePermit.GetReleaseId();
+                SerialIdTextBox.IsEnabled = false;
+                addContactBtn.Visibility= Visibility.Collapsed;
+                if (parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpSerial ==0)
+                {
+                    workFormComboBox.SelectedIndex = 1;
+                    orderSerials.Items.Clear();
+                    workFormComboBox.IsEnabled = false;
+                    orderSerials.Items.Add(parentWindow.materialReleasePermit.GetWorkOrder().orderSerial);
+                    orderSerials.SelectedIndex = 0;
+                    orderSerials.IsEnabled = false;
 
-            GetOrderIDs();
-            GetRFPsRequestorTeams();
-            GetCurrentEnrolledEmployees();
-            GetNewEntrySerial();
-            FillRFPRequestorTeamComboBox();
-            FillOrderIDsComboBox();
+                    contactComboBox.Items.Clear();
+                    contactComboBox.Items.Add(parentWindow.materialReleasePermit.GetWorkOrder().GetContactName());
+                    contactComboBox.SelectedIndex = 0;
+                    contactComboBox.IsEnabled = false;
+
+                    if(parentWindow.materialReleasePermit.GetReleasePermitStatus()==COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT || parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.SERVICE_REPORT_RECEIVED)
+                    {
+                        serviceReportCheckBox.IsChecked = true;
+                        
+                    }
+                    else if(parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL || parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED)
+                    {
+                        receivalNoteCheckBox.IsChecked = true;
+                    }
+                    serviceReportCheckBox.IsEnabled = false;
+                    receivalNoteCheckBox.IsEnabled = false;
+                }
+                else
+                {
+                    workFormComboBox.SelectedIndex = 0;
+                    rfpRequesters.Items.Clear();
+                    rfpRequesters.Items.Add(parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfp_requestor_team_name);
+                    rfpRequesters.SelectedIndex = 0;
+                    workFormComboBox.IsEnabled = false;
+                    rfpRequesters.IsEnabled = false;
+
+                    rfpSerials.Items.Clear();
+                    rfpSerials.Items.Add(parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpID);
+                    rfpSerials.SelectedIndex = 0;
+                    rfpSerials.IsEnabled = false;   
+
+
+
+                }
+
+            }
+            else
+            {
+                GetOrderIDs();
+                GetRFPsRequestorTeams();
+                GetCurrentEnrolledEmployees();
+                GetNewEntrySerial();
+                FillRFPRequestorTeamComboBox();
+                FillOrderIDsComboBox();
+            }
+
+           
+
+          
           
         }
 
@@ -177,9 +239,12 @@ namespace _01electronics_inventory
         {
             if (MaterialRecieverComboBox.SelectedIndex == -1)
                 return;
-
-            materialReleasePermit.SetMaterialReceiver(employees[MaterialRecieverComboBox.SelectedIndex].employee_id);
-            materialReleasePermit.SetMaterialReceiverName(employees[MaterialRecieverComboBox.SelectedIndex].employee_name);
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
+            {
+                materialReleasePermit.SetMaterialReceiver(employees[MaterialRecieverComboBox.SelectedIndex].employee_id);
+                materialReleasePermit.SetMaterialReceiverName(employees[MaterialRecieverComboBox.SelectedIndex].employee_name);
+            }
+           
 
         }
 
@@ -247,13 +312,16 @@ namespace _01electronics_inventory
 
         private void rfpRequestersSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-           
+           if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
+            {
+                if (!commonQueries.GetTeamRFPsMappedIds(ref rfps, requstersFiltered[rfpRequesters.SelectedIndex].requestor_team.team_id, COMPANY_WORK_MACROS.RFP_AT_STOCK))
+                    return;
+                rfpSerials.Items.Clear();
 
-            if (!commonQueries.GetTeamRFPsMappedIds(ref rfps, requstersFiltered[rfpRequesters.SelectedIndex].requestor_team.team_id,COMPANY_WORK_MACROS.RFP_AT_STOCK))
-                return;
-            rfpSerials.Items.Clear();
+                rfps.ForEach(a => rfpSerials.Items.Add(a.rfpID));
+            }
 
-            rfps.ForEach(a => rfpSerials.Items.Add(a.rfpID));
+            
 
 
         }
@@ -261,65 +329,73 @@ namespace _01electronics_inventory
         private bool InitializeCompanyContacts()
         {
         
-
-            workOrder.InitializeWorkOrderInfo(workOrders[orderSerials.SelectedIndex].order_serial);
-
-            companyContacts.Clear();
-            contactComboBox.Items.Clear();
-            contactComboBox.IsEnabled = true;
-            if (workFormComboBox.SelectedIndex ==1)
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-                if (!commonQueries.GetCompanyContacts(workOrder.GetCompanySerial(), ref companyContacts))
-                    return false;
-            }
-          
-            for (int i = 0; i < companyContacts.Count(); i++)
-            {
-                contactComboBox.Items.Add(companyContacts[i].contact.contact_name);
+                workOrder.InitializeWorkOrderInfo(workOrders[orderSerials.SelectedIndex].order_serial);
+
+                companyContacts.Clear();
+                contactComboBox.Items.Clear();
+                contactComboBox.IsEnabled = true;
+                if (workFormComboBox.SelectedIndex == 1)
+                {
+                    if (!commonQueries.GetCompanyContacts(workOrder.GetCompanySerial(), ref companyContacts))
+                        return false;
+                }
+
+                for (int i = 0; i < companyContacts.Count(); i++)
+                {
+                    contactComboBox.Items.Add(companyContacts[i].contact.contact_name);
+                }
+                return true;
+
             }
             return true;
         }
 
         private void OnSelectionChangedOrderSerial(object sender, SelectionChangedEventArgs e)
         {
-            serialProducts.Clear();
-            workOrder.SetOrderIssueDateToToday();
-
-          
-
-            ComboBox ordersComboBox = sender as ComboBox;
-
-            if (ordersComboBox.SelectedIndex != -1)
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-                InitializeCompanyContacts();
-
-                workOrder.InitializeWorkOrderInfo(workOrders[ordersComboBox.SelectedIndex].order_serial);
-
-            }
-
-            for (int i = 0; i < workOrder.GetOrderProductsList().Length; i++) {
+                serialProducts.Clear();
+                workOrder.SetOrderIssueDateToToday();
 
 
-                if (workOrder.GetOrderProductsList()[i].has_serial_number == true)
+
+                ComboBox ordersComboBox = sender as ComboBox;
+
+                if (ordersComboBox.SelectedIndex != -1)
                 {
-                    int numberOfSerials = 0;
-                    workOrder.GetNumOfProductSerialsForAProduct(workOrder.GetOrderSerial(), workOrder.GetOrderProductsList()[i].productNumber, ref numberOfSerials);
+                    InitializeCompanyContacts();
 
-                    serialProducts.Add(numberOfSerials);
+                    workOrder.InitializeWorkOrderInfo(workOrders[ordersComboBox.SelectedIndex].order_serial);
+
                 }
 
-                else {
+                for (int i = 0; i < workOrder.GetOrderProductsList().Length; i++)
+                {
 
-                    serialProducts.Add(0);
-                
+
+                    if (workOrder.GetOrderProductsList()[i].has_serial_number == true)
+                    {
+                        int numberOfSerials = 0;
+                        workOrder.GetNumOfProductSerialsForAProduct(workOrder.GetOrderSerial(), workOrder.GetOrderProductsList()[i].productNumber, ref numberOfSerials);
+
+                        serialProducts.Add(numberOfSerials);
+                    }
+
+                    else
+                    {
+
+                        serialProducts.Add(0);
+
+                    }
+
                 }
 
+                materialReleasePermit.SetWorkOrder(workOrder);
+                materialReleasePermit.SetRfp(null);
             }
-
-            materialReleasePermit.SetWorkOrder(workOrder);
-            materialReleasePermit.SetRfp(null);
-
-
+          
         }
 
       
@@ -337,129 +413,138 @@ namespace _01electronics_inventory
         /// <param name="e"></param>
         private void OnSelectionChangedContactsComboBox(object sender, SelectionChangedEventArgs e)
         {
-
-           ComboBox contactsComboBox =sender as ComboBox;
-
-            if (contactsComboBox.SelectedIndex != -1)
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-                materialReleasePermit.SetContactId(workOrder.GetContactId());
-                materialReleasePermit.SetBranchSerialId(workOrder.GetAddressSerial());
+                ComboBox contactsComboBox = sender as ComboBox;
 
-                materialReleasePermit.SetSalesPersonId(workOrder.GetSalesPersonId());
-            }
-            else {
-
-
-                materialReleasePermit.SetContactId(0);
-            }
-        }
-        private void OnSelectionChangedRfpIdComboBox(object sender, SelectionChangedEventArgs e)
-        {
-        
-            ComboBox rfpSerialsComboBox = sender as ComboBox;
-
-            serialProducts.Clear();
-            rfp.rfpItems.Clear();
-            
-
-            if (rfpSerialsComboBox.SelectedIndex != -1)
-                if (!rfp.InitializeRFP(rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion))
-                    return;
-
-
-            if (!commonQueries.GetRfpItemsMappingMergedItems(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
-                return;
-
-            for (int i = 0; i < rfpItems.Count; i++)
-            {
-
-                if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK)
+                if (contactsComboBox.SelectedIndex != -1)
                 {
+                    materialReleasePermit.SetContactId(workOrder.GetContactId());
+                    materialReleasePermit.SetBranchSerialId(workOrder.GetAddressSerial());
 
-                    rfpItems.Remove(rfpItems[i]);
-                    i--;
+                    materialReleasePermit.SetSalesPersonId(workOrder.GetSalesPersonId());
                 }
-
-
-            }
-           
-
-            for (int i = 0; i < rfpItems.Count; i++)
-            {
-
-                if (rfpItems[i].product_model.model_name != "")
-                {
-
-                    if (rfpItems[i].product_model.has_serial_number == true)
-                    {
-
-
-                        serialProducts.Add(0);
-
-
-                    }
-
-                    else
-                    {
-
-                        serialProducts.Add(0);
-
-                    }
-
-
-                }
-
-
                 else
                 {
 
 
-                    if (rfpItems[i].product_model.has_serial_number == true)
+                    materialReleasePermit.SetContactId(0);
+                }
+            }
+           
+        }
+        private void OnSelectionChangedRfpIdComboBox(object sender, SelectionChangedEventArgs e)
+        {
+        
+
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
+            {
+                ComboBox rfpSerialsComboBox = sender as ComboBox;
+
+                serialProducts.Clear();
+                rfp.rfpItems.Clear();
+
+
+                if (rfpSerialsComboBox.SelectedIndex != -1)
+                    if (!rfp.InitializeRFP(rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion))
+                        return;
+
+
+                if (!commonQueries.GetRfpItemsMappingMergedItems(rfps[rfpSerialsComboBox.SelectedIndex].rfpSerial, rfps[rfpSerialsComboBox.SelectedIndex].rfpVersion, rfps[rfpSerialsComboBox.SelectedIndex].rfpRequestorTeam, ref rfpItems))
+                    return;
+
+                for (int i = 0; i < rfpItems.Count; i++)
+                {
+
+                    if (rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_INVENTORY_REVISED && rfpItems[i].item_status.status_id != COMPANY_WORK_MACROS.RFP_AT_STOCK)
                     {
 
+                        rfpItems.Remove(rfpItems[i]);
+                        i--;
+                    }
 
-                        serialProducts.Add(0);
+
+                }
+
+
+                for (int i = 0; i < rfpItems.Count; i++)
+                {
+
+                    if (rfpItems[i].product_model.model_name != "")
+                    {
+
+                        if (rfpItems[i].product_model.has_serial_number == true)
+                        {
+
+
+                            serialProducts.Add(0);
+
+
+                        }
+
+                        else
+                        {
+
+                            serialProducts.Add(0);
+
+                        }
 
 
                     }
+
 
                     else
                     {
 
-                        serialProducts.Add(0);
+
+                        if (rfpItems[i].product_model.has_serial_number == true)
+                        {
+
+
+                            serialProducts.Add(0);
+
+
+                        }
+
+                        else
+                        {
+
+                            serialProducts.Add(0);
+
+                        }
 
                     }
 
                 }
-
-            }
-            for(int i = 0;i< rfpItems.Count;i++)
-            {
-                if (rfp.rfpItems.Any(f => f.product_category.category_id == rfpItems[i].product_category.category_id
-                                        && f.product_type.type_id == rfpItems[i].product_type.type_id
-                                        && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
-                                        && f.product_model.model_id == rfpItems[i].product_model.model_id
-                                        && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id))
+                for (int i = 0; i < rfpItems.Count; i++)
                 {
-                    PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItemmin = new PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT();
-                    rfpItemmin = rfpItems[i];
-                    rfpItemmin.rfp_item_number = rfp.rfpItems.Find(f => f.product_category.category_id == rfpItems[i].product_category.category_id
-                                        && f.product_type.type_id == rfpItems[i].product_type.type_id
-                                        && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
-                                        && f.product_model.model_id == rfpItems[i].product_model.model_id
-                                        && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id).rfp_item_number;
-                    rfpItems.RemoveAt(i);
-                    rfpItems.Insert(i, rfpItemmin);
+                    if (rfp.rfpItems.Any(f => f.product_category.category_id == rfpItems[i].product_category.category_id
+                                            && f.product_type.type_id == rfpItems[i].product_type.type_id
+                                            && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
+                                            && f.product_model.model_id == rfpItems[i].product_model.model_id
+                                            && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id))
+                    {
+                        PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT rfpItemmin = new PROCUREMENT_STRUCTS.RFP_ITEM_MIN_STRUCT();
+                        rfpItemmin = rfpItems[i];
+                        rfpItemmin.rfp_item_number = rfp.rfpItems.Find(f => f.product_category.category_id == rfpItems[i].product_category.category_id
+                                            && f.product_type.type_id == rfpItems[i].product_type.type_id
+                                            && f.product_brand.brand_id == rfpItems[i].product_brand.brand_id
+                                            && f.product_model.model_id == rfpItems[i].product_model.model_id
+                                            && f.product_specs.spec_id == rfpItems[i].product_specs.spec_id).rfp_item_number;
+                        rfpItems.RemoveAt(i);
+                        rfpItems.Insert(i, rfpItemmin);
+                    }
                 }
-            }
-            materialReleasePermit.SetRfp(rfp);
-            materialReleasePermit.SetWorkOrder(null);
+                materialReleasePermit.SetRfp(rfp);
+                materialReleasePermit.SetWorkOrder(null);
 
-            parentWindow.releasePermitItemPage.checkedItemsCounterLabel.Content = "0";
-            parentWindow.releasePermitItemPage.checkedItemsCounter = 0;
-            parentWindow.releasePermitItemPage.checkedRFPItems.Clear();
-            parentWindow.releasePermitItemPage.checkedOrderItems.Clear();
-            parentWindow.releasePermitItemPage.selectedItems.Clear();
+                parentWindow.releasePermitItemPage.checkedItemsCounterLabel.Content = "0";
+                parentWindow.releasePermitItemPage.checkedItemsCounter = 0;
+                parentWindow.releasePermitItemPage.checkedRFPItems.Clear();
+                parentWindow.releasePermitItemPage.checkedOrderItems.Clear();
+                parentWindow.releasePermitItemPage.selectedItems.Clear();
+            }
+            
 
         }
         /// <summary>
@@ -498,23 +583,32 @@ namespace _01electronics_inventory
 
         private void OnButtonClickNext(object sender, RoutedEventArgs e)
         {
-            if (workFormComboBox.SelectedIndex==-1)
+            if(viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
             {
-
-                System.Windows.Forms.MessageBox.Show("You have to choose rfp or order", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                return;
+               // 
+                this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
             }
-            if(workFormComboBox.SelectedIndex == 1 && serviceReportCheckBox.IsChecked==false && receivalNoteCheckBox.IsChecked == false )
+            else
             {
-                System.Windows.Forms.MessageBox.Show("Please choose ending it with receival note or service report", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                return;
+                if (workFormComboBox.SelectedIndex == -1)
+                {
+
+                    System.Windows.Forms.MessageBox.Show("You have to choose rfp or order", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (workFormComboBox.SelectedIndex == 1 && serviceReportCheckBox.IsChecked == false && receivalNoteCheckBox.IsChecked == false)
+                {
+                    System.Windows.Forms.MessageBox.Show("Please choose ending it with receival note or service report", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+
+                materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
+
+                // addReleasePermitItem.addReleasePermitPage = this;
+                parentWindow.releasePermitItemPage.InitializeStock();
+                this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
             }
-
-            materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
-            parentWindow.releasePermitItemPage.InitializeStock();
-            // addReleasePermitItem.addReleasePermitPage = this;
-
-            this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
+           
 
 
         }

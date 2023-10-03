@@ -290,7 +290,7 @@ namespace _01electronics_inventory
                 {
 
 
-                    if (reEntryPermit.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL &&
+                    if (reEntryPermit.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT &&
                         reEntryPermit.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL)
                     {
 

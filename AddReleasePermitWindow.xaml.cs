@@ -26,7 +26,7 @@ namespace _01electronics_inventory
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
 
-        public bool isView;
+        public int viewAddCondition;
 
         public delegate void func(int serial);
 
@@ -42,7 +42,7 @@ namespace _01electronics_inventory
         public WorkOrder workOrder;
         public RFP rfps;
 
-        public AddReleasePermitWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, MaterialReleasePermits mMaterialReleasePermit=null, bool mIsView=false,func function=null)
+        public AddReleasePermitWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, MaterialReleasePermits mMaterialReleasePermit=null, int mViewAddCondition = 0,func function=null)
         {
             commonFunctions = mCommonFunctions;
             commonQueries = mCommonQueries; 
@@ -51,20 +51,24 @@ namespace _01electronics_inventory
             serviceReport = false;
             rfp = false;
             InitializeComponent();
-            isView=mIsView;
+            viewAddCondition=mViewAddCondition;
             workOrder = new WorkOrder();
-            materialReleasePermit = new MaterialReleasePermits();
+           //
             rfps = new RFP();
             func1=function;
-            
+            if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
+                materialReleasePermit = mMaterialReleasePermit;
+            else
+                materialReleasePermit = new MaterialReleasePermits();
             releasePermitPage = new AddReleasePermitPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
             releasePermitItemPage = new AddReleasePermitItemPage(ref  commonQueries, ref commonFunctions,ref integrityChecks,ref loggedInUser, this);
             releasePermitSummary = new AddReleasePermitSummary(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this);
-            if (isView == true)
-                materialReleasePermit = mMaterialReleasePermit;
 
 
-            frame.Content = releasePermitPage;
+            if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
+                frame.Content =releasePermitSummary;
+            else
+                 frame.Content = releasePermitPage;
 
         }
     }

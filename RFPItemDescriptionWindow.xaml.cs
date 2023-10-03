@@ -363,7 +363,11 @@ namespace _01electronics_inventory
             for (int i = 0; i < companyModelSpecs.Count; i++)
             {
                 if (companyModelSpecs[i].spec_id==0)
+                {
                     companyModelSpecs.RemoveAt(i);
+                    i -= 1;
+                }
+                    
                 else
                 specsComboBox.Items.Add(companyModelSpecs[i].spec_name);
             }
