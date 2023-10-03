@@ -491,7 +491,7 @@ namespace _01electronics_inventory
         {
             workOrder.GetOrderModelsSerialsList().Clear();
 
-            List<BASIC_STRUCTS.ADDRESS_STRUCT> Locations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+            List<PROJECT_MACROS.PROJECT_SITE_STRUCT> Locations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
             workOrder.GetProjectLocations(ref Locations);
             //AN MAKE IT POP UP AS AN ERROR NOT MESSAGE
             if (workOrder.GetOrderProduct1Quantity() != 0)

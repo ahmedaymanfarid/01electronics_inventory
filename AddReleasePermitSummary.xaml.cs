@@ -60,7 +60,7 @@ namespace _01electronics_inventory
         }
         public void InitializeSummarySheet()
         {
-            if(parentWindow.viewAddCondition==COMPANY_WORK_MACROS.VIEW_RELEASE)
+            if(parentWindow.viewAddCondition==COMPANY_WORK_MACROS.VIEW_RELEASE || parentWindow.viewAddCondition==COMPANY_WORK_MACROS.EDIT_RELEASE)
             {
                 finishButton.IsEnabled = false;
                 int rowCount = 1;

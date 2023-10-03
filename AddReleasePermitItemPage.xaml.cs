@@ -57,11 +57,11 @@ namespace _01electronics_inventory
 
         private List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT> workOrders;
 
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> workOrdersLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> workOrdersLocations;
 
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> maintenanceContractLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> maintenanceContractLocations;
 
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> companyProjectLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> companyProjectLocations;
 
         private List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT> specs;
 
@@ -102,10 +102,10 @@ namespace _01electronics_inventory
 
             workOrders = new List<SALES_STRUCTS.WORK_ORDER_MIN_STRUCT>();
 
-            workOrdersLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+            workOrdersLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
 
-            maintenanceContractLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
-            companyProjectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+            maintenanceContractLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
+            companyProjectLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
             
             specs = new List<PRODUCTS_STRUCTS.PRODUCT_SPECS_STRUCT>();
             genericCategories= new List<PRODUCTS_STRUCTS.PRODUCT_CATEGORY_STRUCT>();
@@ -2908,7 +2908,7 @@ namespace _01electronics_inventory
                 workOrder.GetProjectLocations(ref workOrdersLocations);
 
 
-                workOrdersLocations.ForEach(a => locations.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
+                workOrdersLocations.ForEach(a => locations.Items.Add(a.site_location.district.district_name + " ," + a.site_location.city.city_name + " ," + a.site_location.state_governorate.state_name + " ," + a.site_location.country.country_name));
 
                 identityTextBox.Text = workOrder.GetOrderID();
 
@@ -2924,7 +2924,7 @@ namespace _01electronics_inventory
                 maintenanceContractLocations = maintenanceContract.GetMaintContractProjectLocations();
 
 
-                maintenanceContractLocations.ForEach(a => locations.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
+                maintenanceContractLocations.ForEach(a => locations.Items.Add(a.site_location.district.district_name + " ," + a.site_location.city.city_name + " ," + a.site_location.state_governorate.state_name + " ," + a.site_location.country.country_name));
 
                 identityTextBox.Text = maintenanceContract.GetMaintContractID();
 
@@ -2937,7 +2937,7 @@ namespace _01electronics_inventory
 
                 commonQueries.GetCompanyProjectLocations(addReleasePermitPage.rfp.GetProjectSerial(), ref companyProjectLocations);
 
-                companyProjectLocations.ForEach(a => locations.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
+                companyProjectLocations.ForEach(a => locations.Items.Add(a.site_location.district.district_name + " ," + a.site_location.city.city_name + " ," + a.site_location.state_governorate.state_name + " ," + a.site_location.country.country_name));
 
                 identityTextBox.Text = "PROJECT";
 
@@ -3171,7 +3171,7 @@ namespace _01electronics_inventory
             parentWindow.releasePermitPage.workOrder.GetProjectLocations(ref workOrdersLocations);
 
 
-            workOrdersLocations.ForEach(a => orderLocationsComboBox.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
+            workOrdersLocations.ForEach(a => orderLocationsComboBox.Items.Add(a.site_location.district.district_name + " ," + a.site_location.city.city_name + " ," + a.site_location.state_governorate.state_name + " ," + a.site_location.country.country_name));
 
 
             PRODUCTS_STRUCTS.ORDER_PRODUCT_STRUCT[] workOrderProducts = parentWindow.releasePermitPage.workOrder.GetOrderProductsList();
@@ -3271,7 +3271,7 @@ namespace _01electronics_inventory
             workOrder.GetProjectLocations(ref workOrdersLocations);
 
 
-            workOrdersLocations.ForEach(a => orderLocationComboBox.Items.Add(a.district.district_name + " ," + a.city.city_name + " ," + a.state_governorate.state_name + " ," + a.country.country_name));
+            workOrdersLocations.ForEach(a => orderLocationComboBox.Items.Add(a.site_location.district.district_name + " ," + a.site_location.city.city_name + " ," + a.site_location.state_governorate.state_name + " ," + a.site_location.country.country_name));
 
             orderLocationComboBox.IsEnabled = true;
 

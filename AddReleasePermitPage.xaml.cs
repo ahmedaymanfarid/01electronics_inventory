@@ -131,6 +131,50 @@ namespace _01electronics_inventory
                 }
 
             }
+            else if(viewAddCondition==COMPANY_WORK_MACROS.EDIT_RELEASE)
+            {
+                GetOrderIDs();
+                GetRFPsRequestorTeams();
+                GetCurrentEnrolledEmployees();
+                GetNewEntrySerial();
+                FillRFPRequestorTeamComboBox();
+                FillOrderIDsComboBox();
+
+
+                ReleaseDatePicker.SelectedDate = parentWindow.materialReleasePermit.GetReleaseDate();
+                MaterialRecieverComboBox.SelectedItem=MaterialRecieverComboBox.Items.Cast<string>().First(f=>f.Contains(parentWindow.materialReleasePermit.GetMaterialReceiver().employee_name));
+                SerialIdTextBox.Text = parentWindow.materialReleasePermit.GetReleaseId();
+
+                addContactBtn.Visibility = Visibility.Collapsed;
+                if (parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpSerial == 0)
+                {
+                    workFormComboBox.SelectedIndex = 1;
+                    orderSerials.SelectedItem = orderSerials.Items.Cast<string>().FirstOrDefault(f => f.Contains(parentWindow.materialReleasePermit.GetWorkOrder().orderSerial.ToString()));   
+                    contactComboBox.SelectedItem=contactComboBox.Items.Cast<string>().FirstOrDefault(f=>f.Contains(parentWindow.materialReleasePermit.GetWorkOrder().GetContactName()));
+
+                    if (parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT || parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.SERVICE_REPORT_RECEIVED)
+                    {
+                        serviceReportCheckBox.IsChecked = true;
+
+                    }
+                    else if (parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL || parentWindow.materialReleasePermit.GetReleasePermitStatus() == COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED)
+                    {
+                        receivalNoteCheckBox.IsChecked = true;
+                    }
+                 
+                }
+                else
+                {
+                    workFormComboBox.SelectedIndex = 0;
+                    rfpRequesters.SelectedItem=rfpRequesters.Items.Cast<string>().FirstOrDefault(f=>f.Contains(parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfp_requestor_team_name));
+                    rfpSerials.SelectedItem = rfpSerials.Items.Cast<string>().FirstOrDefault(f => f.Contains(parentWindow.materialReleasePermit.GetReleaseItems()[0].rfp_info.rfpID));
+                  
+                }
+
+
+
+
+            }
             else
             {
                 GetOrderIDs();
@@ -437,7 +481,7 @@ namespace _01electronics_inventory
         {
         
 
-            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE)
+            if(viewAddCondition!=COMPANY_WORK_MACROS.VIEW_RELEASE && viewAddCondition!=COMPANY_WORK_MACROS.EDIT_RELEASE)
             {
                 ComboBox rfpSerialsComboBox = sender as ComboBox;
 
@@ -583,7 +627,7 @@ namespace _01electronics_inventory
 
         private void OnButtonClickNext(object sender, RoutedEventArgs e)
         {
-            if(viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE)
+            if(viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE || viewAddCondition == COMPANY_WORK_MACROS.EDIT_RELEASE)
             {
                // 
                 this.NavigationService.Navigate(parentWindow.releasePermitItemPage);

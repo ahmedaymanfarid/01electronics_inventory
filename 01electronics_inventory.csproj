@@ -200,6 +200,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AddContactWindow.xaml.cs" />
+    <Compile Include="AddEntryPermitSummaryPage.xaml.cs">
+      <DependentUpon>AddEntryPermitSummaryPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AddReleasePermitSummary.xaml.cs">
       <DependentUpon>AddReleasePermitSummary.xaml</DependentUpon>
     </Compile>
@@ -247,6 +250,10 @@
     <Page Include="AddEntryPermitPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AddEntryPermitSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="AddEntryPermitWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

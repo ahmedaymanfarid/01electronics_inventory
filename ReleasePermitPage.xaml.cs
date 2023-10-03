@@ -1654,7 +1654,13 @@ namespace _01electronics_inventory
 
         private void EditButtonClick(object sender, RoutedEventArgs e)
         {
-
+            Button viewButton = sender as Button;
+            int materialReleasePermitSerial = Convert.ToInt32(viewButton.Tag.ToString());
+            viewAddCondition = COMPANY_WORK_MACROS.EDIT_RELEASE;
+            materialRelease.SetReleaseSerial(materialReleasePermitSerial);
+            materialRelease.InitializeMaterialReleasePermit();
+            addReleasePermitWindow = new AddReleasePermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, materialRelease, viewAddCondition);
+            addReleasePermitWindow.Show();
         }
 
         private void OnAddButtonClick(object sender, RoutedEventArgs e)

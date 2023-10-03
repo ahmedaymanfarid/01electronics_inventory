@@ -159,7 +159,7 @@ namespace _01electronics_inventory
             {
                 if(rowCount%2==0)
                 {
-                    GridEvenRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
+                    GridEvenRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.location_id, grid);
                     GridEvenRows(1, rowCount, stock.GetStockAvailabiltyList()[i].stock_category_name, stock.GetStockAvailabiltyList()[i].stock_category_id, grid);
 
                     if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name != "")
@@ -200,7 +200,7 @@ namespace _01electronics_inventory
                 }
                 else
                 {
-                    GridOddRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
+                    GridOddRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.location_id, grid);
                     GridOddRows(1, rowCount, stock.GetStockAvailabiltyList()[i].stock_category_name, stock.GetStockAvailabiltyList()[i].stock_category_id, grid);
 
                     if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name != "")

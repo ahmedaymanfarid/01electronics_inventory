@@ -97,7 +97,7 @@ namespace _01electronics_inventory
         {
 
             materialEntryPermit.SetWarehouseNickName(Locations[WareHouseCombo.SelectedIndex].location_nick_name);
-            materialEntryPermit.SetWareHouseLocationId(Locations[WareHouseCombo.SelectedIndex].address.location_id);
+            materialEntryPermit.SetWareHouseLocationId(Locations[WareHouseCombo.SelectedIndex].location_id);
             materialEntryPermit.SetAddedBy(loggedInUser.GetEmployeeId());
 
 

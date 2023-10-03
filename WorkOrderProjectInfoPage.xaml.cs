@@ -31,10 +31,10 @@ namespace _01electronics_inventory
 
         private int viewAddCondition;
 
-        private List<PROJECT_MACROS.PROJECT_STRUCT> projects = new List<PROJECT_MACROS.PROJECT_STRUCT>();
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> projectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> orderProjectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> addedLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+        private List<PROJECT_MACROS.PROJECT_STRUCT> projects;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> projectLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> orderProjectLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> addedLocations;
 
         public WorkOrderBasicInfoPage workOrderBasicInfoPage;
         public WorkOrderProductsPage workOrderProductsPage;
@@ -57,7 +57,10 @@ namespace _01electronics_inventory
             viewAddCondition = mViewAddCondition;
 
             workOrder = mWorkOrder;
-
+            projects = new List<PROJECT_MACROS.PROJECT_STRUCT>();
+            projectLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
+            orderProjectLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
+            addedLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
             InitializeComponent();
 
             InitializeProjectsCombo();
@@ -141,13 +144,13 @@ namespace _01electronics_inventory
                     if (!commonQueries.GetProjectLocations(workOrder.GetprojectSerial(), ref projectLocations))
                         return;
 
-                    List<BASIC_STRUCTS.ADDRESS_STRUCT> temp = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+                    List<PROJECT_MACROS.PROJECT_SITE_STRUCT> temp = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
                     workOrder.GetProjectLocations(ref temp);
 
                     for (int i = 0; i < projectLocations.Count; i++)
                     {
                         CheckBox checkBox = new CheckBox();
-                        checkBox.Content = projectLocations[i].country.country_name + "," + projectLocations[i].state_governorate.state_name + "," + projectLocations[i].city.city_name + "," + projectLocations[i].district.district_name;
+                        checkBox.Content = projectLocations[i].site_location.country.country_name + "," + projectLocations[i].site_location.state_governorate.state_name + "," + projectLocations[i].site_location.city.city_name + "," + projectLocations[i].site_location.district.district_name;
                         checkBox.Tag = i;
                         checkBox.Style = (Style)FindResource("checkBoxStyle");
                         checkBox.Checked += OnCheckProjectLocation;
@@ -176,7 +179,7 @@ namespace _01electronics_inventory
                     for (int i = 0; i < orderProjectLocations.Count; i++)
                     {
                         CheckBox checkBox = new CheckBox();
-                        checkBox.Content = orderProjectLocations[i].country.country_name + "," + orderProjectLocations[i].state_governorate.state_name + "," + orderProjectLocations[i].city.city_name + "," + orderProjectLocations[i].district.district_name;
+                        checkBox.Content = orderProjectLocations[i].site_location.country.country_name + "," + orderProjectLocations[i].site_location.state_governorate.state_name + "," + orderProjectLocations[i].site_location.city.city_name + "," + orderProjectLocations[i].site_location.district.district_name;
                         checkBox.IsEnabled = false;
                         checkBox.IsChecked = true;
                         checkBox.Style = (Style)FindResource("checkBoxStyle");
