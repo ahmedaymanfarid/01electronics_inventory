@@ -35,7 +35,7 @@ namespace _01electronics_inventory
         private Employee loggedInUser;
         private RFP rfp;
         private RFP oldRfp;
-        int viewAddCondition;
+        public int viewAddCondition;
         private AddEntryPermitWindow entryPermitWindow;
         public AddEntryPermitPage addEntryPermitPage;
 
@@ -3162,7 +3162,7 @@ namespace _01electronics_inventory
         {
             entryPermitWindow.Close();
         }
-        private void OnButtonClickFinish(object sender, RoutedEventArgs e)
+        public void OnButtonClickFinish(object sender, RoutedEventArgs e)
         {
 
             if (addEntryPermitPage.WareHouseCombo.SelectedIndex == -1 || addEntryPermitPage.TransactionDatePicker.Text == ""|| addEntryPermitPage.entryPermitIdTextBox.Text=="") {
@@ -4597,13 +4597,13 @@ namespace _01electronics_inventory
             }
             
            
-            EntryPermitUploadFilesPage = new EntryPermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, addEntryPermitPage, entryPermitWindow, ref addEntryPermitPage.materialEntryPermit);
+            //EntryPermitUploadFilesPage = new EntryPermitUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, this, addEntryPermitPage, entryPermitWindow, ref addEntryPermitPage.materialEntryPermit);
 
 
-                this.NavigationService.Navigate(EntryPermitUploadFilesPage);
+            //    this.NavigationService.Navigate(EntryPermitUploadFilesPage);
 
-                this.nextButton.IsEnabled = true;
-                this.finishButton.IsEnabled = false;
+            //    this.nextButton.IsEnabled = true;
+            //    this.finishButton.IsEnabled = false;
 
             
         }
@@ -4634,8 +4634,10 @@ namespace _01electronics_inventory
         }
         private void OnButtonClickNext(object sender, RoutedEventArgs e)
         {
-            if (EntryPermitUploadFilesPage != null)
-                this.NavigationService.Navigate(EntryPermitUploadFilesPage);
+            entryPermitWindow.EntryPermitPage.addEntryPermitSummaryPage.InitializeSummarySheet();
+            this.NavigationService.Navigate(entryPermitWindow.EntryPermitPage.addEntryPermitSummaryPage);
+            //if (EntryPermitUploadFilesPage != null)
+            //    this.NavigationService.Navigate(EntryPermitUploadFilesPage);
         }
         private void OnButtonClickRemoveItem(object sender, RoutedEventArgs e)
         {
