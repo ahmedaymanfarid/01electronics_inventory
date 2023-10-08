@@ -89,8 +89,8 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" Click="OnButtonClickBack" IsEnabled="true" Margin="24"/>
-            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnButtonClickNext" Content="Next" IsEnabled="False"  Margin="24"/>
-            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnButtonClickFinish" IsEnabled="True" Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnButtonClickNext" Content="Next" IsEnabled="true"  Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnButtonClickFinish" IsEnabled="false" Margin="24"/>
             <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Click="OnButtonClickCancel" Content="Cancel"  Margin="24"/>
 
         </Grid>

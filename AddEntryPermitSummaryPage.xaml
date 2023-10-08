@@ -75,25 +75,21 @@
                         </Grid.ColumnDefinitions>
                         <Image Source="./Icons/01Electronics.png" Width="100" Margin="20" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left"/>
                         <Image Source="./Icons/printer-icon.png" Width="50" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" MouseDown="OnMouseDownPrint" x:Name="printer"/>
-                        <Label Content="Entry Permit" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource tableHeaderItem}" FontSize="30" x:Name="releasePermitHeader"/>
+                        <Label Content="Entry Permit" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource tableHeaderItem}" FontSize="30" x:Name="entryPermitHeader"/>
                         <Grid Grid.Row="2" ShowGridLines="True" Grid.ColumnSpan="2">
                             <Grid.RowDefinitions >
                                 <RowDefinition/>
-                                <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="400"/>
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Label Style="{StaticResource labelStyle}" Content="Release Date: " Grid.Column="0" Width="250"  Grid.Row="0" HorizontalAlignment="Left" x:Name="releaseDateLabel"/>
-                            <Label Style="{StaticResource labelStyle}" Content="Release Id: " Grid.Column="1" Width="250"  Grid.Row="0" HorizontalAlignment="Left" x:Name="releaseIdLabel"/>
-                            <Label Style="{StaticResource labelStyle}" Content="Reciever: " Grid.Column="0" Width="400"  Grid.Row="1" HorizontalAlignment="Left" x:Name="recieverNameLabel"/>
-                            <Label Style="{StaticResource labelStyle}" Content="Work From: " Grid.Column="1" Width="250"  Grid.Row="1" HorizontalAlignment="Left" x:Name="workFormLabel"/>
-                            <Label Style="{StaticResource labelStyle}" Content="Work Order Serial: " Grid.Column="0" Width="250"  Grid.Row="2" HorizontalAlignment="Left" x:Name="workOrderSerialLabel" Visibility="Hidden"/>
-                            <Label Style="{StaticResource labelStyle}" Content="RFP Requestor Team: " Grid.Column="0" Width="250"  Grid.Row="2" HorizontalAlignment="Left" x:Name="rfpRequestorTeamLabel" Visibility="Hidden"/>
-                            <Label Style="{StaticResource labelStyle}" Content="Work Order Contact: " Grid.Column="1" Width="250"  Grid.Row="2" HorizontalAlignment="Left" x:Name="workOrderContactLabel" Visibility="Hidden"/>
-                            <Label Style="{StaticResource labelStyle}" Content="RFP ID: " Grid.Column="1" Width="250"  Grid.Row="2" HorizontalAlignment="Left" x:Name="rfpIDLabel" Visibility="Hidden"/>
+                            <Label Style="{StaticResource labelStyle}" Content="Transaction Date: " Grid.Column="0" Width="250"  Grid.Row="0" HorizontalAlignment="Left" x:Name="transactionDateLabel"/>
+                            <Label Style="{StaticResource labelStyle}" Content="Entry Id: " Grid.Column="1" Width="250"  Grid.Row="0" HorizontalAlignment="Left" x:Name="entryIDLabel"/>
+                            <Label Style="{StaticResource labelStyle}" Content="Warehouse: " Grid.Column="0" Width="400"  Grid.Row="1" HorizontalAlignment="Left" x:Name="wareHouseLabel"/>
+                            <Label Style="{StaticResource labelStyle}" Content="Location: " Grid.Column="1" Width="310"  Grid.Row="1" HorizontalAlignment="Left" x:Name="wareHouseLocationLabel"/>
+                           
                         </Grid>
                         <Grid Grid.Row="3" ShowGridLines="True" Grid.ColumnSpan="2" x:Name="itemsGrid">
                             <Grid.ColumnDefinitions>
@@ -107,7 +103,7 @@
                             </Grid.RowDefinitions>
                             <Label Content="Item Name" Grid.Row="0" Grid.Column="0" Style="{StaticResource tableHeaderItem}"/>
                             <Label Content="Requested Quantity" Grid.Row="0" Grid.Column="1" Style="{StaticResource tableHeaderItem}"/>
-                            <Label Content="Released Quantity" Grid.Row="0" Grid.Column="2" Style="{StaticResource tableHeaderItem}"/>
+                            <Label Content="Entered Quantity" Grid.Row="0" Grid.Column="2" Style="{StaticResource tableHeaderItem}"/>
                             <Label Content="Serial Number" Grid.Row="0" Grid.Column="3" Style="{StaticResource tableHeaderItem}"/>
                         </Grid>
                     </Grid>
