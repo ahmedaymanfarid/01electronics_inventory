@@ -310,21 +310,21 @@ namespace _01electronics_inventory
                                                                     product_model.SetModelHasSerialNumber(true);
                                                                     product_model.SetCategoryName(categoryComboBox.Text);
                                                                     if (!product_model.IssuNewCategory())
-                                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                        return;
                                                                     else
                                                                     {
                                                                         product_model.SetProductName(typeComboBox.Text);
                                                                         if (!product_model.IssuNewProduct())
-                                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                            return;
                                                                         else
                                                                         {
                                                                             product_model.SetBrandName(brandComboBox.Text);
                                                                             if (!product_model.IssuNewBrand())
-                                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                                return;
                                                                             else
                                                                             {
                                                                                 if (!product_model.IssuNewModel())
-                                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                                    return;
                                                                                 else
                                                                                 {
                                                                                     this.Close();
@@ -340,21 +340,21 @@ namespace _01electronics_inventory
                                                                     product_model.SetModelHasSerialNumber(false);
                                                                     product_model.SetCategoryName(categoryComboBox.Text);
                                                                     if (!product_model.IssuNewCategory())
-                                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                        return;
                                                                     else
                                                                     {
                                                                         product_model.SetProductName(typeComboBox.Text);
                                                                         if (!product_model.IssuNewProduct())
-                                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                            return;
                                                                         else
                                                                         {
                                                                             product_model.SetBrandName(brandComboBox.Text);
                                                                             if (!product_model.IssuNewBrand())
-                                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                                return;
                                                                             else
                                                                             {
                                                                                 if (!product_model.IssuNewModel())
-                                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                                    return;
                                                                                 else
                                                                                 {
                                                                                     this.Close();
@@ -380,17 +380,17 @@ namespace _01electronics_inventory
                                                     {
                                                         product_model.SetCategoryName(categoryComboBox.Text);
                                                         if (!product_model.IssuNewCategory())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             product_model.SetProductName(typeComboBox.Text);
                                                             if (!product_model.IssuNewProduct())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                             {
                                                                 product_model.SetBrandName(brandComboBox.Text);
                                                                 if (!product_model.IssuNewBrand())
-                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                    return;
                                                                 else
                                                                 {
                                                                     this.Close();
@@ -407,12 +407,12 @@ namespace _01electronics_inventory
                                                 {
                                                     product_model.SetCategoryName(categoryComboBox.Text);
                                                     if (!product_model.IssuNewCategory())
-                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                        return;
                                                     else
                                                     {
                                                         product_model.SetProductName(typeComboBox.Text);
                                                         if (!product_model.IssuNewProduct())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             this.Close();
@@ -452,21 +452,21 @@ namespace _01electronics_inventory
                                                         product_model.SetModelHasSerialNumber(true);
                                                         product_model.SetCategoryName(categoryComboBox.Text);
                                                         if (!product_model.IssuNewCategory())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             product_model.SetProductName(typeComboBox.Text);
                                                             if (!product_model.IssuNewProduct())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                             {
                                                                 product_model.SetBrandName(brandComboBox.Text);
                                                                 if (!product_model.IssuproductBrand())
-                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                    return;
                                                                 else
                                                                 {
                                                                     if (!product_model.IssuNewModel())
-                                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                        return;
                                                                     else
                                                                     {
                                                                         this.Close();
@@ -481,21 +481,21 @@ namespace _01electronics_inventory
                                                         product_model.SetModelHasSerialNumber(false);
                                                         product_model.SetCategoryName(categoryComboBox.Text);
                                                         if (!product_model.IssuNewCategory())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             product_model.SetProductName(typeComboBox.Text);
                                                             if (!product_model.IssuNewProduct())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                             {
                                                                 product_model.SetBrandName(brandComboBox.Text);
                                                                 if (!product_model.IssuproductBrand())
-                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                    return;
                                                                 else
                                                                 {
                                                                     if (!product_model.IssuNewModel())
-                                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                        return;
                                                                     else
                                                                     {
                                                                         this.Close();
@@ -512,17 +512,17 @@ namespace _01electronics_inventory
                                                 {
                                                     product_model.SetCategoryName(categoryComboBox.Text);
                                                     if (!product_model.IssuNewCategory())
-                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                        return;
                                                     else
                                                     {
                                                         product_model.SetProductName(typeComboBox.Text);
                                                         if (!product_model.IssuNewProduct())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                           
                                                             if (!product_model.IssuproductBrand())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                             {
                                                                 this.Close();
@@ -538,7 +538,7 @@ namespace _01electronics_inventory
                                         {
                                             product_model.SetCategoryName(categoryComboBox.Text);
                                             if (!product_model.IssuNewCategory())
-                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                return;
                                                this.Close();
                                             //System.Windows.Forms.MessageBox.Show("Type must be specified", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         }
@@ -569,7 +569,7 @@ namespace _01electronics_inventory
                                                                 product_model.SetModelHasSerialNumber(true);
 
                                                                 if (!product_model.IssuNewModel())
-                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                    return;
                                                                 else
                                                                     this.Close();
                                                             }
@@ -577,7 +577,7 @@ namespace _01electronics_inventory
                                                             {
                                                                 product_model.SetModelHasSerialNumber(false);
                                                                 if (!product_model.IssuNewModel())
-                                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                    return;
                                                                 else
                                                                     this.Close();
                                                             }
@@ -601,7 +601,7 @@ namespace _01electronics_inventory
                                                 {
                                                     product_model.SetBrandName(brandComboBox.Text);
                                                     if (!product_model.IssuNewBrand())
-                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                        return;
                                                     else
                                                         this.Close();
                                                     //System.Windows.Forms.MessageBox.Show("Model must be specified", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -634,7 +634,7 @@ namespace _01electronics_inventory
                                                         {
                                                             product_model.SetModelHasSerialNumber(true);
                                                             if (!product_model.IssuNewModel())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                                 this.Close();
                                                         }
@@ -642,7 +642,7 @@ namespace _01electronics_inventory
                                                         {
                                                             product_model.SetModelHasSerialNumber(false);
                                                             if (!product_model.IssuNewModel())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                                 this.Close();
                                                         }
@@ -719,16 +719,16 @@ namespace _01electronics_inventory
                                                                
                                                                     product_model.SetProductName(typeComboBox.Text);
                                                                     if (!product_model.IssuNewProduct())
-                                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                        return;
                                                                     else
                                                                     {
                                                                         product_model.SetBrandName(brandComboBox.Text);
                                                                         if (!product_model.IssuNewBrand())
-                                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                            return;
                                                                         else
                                                                         {
                                                                             if (!product_model.IssuNewModel())
-                                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                                return;
                                                                         else
                                                                             this.Close();
                                                                         }
@@ -743,16 +743,16 @@ namespace _01electronics_inventory
                                                                
                                                                     product_model.SetProductName(typeComboBox.Text);
                                                                     if (!product_model.IssuNewProduct())
-                                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                        return;
                                                                     else
                                                                     {
                                                                         product_model.SetBrandName(brandComboBox.Text);
                                                                         if (!product_model.IssuNewBrand())
-                                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                            return;
                                                                         else
                                                                         {
                                                                             if (!product_model.IssuNewModel())
-                                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                                return;
                                                                         else
                                                                             this.Close();
                                                                         }
@@ -778,12 +778,12 @@ namespace _01electronics_inventory
                                                    
                                                         product_model.SetProductName(typeComboBox.Text);
                                                         if (!product_model.IssuNewProduct())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             product_model.SetBrandName(brandComboBox.Text);
                                                             if (!product_model.IssuNewBrand())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                         else
                                                             this.Close();
                                                         }
@@ -800,7 +800,7 @@ namespace _01electronics_inventory
                                                
                                                     product_model.SetProductName(typeComboBox.Text);
                                                     if (!product_model.IssuNewProduct())
-                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                        return;
                                                 else
                                                     this.Close();
                                                 
@@ -840,16 +840,16 @@ namespace _01electronics_inventory
                                                     
                                                         product_model.SetProductName(typeComboBox.Text);
                                                         if (!product_model.IssuNewProduct())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             product_model.SetBrandName(brandComboBox.Text);
                                                             if (!product_model.IssuproductBrand())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                             {
                                                             if (!product_model.IssuNewModel())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                                 this.Close();
                                                             }
@@ -863,16 +863,16 @@ namespace _01electronics_inventory
                                                   
                                                         product_model.SetProductName(typeComboBox.Text);
                                                         if (!product_model.IssuNewProduct())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                         {
                                                             product_model.SetBrandName(brandComboBox.Text);
                                                             if (!product_model.IssuproductBrand())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                             {
                                                             if (!product_model.IssuNewModel())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                                 this.Close();
                                                             }
@@ -888,12 +888,12 @@ namespace _01electronics_inventory
                                                
                                                     product_model.SetProductName(typeComboBox.Text);
                                                     if (!product_model.IssuNewProduct())
-                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                        return;
                                                     else
                                                     {
 
                                                     if (!product_model.IssuproductBrand())
-                                                        System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                        return;
                                                     else
                                                         this.Close();
                                                     }
@@ -908,7 +908,7 @@ namespace _01electronics_inventory
                                         System.Windows.Forms.MessageBox.Show("Category Already Exists.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                                         // product_model.SetCategoryName(categoryComboBox.Text);
                                         // if (!product_model.IssuNewCategory())
-                                        //     System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                        //     return;
                                         //System.Windows.Forms.MessageBox.Show("Type must be specified", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     }
                                 }
@@ -938,7 +938,7 @@ namespace _01electronics_inventory
                                                             product_model.SetModelHasSerialNumber(true);
 
                                                             if (!product_model.IssuNewModel())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                                 this.Close();
                                                         }
@@ -946,7 +946,7 @@ namespace _01electronics_inventory
                                                         {
                                                             product_model.SetModelHasSerialNumber(false);
                                                             if (!product_model.IssuNewModel())
-                                                                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                                return;
                                                             else
                                                                 this.Close();
                                                         }
@@ -970,7 +970,7 @@ namespace _01electronics_inventory
                                             {
                                                 product_model.SetBrandName(brandComboBox.Text);
                                                 if (!product_model.IssuNewBrand())
-                                                    System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                    return;
                                                 else
                                                     this.Close();
                                                 //System.Windows.Forms.MessageBox.Show("Model must be specified", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -988,7 +988,7 @@ namespace _01electronics_inventory
                                     {
                                         product_model.SetBrandName(brandComboBox.Text);
                                         if(brandComboBox.SelectedIndex!=-1)
-                                        product_model.SetBrandId(brandList[brandComboBox.SelectedIndex].brand_id);
+                                        product_model.SetBrandId(productbrandList[brandComboBox.SelectedIndex].brand_id);
 
                                         if (modelTextBlock.Text != string.Empty)
                                         {
@@ -1003,7 +1003,7 @@ namespace _01electronics_inventory
                                                     {
                                                         product_model.SetModelHasSerialNumber(true);
                                                         if (!product_model.IssuNewModel())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                             this.Close();
                                                     }
@@ -1011,7 +1011,7 @@ namespace _01electronics_inventory
                                                     {
                                                         product_model.SetModelHasSerialNumber(false);
                                                         if (!product_model.IssuNewModel())
-                                                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                                            return;
                                                         else
                                                             this.Close();
                                                     }

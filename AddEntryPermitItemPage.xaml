@@ -18,7 +18,7 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="50"/>
             <RowDefinition />
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="#105A97">
@@ -60,7 +60,7 @@
 
         <ScrollViewer Grid.Row="2" x:Name="itemsScrollViewer">
 
-            <WrapPanel x:Name="itemsWrapPanel" Margin="24">
+            <WrapPanel x:Name="itemsWrapPanel" Margin="24" MaxWidth="1500">
                
                 
 
@@ -89,8 +89,8 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" Click="OnButtonClickBack" IsEnabled="true" Margin="24"/>
-            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnButtonClickNext" Content="Next" IsEnabled="False"  Margin="24"/>
-            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnButtonClickFinish" IsEnabled="True" Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Click="OnButtonClickNext" Content="Next" IsEnabled="true"  Margin="24"/>
+            <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" Click="OnButtonClickFinish" IsEnabled="false" Margin="24"/>
             <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Click="OnButtonClickCancel" Content="Cancel"  Margin="24"/>
 
         </Grid>

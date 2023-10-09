@@ -23,8 +23,8 @@ namespace _01electronics_inventory
         private int viewAddCondition;
 
         private List<PROJECT_MACROS.PROJECT_STRUCT> projects = new List<PROJECT_MACROS.PROJECT_STRUCT>();
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> projectLocations;
-        private List<BASIC_STRUCTS.ADDRESS_STRUCT> addedLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> projectLocations;
+        private List<PROJECT_MACROS.PROJECT_SITE_STRUCT> addedLocations;
 
         public MaintContractsBasicInfoPage maintContractsBasicInfoPage;
         public MaintContractsProductsPage maintContractsProductsPage;
@@ -50,8 +50,8 @@ namespace _01electronics_inventory
 
             maintContract = mMaintContracts;
 
-            projectLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
-            addedLocations = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+            projectLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
+            addedLocations = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
 
 
             InitializeComponent();
@@ -109,7 +109,7 @@ namespace _01electronics_inventory
 
                 commonQueries.GetProjectLocations(projects[projectComboBox.SelectedIndex].project_serial, ref projectLocations);
 
-                List<BASIC_STRUCTS.ADDRESS_STRUCT> temp = new List<BASIC_STRUCTS.ADDRESS_STRUCT>();
+                List<PROJECT_MACROS.PROJECT_SITE_STRUCT> temp = new List<PROJECT_MACROS.PROJECT_SITE_STRUCT>();
 
                 maintContract.GetProjectLocations(ref temp);
 
@@ -117,7 +117,7 @@ namespace _01electronics_inventory
                 for (int i = 0; i < projectLocations.Count; i++)
                 {
                     CheckBox checkBox = new CheckBox();
-                    checkBox.Content = projectLocations[i].country.country_name + "," + projectLocations[i].city.city_name + "," + projectLocations[i].state_governorate.state_name + "," + projectLocations[i].district.district_name;
+                    checkBox.Content = projectLocations[i].site_location.country.country_name + "," + projectLocations[i].site_location.city.city_name + "," + projectLocations[i].site_location.state_governorate.state_name + "," + projectLocations[i].site_location.district.district_name;
                     checkBox.Tag = i;
                     checkBox.Style = (Style)FindResource("checkBoxStyle");
                     checkBox.Checked += OnCheckProjectLocation;
@@ -146,7 +146,7 @@ namespace _01electronics_inventory
                 for (int i = 0; i < projectLocations.Count; i++)
                 {
                     CheckBox checkBox = new CheckBox();
-                    checkBox.Content = projectLocations[i].country.country_name + "," + projectLocations[i].city.city_name + "," + projectLocations[i].state_governorate.state_name + "," + projectLocations[i].district.district_name;
+                    checkBox.Content = projectLocations[i].site_location.country.country_name + "," + projectLocations[i].site_location.city.city_name + "," + projectLocations[i].site_location.state_governorate.state_name + "," + projectLocations[i].site_location.district.district_name;
                     checkBox.IsEnabled = false;
                     checkBox.IsChecked = true;
                     checkBox.Style = (Style)FindResource("checkBoxStyle");

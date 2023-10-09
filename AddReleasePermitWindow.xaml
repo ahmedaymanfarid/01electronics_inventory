@@ -8,9 +8,8 @@
         Background="#EDEDED"
         Title="Add New Release Permit" Height="730" Width="1200" MinWidth="700">
     <Grid>
-        
-        <Frame x:Name="frame" Content="" NavigationUIVisibility="Hidden"/>
 
+        <Frame x:Name="frame" Content="" NavigationUIVisibility="Hidden" />
 
 
     </Grid>

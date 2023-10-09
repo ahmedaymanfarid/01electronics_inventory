@@ -1,4 +1,5 @@
 ﻿using _01electronics_library;
+using Spire.Doc.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,8 @@ namespace _01electronics_inventory
             loggedInUser = mLoggedInUser;
             materialEntryPermits = new List<INVENTORY_STRUCTS.ENTRY_PERMIT_MAX_STRUCT>();
             InitializeComponent();
-
+            if (loggedInUser.GetEmployeeTeamId() != COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
+                addButton.IsEnabled = false;
             InitializeUiElements();
         }
 
@@ -89,7 +91,7 @@ namespace _01electronics_inventory
                 Grid card = new Grid() { Margin = new Thickness(0, 0, 0, 10) };
                 card.RowDefinitions.Add(new RowDefinition());
                 card.ColumnDefinitions.Add(new ColumnDefinition());
-                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(50) });
+                card.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(300) });
 
                 Label header = new Label();
                 header.Content = $"Entry Permit - {materialEntryPermits[i].entry_permit_id}";
@@ -129,21 +131,70 @@ namespace _01electronics_inventory
                     Grid.SetColumn(rfpIdLabel, 0);
                     card.Children.Add(rfpIdLabel);
                 }
+                int itemNo = 0;
+                int entryProductQuantity = 1;
+                Label quantityLabel = new Label();
                 for (int j = 0; j < materialEntryPermits[i].items.Count; j++)
                 {
+                    if (j>0 && materialEntryPermits[i].items[j].product_category.category_id == materialEntryPermits[i].items[j-1].product_category.category_id
+                        && materialEntryPermits[i].items[j].product_type.type_id == materialEntryPermits[i].items[j-1].product_type.type_id
+                        && materialEntryPermits[i].items[j].product_brand.brand_id== materialEntryPermits[i].items[j - 1].product_brand.brand_id
+                        && materialEntryPermits[i].items[j].product_model.model_id == materialEntryPermits[i].items[j - 1].product_model.model_id
+                        && materialEntryPermits[i].items[j].product_specs.spec_id == materialEntryPermits[i].items[j - 1].product_specs.spec_id)
+                    {
+                        entryProductQuantity++;
+                        quantityLabel.Content = "Item Quantity: " + entryProductQuantity;
+                        continue;
+                    }
+                    else
+                    {
+                        if (materialEntryPermits[i].items[j].product_serial_number != null && materialEntryPermits[i].items[j].quantity == 0)
+                            entryProductQuantity = 1;
+                    }
+                    if(materialEntryPermits[i].items[j].quantity!=0)
+                    {
+                        entryProductQuantity = materialEntryPermits[i].items[j].quantity;
+                    }
                     card.RowDefinitions.Add(new RowDefinition());
                     Label itemsLabel = new Label();
                     itemsLabel.Margin = new Thickness(0,0,0,10);
                     itemsLabel.Style = (Style)FindResource("stackPanelItemBody");
-                    itemsLabel.Content = $@"Item {j+1}: "+materialEntryPermits[i].items[j].product_category.category_name+"-"+
+                    itemsLabel.Content = $@"Item {itemNo += 1}: "+materialEntryPermits[i].items[j].product_category.category_name+"-"+
                                           materialEntryPermits[i].items[j].product_type.product_name+"-"+
                                           materialEntryPermits[i].items[j].product_brand.brand_name+"-"+
                                           materialEntryPermits[i].items[j].product_model.model_name+"-"+
-                                          materialEntryPermits[i].items[j].product_specs.spec_name;
+                                          materialEntryPermits[i].items[j].product_specs.spec_name ;
+
+                    
+                    card.RowDefinitions.Add(new RowDefinition());
+
+                    Border quantity = new Border();
+                    quantity.Margin = new Thickness(5);
+                    quantity.BorderBrush = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                    quantity.Background = (Brush)(new BrushConverter().ConvertFrom("#105A97"));
+                    quantity.BorderThickness = new Thickness(1);
+                    quantity.CornerRadius = new CornerRadius(10);
+                    quantity.HorizontalAlignment = HorizontalAlignment.Right;
+                    quantity.Width = 170;
+
+
+                    quantityLabel = new Label();
+                    quantityLabel.Content = "Item Quantity: " + entryProductQuantity;
+                    quantityLabel.Style = (Style)FindResource("stackPanelItemHeader");
+                    quantityLabel.Foreground = Brushes.White;
+                    quantityLabel.FontSize = 12;
+                    quantityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+
+                    quantity.Child = quantityLabel;
 
                     Grid.SetRow(itemsLabel,card.Children.Count);
                     Grid.SetColumn(itemsLabel, 0);
+
+                    Grid.SetRow(quantity,card.Children.Count);
+                    Grid.SetColumn(quantity,1);
+                 
                     card.Children.Add(itemsLabel);
+                    card.Children.Add(quantity);
                 }
 
                 StackPanel expand = new StackPanel();
@@ -156,13 +207,14 @@ namespace _01electronics_inventory
                 viewButton.Content = "VIEW";
 
                 expand.Children.Add(viewButton);
+                if(loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
                 expand.Children.Add(editButton);
 
                 card.RowDefinitions.Add(new RowDefinition());
                 Expander expander = new Expander();
                 expander.Expanded += ExpanderExpanded;
                 expander.Content = expand;
-
+                expander.HorizontalAlignment = HorizontalAlignment.Right;
 
                 Grid.SetRow(expander, 0);
                 Grid.SetColumn(expander, 1);
@@ -1791,7 +1843,7 @@ namespace _01electronics_inventory
         private void AddButtonClick(object sender, RoutedEventArgs e)
         {
             MaterialEntryPermit material = null;
-            AddEntryPermitWindow entryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,viewAddCondition,ref material,this);
+            AddEntryPermitWindow entryPermitWindow = new AddEntryPermitWindow(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser,COMPANY_WORK_MACROS.ENTRY_PERMIT_ADD_CONDITION,ref material,this);
 
             entryPermitWindow.Show();
         }
@@ -1863,6 +1915,10 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
-
+        private void OnButtonClickedRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
     }
 }

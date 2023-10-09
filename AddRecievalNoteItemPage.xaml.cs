@@ -107,6 +107,7 @@ namespace _01electronics_inventory
 
 
                 CheckBox productSerialCheckBox1 = item.Children[2] as CheckBox;
+                
 
 
                 if (productSerialCheckBox1 == null)
@@ -125,6 +126,14 @@ namespace _01electronics_inventory
 
                         recievalNoteItem.release_serial = Convert.ToInt32(item.Tag.ToString().Split(' ')[0]);
                         recievalNoteItem.release_item_serial = Convert.ToInt32(item.Tag.ToString().Split(' ')[1]);
+                        if(Convert.ToInt32(productSerialCheckBox.Tag.ToString().Split('-')[3])==BASIC_MACROS.IS_WORK_ORDER)
+                        {
+                            recievalNoteItem.work_order_serial = Convert.ToInt32(productSerialCheckBox.Tag.ToString().Split('-')[0]);
+                            recievalNoteItem.product_number = Convert.ToInt32(productSerialCheckBox.Tag.ToString().Split('-')[1]);
+                            recievalNoteItem.work_order_serial_number_id = Convert.ToInt32(productSerialCheckBox.Tag.ToString().Split('-')[2]);
+                        }
+                      
+                        
 
                         recievalNote.AddRecievalNoteItem(recievalNoteItem);
                     }
@@ -148,12 +157,18 @@ namespace _01electronics_inventory
 
                         recievalNoteItem.release_serial = Convert.ToInt32(item.Tag.ToString().Split(' ')[0]);
                         recievalNoteItem.release_item_serial = Convert.ToInt32(item.Tag.ToString().Split(' ')[1]);
+                        if (Convert.ToInt32(quantityCheckBox.Tag.ToString().Split('-')[2]) == BASIC_MACROS.IS_WORK_ORDER)
+                        {
+                            recievalNoteItem.work_order_serial = Convert.ToInt32(quantityCheckBox.Tag.ToString().Split('-')[0]);
+                            recievalNoteItem.product_number = Convert.ToInt32(quantityCheckBox.Tag.ToString().Split('-')[1]);
+                           
 
+                        }
                         recievalNote.AddRecievalNoteItem(recievalNoteItem);
                     }
 
                 }
-
+                
             }
 
             recievalNote.SetRecievalNoteDate(Convert.ToDateTime(recievalDate.SelectedDate));
@@ -161,6 +176,8 @@ namespace _01electronics_inventory
 
             if (!recievalNote.IssueNewRecievalNote())
                 return;
+          
+         
 
             recievalNoteUploadFilesPage = new AddRecievalNoteUploadFilesPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser , this, ref recievalNote);
 
@@ -182,7 +199,7 @@ namespace _01electronics_inventory
 
         }
 
-        private void OnreleasePermitsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnReleasePermitsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
             if (parentWindow.isView == true)
@@ -282,7 +299,7 @@ namespace _01electronics_inventory
                 {
 
 
-                    if (recievalNote.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_EMPLOYEE_RECIEVAL &&
+                    if (recievalNote.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.RECEIVAL_NOTE_RECEIVED &&
                         recievalNote.GetReleaseItems()[i].release_permit_item_status != COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL)
                     {
 
@@ -381,8 +398,14 @@ namespace _01electronics_inventory
                     }
 
                     chooseItemSerialCheckBox.Style = (Style)FindResource("checkBoxStyle");
-
-
+                    if(recievalNote.GetReleaseItems()[i].workOrder_serial != 0)
+                    {
+                        chooseItemSerialCheckBox.Tag = recievalNote.GetReleaseItems()[i].workOrder_serial + "-" + recievalNote.GetReleaseItems()[i].workOrder_product_number + "-" + recievalNote.GetReleaseItems()[i].workOrder_serial_Number_id +"-"+BASIC_MACROS.IS_WORK_ORDER;
+                    }
+                    else
+                    {
+                        chooseItemSerialCheckBox.Tag = recievalNote.GetReleaseItems()[i].rfp_info + "-" + recievalNote.GetReleaseItems()[i].rfp_item_number + "-" + BASIC_MACROS.IS_RFP;
+                    }
 
                     Grid.SetColumn(chooseItemSerialCheckBox, 2);
 
@@ -428,7 +451,14 @@ namespace _01electronics_inventory
                     quantityCheckBox.Width = 30;
 
                     quantityCheckBox.Style = (Style)FindResource("checkBoxStyle");
-
+                    if (recievalNote.GetReleaseItems()[i].workOrder_serial != 0)
+                    {
+                        quantityCheckBox.Tag = recievalNote.GetReleaseItems()[i].workOrder_serial + "-" + recievalNote.GetReleaseItems()[i].workOrder_product_number+"-"+BASIC_MACROS.IS_WORK_ORDER;
+                    }
+                    else
+                    {
+                        quantityCheckBox.Tag = recievalNote.GetReleaseItems()[i].rfp_info + "-" + recievalNote.GetReleaseItems()[i].rfp_item_number + "-" + BASIC_MACROS.IS_RFP;
+                    }
 
 
 

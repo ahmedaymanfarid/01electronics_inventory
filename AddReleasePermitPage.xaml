@@ -16,9 +16,9 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="#105A97">
@@ -40,85 +40,77 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <Border  Grid.Column="0" Style="{StaticResource selectedSecondaryTabBorder}" >
                 <Label Content="Basic Info" Style="{StaticResource selectedSecondaryTabLabelItem}" MouseLeftButtonDown="BasicInfoLableMouseLeftButtonDown"/>
             </Border>
             <Border x:Name="itemsBorder" Grid.Column="1" Style="{StaticResource unselectedSecondaryTabBorder}" >
-                <Label Content="Items Info" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="LabelMouseLeftButtonDown" />
+                <Label Content="Items Info" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnMouseDownItemsInfoLabel" />
+            </Border>
+            <Border x:Name="summaryItem" Grid.Column="2" Style="{StaticResource unselectedSecondaryTabBorder}" >
+                <Label Content="Summary" Style="{StaticResource unselectedSecondaryTabLabelItem}" MouseLeftButtonDown="OnMouseDownItemsInfoLabel" />
             </Border>
 
-
-            <Border Grid.Column="2" Style="{StaticResource unselectedSecondaryTabBorder}" >
-                <Label Content="Release permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}"/>
+            <Border Grid.Column="3" Style="{StaticResource unselectedSecondaryTabBorder}" >
+                <Label Content="Release Permit Files" Style="{StaticResource unselectedSecondaryTabLabelItem}"/>
             </Border>
 
 
         </Grid>
 
         <ScrollViewer Grid.Row="2">
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
+            <StackPanel >
+                <WrapPanel>
 
-                </Grid.RowDefinitions>
-
-                <WrapPanel Grid.Row="0">
-                    <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}" Content="Release &#x0a;Date"/>
-                        <DatePicker Style="{StaticResource datePickerStyle}" Name="ReleaseDatePicker" IsEnabled="True" SelectedDateChanged="ReleaseDatePickerSelectedDateChanged"/>
-                    </WrapPanel>
+                    <Label Style="{StaticResource labelStyle}" Content="Release Date" Width="200"/>
+                    <DatePicker Style="{StaticResource datePickerStyle}" Name="ReleaseDatePicker" IsEnabled="True" SelectedDateChanged="ReleaseDatePickerSelectedDateChanged"/>
 
                 </WrapPanel>
+                <WrapPanel >
 
-                <WrapPanel Grid.Row="1">
-                    <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}" Content="Material &#x0a;Reciever"/>
-                        <ComboBox Style="{StaticResource comboBoxStyle}" Name="MaterialRecieverComboBox" SelectionChanged="MaterialRecieverComboSelectionChanged"/>
-                    </WrapPanel>
+                    <Label Style="{StaticResource labelStyle}" Content="Material Reciever" Width="200"/>
+                    <ComboBox Style="{StaticResource comboBoxStyle}" Name="MaterialRecieverComboBox" SelectionChanged="MaterialRecieverComboSelectionChanged"/>
+
                 </WrapPanel>
+                <WrapPanel >
 
+                    <Label Style="{StaticResource labelStyle}" Content="Serial id" Width="200"/>
+                    <TextBox Style="{StaticResource textBoxStyle}" x:Name="SerialIdTextBox" />
 
-                <WrapPanel Grid.Row="2">
-                    <WrapPanel>
-                        <Label Style="{StaticResource labelStyle}" Content="Serial &#x0a;id"/>
-                        <TextBox Style="{StaticResource textBoxStyle}" Name="SerialIdTextBox" />
-                    </WrapPanel>
                 </WrapPanel>
+                <WrapPanel>
 
+                    <Label Style="{StaticResource labelStyle}" Content="Work Form" Width="200"/>
+                    <ComboBox Style="{StaticResource comboBoxStyle}" x:Name="workFormComboBox" SelectionChanged="OnSelectionChangedWorkForm">
+                        <ComboBoxItem Content="RFP"/>
+                        <ComboBoxItem Content="Work Order"/>
+                    </ComboBox>
 
-                <WrapPanel Margin="20,0,0,0" Grid.Row="3">
-                    <WrapPanel>
-                        <CheckBox x:Name="rfpChecked" Style="{StaticResource checkBoxStyle}" Content="RFP" Checked="rfpCheckedChecked" Unchecked="OnRfpUnChecked"/>
-                        <CheckBox x:Name="orderChecked" Style="{StaticResource checkBoxStyle}" Content="ORDER" Checked="orderCheckedChecked" Unchecked="OnOrderUnChecked"/>
-                    </WrapPanel>
                 </WrapPanel>
-
-
-
-                <WrapPanel x:Name="mainPanel" Margin="20,0,0,0" Grid.Row="4">
-                    
-                    <WrapPanel x:Name="rfpPanel" Visibility="Collapsed">
-                        <ComboBox x:Name="rfpRequesters" Style="{StaticResource comboBoxStyle}" SelectionChanged="rfpRequestersSelectionChanged" />
-                        <ComboBox x:Name="rfpSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="rfpSerialsSelectionChanged" />
-                    </WrapPanel>
-
-                    <WrapPanel x:Name="orderPanel" Visibility="Collapsed">
-                        <ComboBox x:Name="orderSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="orderSerialsSelectionChanged" />
-                        <ComboBox x:Name="contactComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnContactsComboBoxSelectionChanged" />
-                        <Button Style="{StaticResource buttonBrowseStyle}" Height="26" Content="Add" Name="addContactBtn" Click="OnBtnClickAddContact"/>
-
-
-                    </WrapPanel>
-                    
+                <WrapPanel x:Name="rfpPanel"  Visibility="Collapsed">
+                    <Label Style="{StaticResource labelStyle}" Content="RFP Requestor Team"  Width="200" />
+                    <ComboBox x:Name="rfpRequesters" Style="{StaticResource comboBoxStyle}" SelectionChanged="rfpRequestersSelectionChanged"/>
                 </WrapPanel>
-
-            </Grid>
+                <WrapPanel x:Name="rfpIdPanel" Visibility="Collapsed">
+                    <Label Style="{StaticResource labelStyle}" Content="RFP ID" Width="200"/>
+                    <ComboBox x:Name="rfpSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedRfpIdComboBox" />
+                </WrapPanel>
+                <WrapPanel x:Name="orderPanel" Visibility="Collapsed">
+                    <Label Style="{StaticResource labelStyle}" Content="Order ID" Width="200"/>
+                    <ComboBox x:Name="orderSerials" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedOrderSerial" />
+                </WrapPanel>
+                <WrapPanel x:Name="orderContactPanel" Visibility="Collapsed">
+                    <Label Style="{StaticResource labelStyle}" Content="Contact" Width="200"/>
+                    <ComboBox x:Name="contactComboBox" Style="{StaticResource comboBoxStyle}" SelectionChanged="OnSelectionChangedContactsComboBox" />
+                    <Button Style="{StaticResource buttonBrowseStyle}" Height="26" Content="Add New Contact" Name="addContactBtn" Click="OnButtonClickAddContact" Width="200"/>
+                </WrapPanel>
+            <WrapPanel Margin="20,0,0,0" x:Name="chooseToBeClosedWith" Visibility="Collapsed">
+                <CheckBox x:Name="serviceReportCheckBox" Content="Service Report" Style="{StaticResource checkBoxStyle}" Width="210" Checked="OnCheckServiceReportCheckBox"/>
+                <CheckBox x:Name="receivalNoteCheckBox" Content="Receival Note" Style="{StaticResource checkBoxStyle}" Checked="OnCheckReceivalNoteCheckBox" />
+            </WrapPanel>
+            </StackPanel>
         </ScrollViewer>
 
         <Grid Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom">
@@ -130,9 +122,9 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Style="{StaticResource buttonStyle}" Name="backButton" Content="BACK" IsEnabled="False" Margin="24"/>
-            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Content="Next" Click="NextButtonClick"  Margin="24"/>
+            <Button Grid.Column="1" Style="{StaticResource buttonStyle}" Name="nextButton"  Content="Next" Click="OnButtonClickNext"  Margin="24"/>
             <Button Grid.Column="2" Style="{StaticResource buttonStyle}" Name="finishButton" Content="Finish" IsEnabled="False" Margin="24"/>
-            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Content="Cancel" Click="CancelButtonClick"  Margin="24"/>
+            <Button Grid.Column="3" Style="{StaticResource buttonStyle}" Name="cancelButton" Content="Cancel" Click="OnButtonClickCancel"  Margin="24"/>
 
         </Grid>
 

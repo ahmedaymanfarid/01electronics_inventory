@@ -1047,7 +1047,11 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
-
+        private void OnButtonClickedRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
         private void OnClosedMaintContractWindow(object sender, EventArgs e)
         {
             if (!GetMaintenanceContracts())
@@ -1162,5 +1166,7 @@ namespace _01electronics_inventory
             stackPanelScrollViewer.Visibility = Visibility.Collapsed;
             gridScrollViewer.Visibility = Visibility.Visible;
         }
+
+       
     }
 }

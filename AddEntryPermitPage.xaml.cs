@@ -26,8 +26,9 @@ namespace _01electronics_inventory
         private CommonFunctions commonFunctions;
         private IntegrityChecks integrityChecks;
         private Employee loggedInUser;
-        private int viewAddCondition;
+        public int viewAddCondition;
         public  AddEntryPermitItemPage addEntryPermitItem ;
+        public AddEntryPermitSummaryPage addEntryPermitSummaryPage ;
 
         List<INVENTORY_STRUCTS.WARE_HOUSE_LOCATION_STRUCT> Locations = new List<INVENTORY_STRUCTS.WARE_HOUSE_LOCATION_STRUCT>();
 
@@ -63,9 +64,9 @@ namespace _01electronics_inventory
 
                 materialEntryPermit.InitializeMaterialEntryPermit();
             }
-
+                materialEntryPermit.SetLoggedInUser(loggedInUser);
                 addEntryPermitItem = new AddEntryPermitItemPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser, entryPermitWindow, viewAddCondition, ref noldMaterialEntryPermit);
-
+                addEntryPermitSummaryPage = new AddEntryPermitSummaryPage(ref commonQueries,ref commonFunctions,ref integrityChecks,ref loggedInUser,viewAddCondition,ref noldMaterialEntryPermit,this);
 
         }
 
@@ -97,7 +98,7 @@ namespace _01electronics_inventory
         {
 
             materialEntryPermit.SetWarehouseNickName(Locations[WareHouseCombo.SelectedIndex].location_nick_name);
-            materialEntryPermit.SetWareHouseLocationId(Locations[WareHouseCombo.SelectedIndex].address.location_id);
+            materialEntryPermit.SetWareHouseLocationId(Locations[WareHouseCombo.SelectedIndex].location_id);
             materialEntryPermit.SetAddedBy(loggedInUser.GetEmployeeId());
 
 

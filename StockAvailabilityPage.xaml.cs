@@ -117,7 +117,11 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
-
+        private void OnButtonClickedRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
         ////////////////////////////////////// INITIALIZATION FUNCTION /////////////////////
         private void InitializationFunction()
         {
@@ -127,7 +131,7 @@ namespace _01electronics_inventory
         private void FillStockAvailability()
         {
             if (!stock.GetAllEntryPermitsItems())
-                System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+               return;
             else
             {
                 FillStockStackPanel();
@@ -155,7 +159,7 @@ namespace _01electronics_inventory
             {
                 if(rowCount%2==0)
                 {
-                    GridEvenRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
+                    GridEvenRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.location_id, grid);
                     GridEvenRows(1, rowCount, stock.GetStockAvailabiltyList()[i].stock_category_name, stock.GetStockAvailabiltyList()[i].stock_category_id, grid);
 
                     if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name != "")
@@ -196,7 +200,7 @@ namespace _01electronics_inventory
                 }
                 else
                 {
-                    GridOddRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.address.location_id, grid);
+                    GridOddRows(0, rowCount, stock.GetStockAvailabiltyList()[i].ware_house_location.location_nick_name, stock.GetStockAvailabiltyList()[i].ware_house_location.location_id, grid);
                     GridOddRows(1, rowCount, stock.GetStockAvailabiltyList()[i].stock_category_name, stock.GetStockAvailabiltyList()[i].stock_category_id, grid);
 
                     if (stock.GetStockAvailabiltyList()[i].entry_permit_item.product_model.model_name != "")

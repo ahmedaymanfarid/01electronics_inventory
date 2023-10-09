@@ -154,6 +154,11 @@ namespace _01electronics_inventory
             ReservationsPage reservationsPage = new ReservationsPage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
             this.NavigationService.Navigate(reservationsPage);
         }
+        private void OnButtonClickedRecievalNotes(object sender, MouseButtonEventArgs e)
+        {
+            RecievalNotePage recievalNotePage = new RecievalNotePage(ref commonQueries, ref commonFunctions, ref integrityChecks, ref loggedInUser);
+            this.NavigationService.Navigate(recievalNotePage);
+        }
 
         ////////////////////////////// INITIALIZATION FUNCTION //////////////////////////
         private void InitializationFunction()
@@ -220,7 +225,7 @@ namespace _01electronics_inventory
             grid.Tag = 0;
             BitmapImage imgSource = new BitmapImage();
             imgSource.BeginInit();
-            imgSource.UriSource = new Uri(@"Icons\arrow_down.png", UriKind.Relative);
+            imgSource.UriSource = new Uri(@".\Icons\arrow_down.png", UriKind.Relative);
             imgSource.EndInit();
             System.Windows.Controls.Image arrowDown = new System.Windows.Controls.Image();
             arrowDown.Source = imgSource;
@@ -721,7 +726,7 @@ namespace _01electronics_inventory
             genericProducts.Clear();
             Grid grid = new Grid();
             if (!commonQueries.GetGenericProducts(ref genericProducts))
-                MessageBox.Show("Error");
+                return;
            
             if(sortGenericProducts.category_name==true)
             {
@@ -1599,7 +1604,7 @@ namespace _01electronics_inventory
                 product_model.SetProductName(textBox.Text);
 
                 if (!product_model.IssuNewProduct())
-                    System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
                 else
                 {
                     label.Text = textBox.Text;
@@ -1662,7 +1667,7 @@ namespace _01electronics_inventory
                     product_model.SetModelpricingCriteria(priceId);
 
                     if (!product_model.IssuNewModel())
-                        System.Windows.Forms.MessageBox.Show(" Server connection failed! Please check your internet connection and try again.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
                     else
                     {
                         label.Text = textBox.Text;
@@ -3318,8 +3323,11 @@ namespace _01electronics_inventory
             if (model_id != 0)
             {
                 if (!product_model.DeleteModel())
+                {
                     System.Windows.Forms.MessageBox.Show("Couldn't Delete The Model.  Please report this to your system adminstrator ", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                else 
+                    return;
+                }
+                else
                     InitializeTableView();
             }
             else
@@ -3938,11 +3946,11 @@ namespace _01electronics_inventory
                         else
                         {
                             if (!product_model.IssuNewProduct())
-                                System.Windows.Forms.MessageBox.Show("Product Type Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                return;
                             else
                             {
                                 if (!product_model.IssuNewBrand())
-                                    System.Windows.Forms.MessageBox.Show("Product Type Must Be Specified.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                    return;
                                 else
                                 {
                                     categoryTextBlock.Text = product_model.GetCategoryName();
@@ -3967,7 +3975,7 @@ namespace _01electronics_inventory
                                     modelTextBox.Visibility = Visibility.Collapsed;
                                     modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                                   // itemTextBlock.Text = product_model.GetModelUnitName();
+                                    // itemTextBlock.Text = product_model.GetModelUnitName();
                                     itemTextBlock.Visibility = Visibility.Visible;
                                     itemComboBox.Visibility = Visibility.Collapsed;
                                     itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
@@ -3999,8 +4007,8 @@ namespace _01electronics_inventory
                     }
                     else
                     {
-                        if(!product_model.IssuNewProduct())
-                            System.Windows.Forms.MessageBox.Show("Server connection failed! Please check your internet connection and try again", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        if (!product_model.IssuNewProduct())
+                            return;
                         else
                         {
                             categoryTextBlock.Text = product_model.GetCategoryName();
@@ -4015,30 +4023,30 @@ namespace _01electronics_inventory
                             typeTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
 
-                          //  brandTextBlock.Text = product_model.GetBrandName();
+                            //  brandTextBlock.Text = product_model.GetBrandName();
                             brandTextBlock.Visibility = Visibility.Visible;
                             brandComboBox.Visibility = Visibility.Collapsed;
                             brandTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                          //  modelTextBlock.Text = product_model.GetModelName();
+                            //  modelTextBlock.Text = product_model.GetModelName();
                             modelTextBlock.Visibility = Visibility.Visible;
                             modelTextBox.Visibility = Visibility.Collapsed;
                             modelTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                           // itemTextBlock.Text = product_model.GetModelUnitName();
+                            // itemTextBlock.Text = product_model.GetModelUnitName();
                             itemTextBlock.Visibility = Visibility.Visible;
                             itemComboBox.Visibility = Visibility.Collapsed;
                             itemTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                           // pricingTextBlock.Text = pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name;
+                            // pricingTextBlock.Text = pricingCriteriaList[pricingComboBox.SelectedIndex].pricing_criteria_name;
                             pricingTextBlock.Visibility = Visibility.Visible;
                             pricingComboBox.Visibility = Visibility.Collapsed;
                             pricingTextBlock.Foreground = System.Windows.Media.Brushes.Green;
 
-                          //  if (hasSerialNumberCheckBox.IsChecked == true)
-                          //    //  hasSerialNumberTextBlock.Text = "YES";
-                          //  else
-                              //  hasSerialNumberTextBlock.Text = "NO";
+                            //  if (hasSerialNumberCheckBox.IsChecked == true)
+                            //    //  hasSerialNumberTextBlock.Text = "YES";
+                            //  else
+                            //  hasSerialNumberTextBlock.Text = "NO";
                             hasSerialNumberTextBlock.Visibility = Visibility.Visible;
                             hasSerialNumberTextBlock.Foreground = System.Windows.Media.Brushes.Green;
                             hasSerialNumberCheckBox.Visibility = Visibility.Collapsed;

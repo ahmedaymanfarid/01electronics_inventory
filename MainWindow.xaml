@@ -6,5 +6,5 @@
         xmlns:local="clr-namespace:_01electronics_inventory"
         mc:Ignorable="d"
         Background="#EDEDED"
-        Title="01 Electronics - Inventory - Portal Window" Height="730" Width="1200">
+        Title="01 Electronics - Inventory - Portal Window" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 </NavigationWindow>
