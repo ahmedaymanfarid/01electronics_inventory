@@ -59,9 +59,10 @@ namespace _01electronics_inventory
             func1=function;
             if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE || viewAddCondition==COMPANY_WORK_MACROS.EDIT_RELEASE)
             {
+                materialReleasePermit = mMaterialReleasePermit;
                 oldMaterialReleasePermit.SetReleaseSerial(materialReleasePermit.GetReleaseSerial());
                 oldMaterialReleasePermit.InitializeMaterialReleasePermit();
-                materialReleasePermit =mMaterialReleasePermit;
+              
        
             }
                 
