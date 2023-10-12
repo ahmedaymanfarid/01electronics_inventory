@@ -207,12 +207,17 @@ namespace _01electronics_inventory
                 viewButton.Content = "VIEW";
 
                 Button deleteButton = new Button();
-                deleteButton.Click += OnButtonClickDelete; ;
-                deleteButton.Content = "VIEW";
+                deleteButton.Click += OnButtonClickDelete; 
+                deleteButton.Content = "Delete";
 
                 expand.Children.Add(viewButton);
                 if(loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
-                expand.Children.Add(editButton);
+                {
+                    expand.Children.Add(editButton);
+                    expand.Children.Add(deleteButton);
+                }
+               
+                
 
                 card.RowDefinitions.Add(new RowDefinition());
                 Expander expander = new Expander();
@@ -236,7 +241,19 @@ namespace _01electronics_inventory
 
         private void OnButtonClickDelete(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            Button delete = sender as Button;
+
+            StackPanel stackPanel = delete.Parent as StackPanel;
+            Expander expander = stackPanel.Parent as Expander;
+            Grid card = expander.Parent as Grid;
+
+
+            INVENTORY_STRUCTS.ENTRY_PERMIT_MAX_STRUCT materialEntryPermit = materialEntryPermits.FirstOrDefault(a => a.entry_permit_serial == Convert.ToInt32(card.Tag));
+
+
+            entryPermit.SetEntryPermitSerialid(materialEntryPermit.entry_permit_serial);
+            entryPermit.InitializeMaterialEntryPermit();
+            entryPermit.DeleteMaterialEntryPermit();
         }
 
         public bool GetMaterialEntryPermits() {

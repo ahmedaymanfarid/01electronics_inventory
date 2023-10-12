@@ -823,6 +823,8 @@ namespace _01electronics_inventory
             }
             else if(parentWindow.viewAddCondition==COMPANY_WORK_MACROS.EDIT_RELEASE)
             {
+                parentWindow.materialReleasePermit.GetReleaseItems().Clear();
+
                 if (parentWindow.releasePermitItemPage.selectedItems.Count == 0)
                 {
                     System.Windows.Forms.MessageBox.Show("Please select items.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
@@ -992,7 +994,7 @@ namespace _01electronics_inventory
                         parentWindow.materialReleasePermit.AddReleaseItem(releasePermitItem);
                     }
                     parentWindow.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.PENDING_CLIENT_RECIEVAL);
-                    if (!parentWindow.materialReleasePermit.UpdateReleasePermits())
+                    if (!parentWindow.materialReleasePermit.UpdateReleasePermits(parentWindow.oldMaterialReleasePermit.GetReleaseItems()))
                         return;
 
 
@@ -1110,7 +1112,7 @@ namespace _01electronics_inventory
                         parentWindow.materialReleasePermit.AddReleaseItem(releasePermitItem);
                     }
                     parentWindow.materialReleasePermit.SetReleasePermitStatusId(COMPANY_WORK_MACROS.PENDING_SERVICE_REPORT);
-                    if (!parentWindow.materialReleasePermit.IssueNewMaterialRelease(ref serials, ref rfpItems, parentWindow.materialReleasePermit.GetWorkOrder().orderSerial, orderProduct.productNumber))
+                    if (!parentWindow.materialReleasePermit.UpdateReleasePermits(parentWindow.oldMaterialReleasePermit.GetReleaseItems()))
                         return;
 
 
