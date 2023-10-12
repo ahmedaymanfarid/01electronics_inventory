@@ -206,6 +206,10 @@ namespace _01electronics_inventory
                 viewButton.Click += ViewButtonOnClick;
                 viewButton.Content = "VIEW";
 
+                Button deleteButton = new Button();
+                deleteButton.Click += OnButtonClickDelete; ;
+                deleteButton.Content = "VIEW";
+
                 expand.Children.Add(viewButton);
                 if(loggedInUser.GetEmployeeTeamId()==COMPANY_ORGANISATION_MACROS.INVENTORY_TEAM_ID)
                 expand.Children.Add(editButton);
@@ -229,6 +233,12 @@ namespace _01electronics_inventory
 
 
         }
+
+        private void OnButtonClickDelete(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool GetMaterialEntryPermits() {
 
             if (!commonQueries.GetEntryPermits(ref materialEntryPermits))

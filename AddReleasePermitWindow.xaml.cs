@@ -41,6 +41,7 @@ namespace _01electronics_inventory
 
         public WorkOrder workOrder;
         public RFP rfps;
+        public MaterialReleasePermits oldMaterialReleasePermit;
 
         public AddReleasePermitWindow(ref CommonQueries mCommonQueries, ref CommonFunctions mCommonFunctions, ref IntegrityChecks mIntegrityChecks, ref Employee mLoggedInUser, MaterialReleasePermits mMaterialReleasePermit=null, int mViewAddCondition = 0,func function=null)
         {
@@ -53,11 +54,17 @@ namespace _01electronics_inventory
             InitializeComponent();
             viewAddCondition=mViewAddCondition;
             workOrder = new WorkOrder();
-           //
+            oldMaterialReleasePermit = new MaterialReleasePermits();
             rfps = new RFP();
             func1=function;
             if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE || viewAddCondition==COMPANY_WORK_MACROS.EDIT_RELEASE)
-                materialReleasePermit = mMaterialReleasePermit;
+            {
+
+                materialReleasePermit = new MaterialReleasePermits();
+               
+                oldMaterialReleasePermit.InitializeMaterialReleasePermit();
+            }
+                
             else
                 materialReleasePermit = new MaterialReleasePermits();
 
