@@ -259,16 +259,32 @@ namespace _01electronics_inventory
 
         private void OnMouseDownItemsInfoLabel(object sender, MouseButtonEventArgs e)
         {
-            if (workFormComboBox.SelectedIndex==-1) {
+            if (viewAddCondition == COMPANY_WORK_MACROS.VIEW_RELEASE || viewAddCondition == COMPANY_WORK_MACROS.EDIT_RELEASE)
+            {
+                // 
+                this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
+            }
+            else
+            {
+                if (workFormComboBox.SelectedIndex == -1)
+                {
 
-                System.Windows.Forms.MessageBox.Show("Please choose the work form", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                return;
+                    System.Windows.Forms.MessageBox.Show("Please choose the work form", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                if (workFormComboBox.SelectedIndex == 1 && serviceReportCheckBox.IsChecked == false && receivalNoteCheckBox.IsChecked == false)
+                {
+                    System.Windows.Forms.MessageBox.Show("Please choose ending it with receival note or service report", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+
+                materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
+
+                // addReleasePermitItem.addReleasePermitPage = this;
+                parentWindow.releasePermitItemPage.InitializeStock();
+                this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
             }
 
-            materialReleasePermit.SetReleaseId(SerialIdTextBox.Text);
-            addReleasePermitItem.InitializeStock();
-           // addReleasePermitItem.addReleasePermitPage = this;
-            this.NavigationService.Navigate(parentWindow.releasePermitItemPage);
 
         }
 
