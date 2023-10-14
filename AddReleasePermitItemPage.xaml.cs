@@ -421,7 +421,7 @@ namespace _01electronics_inventory
 
                             workOrderItemContent.Text = $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].product_category.category_name} - " +
                                 $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productType.product_name} - " +
-                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} -" +
+                                $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productBrand.brand_name} - " +
                                 $" {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productModel.model_name} - " +
                                 $"{parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productSpec.spec_name}  - Needed Quantity : {parentWindow.materialReleasePermit.GetWorkOrder().GetOrderProductsList()[i].productQuantity} ";
 
@@ -526,290 +526,6 @@ namespace _01electronics_inventory
                     }
                 }
             }
-           
-            
-
-           
-
-
-
-
-
-
-
-
-
-
-
-
-            //    Home.Children.Clear();
-            //    //Home.RowDefinitions.Clear();
-
-            //    WrapPanel choicePanel = new WrapPanel();
-            //    Label choice = new Label();
-            //    choice.Style = (Style)FindResource("tableItemLabel");
-            //    choice.Content = "Choose type";
-            //    choice.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-            //    ComboBox choiceComboBox = new ComboBox();
-            //    choiceComboBox.Style = (Style)FindResource("comboBoxStyle");
-            //    choiceComboBox.Items.Add("Generic");
-            //    choiceComboBox.Items.Add("Company");
-            //    choiceComboBox.SelectionChanged += OnChoiceComboBoxSelectionChanged;
-
-            //   // Home.RowDefinitions.Add(new RowDefinition());
-            //    choicePanel.Children.Add(choice);
-            //    choicePanel.Children.Add(choiceComboBox);
-            //    Home.Children.Add(choicePanel);
-
-            //   // Grid.SetRow(choicePanel, Home.RowDefinitions.Count-1);
-
-            //    //WrapPanel GenericCategoryPanel = new WrapPanel();
-            //    //Label genericCategoryLabel = new Label();
-            //    //genericCategoryLabel.Content = "Generic Category";
-            //    //genericCategoryLabel.Style = (Style)FindResource("tableItemLabel");
-            //    //genericCategoryLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //  //  ComboBox genericCategoryComboBox = new ComboBox();
-
-            //  //  genericCategoryComboBox.IsEnabled = false;
-
-
-
-            //  //  genericCategories.ForEach(a => genericCategoryComboBox.Items.Add(a.category_name));
-            //  //  genericCategoryComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            //  //  genericCategoryComboBox.SelectionChanged += OnGenericCategoryComboBoxSelectionChanged;
-
-
-            //  //  GenericCategoryPanel.Children.Add(genericCategoryLabel);
-            //  //  GenericCategoryPanel.Children.Add(genericCategoryComboBox);
-            //  //  Home.Children.Add(GenericCategoryPanel);
-            //  ////  Home.RowDefinitions.Add(new RowDefinition());
-
-            //  ////  Grid.SetRow(GenericCategoryPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
-
-            //  //  WrapPanel GenericProductPanel = new WrapPanel();
-
-            //  //  Label genericProductLabel = new Label();
-
-            //  //  genericProductLabel.Content = "Generic Product";
-
-            //  //  genericProductLabel.Style = (Style)FindResource("tableItemLabel");
-
-            //  //  genericProductLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //  //  ComboBox genericProductComboBox = new ComboBox();
-
-            //  //  genericProductComboBox.IsEnabled = false;
-
-            //  //  genericProductComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            //  //  genericProductComboBox.SelectionChanged += OnGenericProductComboBoxSelectionChanged;
-
-
-            //  //  GenericProductPanel.Children.Add(genericProductLabel);
-            //  //  GenericProductPanel.Children.Add(genericProductComboBox);
-            //  //  Home.Children.Add(GenericProductPanel);
-
-            //  // // Home.RowDefinitions.Add(new RowDefinition());
-
-            //  ////  Grid.SetRow(GenericProductPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
-
-
-            //  //  WrapPanel GenericBrandPanel = new WrapPanel();
-
-            //  //  Label genericBrandLabel = new Label();
-
-            //  //  genericBrandLabel.Content = "Generic Brand";
-
-            //  //  genericBrandLabel.Style = (Style)FindResource("tableItemLabel");
-
-            //  //  genericBrandLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //  //  ComboBox genericBrandComboBox = new ComboBox();
-
-            //  //  genericBrandComboBox.IsEnabled = false;
-
-            //  //  genericBrandComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            //  //  genericBrandComboBox.SelectionChanged += OnGenericBrandComboBoxSelectionChanged;
-
-
-            //  //  GenericBrandPanel.Children.Add(genericBrandLabel);
-            //  //  GenericBrandPanel.Children.Add(genericBrandComboBox);
-            //  //  Home.Children.Add(GenericBrandPanel);
-
-            //  // // Home.RowDefinitions.Add(new RowDefinition());
-
-            //  // // Grid.SetRow(GenericBrandPanel, Home.RowDefinitions.Count - 1);
-
-
-
-
-            //  //  WrapPanel GenericModelPanel = new WrapPanel();
-
-            //  //  Label genericModelLabel = new Label();
-
-            //  //  genericModelLabel.Content = "Generic Model";
-
-            //  //  genericModelLabel.Style = (Style)FindResource("tableItemLabel");
-
-            //  //  genericModelLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //  //  ComboBox genericModelComboBox = new ComboBox();
-
-            //  //  genericModelComboBox.IsEnabled = false;
-
-            //  //  genericModelComboBox.Style = (Style)FindResource("comboBoxStyle");
-
-            //  //  genericModelComboBox.SelectionChanged += OnGenericModelComboBoxSelectionChanged;
-
-
-            //  //  GenericModelPanel.Children.Add(genericModelLabel);
-            //  //  GenericModelPanel.Children.Add(genericModelComboBox);
-            //  //  Home.Children.Add(GenericModelPanel);
-
-            //  //  Home.RowDefinitions.Add(new RowDefinition());
-
-            //  //  Grid.SetRow(GenericModelPanel, Home.RowDefinitions.Count - 1);
-
-
-            //    /////////////////////////////////////////////////////
-            //    //
-
-            //    WrapPanel companyCategoryPanel = new WrapPanel();
-            //    Label companyCategoryLabel = new Label();
-            //    companyCategoryLabel.Content = "Category";
-            //    companyCategoryLabel.Style = (Style)FindResource("tableItemLabel");
-            //    companyCategoryLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //    ComboBox companyCategoryComboBox = new ComboBox();
-            //    companyCategoryComboBox.IsEnabled = false;
-            //    companyCategories.Clear();
-            //    commonQueries.GetProductCategories(ref companyCategories);
-            //    companyCategories.ForEach(a => companyCategoryComboBox.Items.Add(a.category_name));
-            //    companyCategoryComboBox.Style = (Style)FindResource("comboBoxStyle");
-            //    companyCategoryComboBox.SelectionChanged += OnCompanyCategoryComboBoxSelectionChanged;
-            //    companyCategoryPanel.Children.Add(companyCategoryLabel);
-            //    companyCategoryPanel.Children.Add(companyCategoryComboBox);
-
-            //    Home.Children.Add(companyCategoryPanel);
-            //  //  Home.RowDefinitions.Add(new RowDefinition());
-
-
-            // //   Grid.SetRow(companyCategoryPanel, Home.RowDefinitions.Count - 1);
-
-            //    WrapPanel companyProductPanel = new WrapPanel();
-            //    Label companyProductLabel = new Label();
-            //    companyProductLabel.Content = "Product";
-            //    companyProductLabel.Style = (Style)FindResource("tableItemLabel");
-            //    companyProductLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-            //    ComboBox companyProductComboBox = new ComboBox();
-            //    companyProductComboBox.IsEnabled = false;
-            //    companyProductComboBox.Style = (Style)FindResource("comboBoxStyle");
-            //    companyProductComboBox.SelectionChanged += OnCompanyProductComboBoxSelectionChanged;
-            //    companyProductPanel.Children.Add(companyProductLabel);
-            //    companyProductPanel.Children.Add(companyProductComboBox);
-            //    Home.Children.Add(companyProductPanel);
-
-            ////    Home.RowDefinitions.Add(new RowDefinition());
-
-            // //   Grid.SetRow(companyProductPanel, Home.RowDefinitions.Count - 1);
-
-            //    WrapPanel companyBrandPanel = new WrapPanel();
-            //    Label companyBrandLabel = new Label();
-            //    companyBrandLabel.Content = "Brand";
-            //    companyBrandLabel.Style = (Style)FindResource("tableItemLabel");
-            //    companyBrandLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //    ComboBox companyBrandComboBox = new ComboBox();
-            //    companyBrandComboBox.IsEnabled = false;
-            //    companyBrandComboBox.Style = (Style)FindResource("comboBoxStyle");
-            //    companyBrandComboBox.SelectionChanged += OnCompanyBrandComboBoxSelectionChanged;
-            //    companyBrandPanel.Children.Add(companyBrandLabel);
-            //    companyBrandPanel.Children.Add(companyBrandComboBox);
-            //    Home.Children.Add(companyBrandPanel);
-
-            // //   Home.RowDefinitions.Add(new RowDefinition());
-
-            //  //  Grid.SetRow(companyBrandPanel, Home.RowDefinitions.Count - 1);
-
-            //    WrapPanel companyModelPanel = new WrapPanel();
-            //    Label companyModelLabel = new Label();
-            //    companyModelLabel.Content = "Model";
-            //    companyModelLabel.Style = (Style)FindResource("tableItemLabel");
-            //    companyModelLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-
-            //    ComboBox companyModelComboBox = new ComboBox();
-            //    companyModelComboBox.IsEnabled = false;
-            //    companyModelComboBox.Style = (Style)FindResource("comboBoxStyle");
-            //    companyModelComboBox.SelectionChanged += OnCompanyModelComboBoxSelectionChanged;
-            //    companyModelPanel.Children.Add(companyModelLabel);
-            //    companyModelPanel.Children.Add(companyModelComboBox);
-            //    Home.Children.Add(companyModelPanel);
-
-            //   // Home.RowDefinitions.Add(new RowDefinition());
-
-            //  //  Grid.SetRow(companyModelPanel, Home.RowDefinitions.Count - 1);
-
-            //    WrapPanel companySpecsPanel = new WrapPanel();
-            //    Label companySpecsLabel = new Label();
-            //    companySpecsLabel.Content = "Specs";
-            //    companySpecsLabel.Style = (Style)FindResource("tableItemLabel");
-            //    companySpecsLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-            //    ComboBox companySpecsComboBox = new ComboBox();
-            //    companySpecsComboBox.IsEnabled = false;
-            //    companySpecsComboBox.Style = (Style)FindResource("comboBoxStyle");
-            //    companySpecsComboBox.SelectionChanged += OnSelChangedSpecsComboBox;
-            //    companySpecsPanel.Children.Add(companySpecsLabel);
-            //    companySpecsPanel.Children.Add(companySpecsComboBox);
-            //    Home.Children.Add(companySpecsPanel);
-
-            //   // Home.RowDefinitions.Add(new RowDefinition());
-
-            //  //  Grid.SetRow(companySpecsPanel, Home.RowDefinitions.Count - 1);
-
-            //    WrapPanel SelectedItemsPanel = new WrapPanel();
-            //    Label selectedItemsLabel = new Label();
-            //    selectedItemsLabel.Content = "Number of selected Items";
-            //    selectedItemsLabel.Style = (Style)FindResource("tableItemLabel");
-            //    selectedItemsLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-
-            //    Label NumberOfItemsSelected = new Label();
-            //    NumberOfItemsSelected.Content = "0";
-            //    NumberOfItemsSelected.Style = (Style)FindResource("tableItemLabel");
-            //    NumberOfItemsSelected.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#105A97"));
-            //    SelectedItemsPanel.Children.Add(selectedItemsLabel);
-            //    SelectedItemsPanel.Children.Add(NumberOfItemsSelected);
-            //    Home.Children.Add(SelectedItemsPanel);
-
-            //   // Home.RowDefinitions.Add(new RowDefinition());
-            //  //  Grid.SetRow(SelectedItemsPanel, Home.RowDefinitions.Count - 1);
-            //    Grid items = new Grid();
-            //    Home.Children.Add(items);
-
-            //  //  Home.RowDefinitions.Add(new RowDefinition());
-
-            //  //  Grid.SetRow(items, Home.RowDefinitions.Count - 1);
-
 
         }
 
@@ -1043,87 +759,7 @@ namespace _01electronics_inventory
 
                         }
 
-
-
-
                     }
-                    //else if(!rfpItem.is_company_product)
-                    //{
-                    //    if(rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
-                    //    rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
-                    //    rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
-                    //    rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)
-                    //    {
-                    //        if (!entryPermitList[i].items[j].product_model.has_serial_number)
-                    //        {
-                    //            CheckBox entryPermitItemCheckBox = new CheckBox();
-                    //            entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
-                    //            entryPermitItemCheckBox.Margin = new Thickness(10);
-                    //            entryPermitItemCheckBox.Width = 500;
-                    //            entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
-                    //            entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
-
-                    //            WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
-                    //            TextBlock entryPermitCheckBoxContent = new TextBlock();
-                    //            entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
-
-                    //            entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} ";
-
-                    //            Label availableQuantityLabel = new Label();
-                    //            availableQuantityLabel.Style = (Style)FindResource("labelStyle");
-                    //            availableQuantityLabel.Margin = new Thickness(0);
-                    //            availableQuantityLabel.Content = "Quantity:";
-
-                    //            TextBox availableQuantityTextBox = new TextBox();
-                    //            availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                    //            availableQuantityTextBox.Margin = new Thickness(0);
-                    //            availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
-                    //            availableQuantityTextBox.IsEnabled = false;
-
-                    //            Label reservedQuantityLabel = new Label();
-                    //            reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
-                    //            reservedQuantityLabel.Margin = new Thickness(0);
-                    //            reservedQuantityLabel.Width = 170;
-                    //            reservedQuantityLabel.Content = "Realeased Quantity:";
-
-                    //            TextBox reservedQuantity = new TextBox();
-                    //            reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
-                    //            reservedQuantity.Margin = new Thickness(0);
-                    //            reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
-                    //            reservedQuantity.IsEnabled = false;
-
-                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
-                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
-                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
-                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
-                    //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
-
-                    //            entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
-                    //            innerStackPanel.Children.Add(entryPermitItemCheckBox);
-                    //        }
-                    //        else
-                    //        {
-                    //            WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                    //            TextBlock entryPermitContent = new TextBlock();
-                    //            entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                    //            entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
-                    //            entryPermitContent.Width = 300;
-                    //            entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                    //            Label serialNumber = new Label();
-                    //            serialNumber.Style = (Style)FindResource("labelStyle");
-                    //            serialNumber.Margin = new Thickness(0);
-                    //            serialNumber.Width = 200;
-                    //            serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
-
-                    //            entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                    //            entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                    //            if (innerStackPanel.Children.Count <= rfpItem.item_quantity)
-                    //                innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
-                    //        }
-                    //    }
-                    //}
-             
 
                     checkedItemsWrapPanel.Children.Add(itemsBorder);
                 }
@@ -1248,13 +884,7 @@ namespace _01electronics_inventory
 
                          }
 
-                            
-
-                        
                     }
-
-
-
 
                     checkedItemsWrapPanel.Children.Add(itemsBorder);
                 }
@@ -1420,108 +1050,10 @@ namespace _01electronics_inventory
 
 
                                     innerStackPanel.Children.Add(entryPermitItemCheckBox);
-                                    //else
-                                    //{
-                                    //    WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                                    //    TextBlock entryPermitContent = new TextBlock();
-                                    //    entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                                    //    entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
-                                    //    entryPermitContent.Width = 500;
-                                    //    entryPermitContent.HorizontalAlignment = HorizontalAlignment.Center;
-                                    //    entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                                    //    Label serialNumber = new Label();
-                                    //    serialNumber.Style = (Style)FindResource("labelStyle");
-                                    //    serialNumber.Margin = new Thickness(10, 0, 0, 20);
-                                    //    serialNumber.Width = 300;
-                                    //    serialNumber.Content = $"Serial Number :{rfpItem.product_serial_number} ";
-
-                                    //    entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                                    //    entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                                    //    if (innerStackPanel.Children.Count < rfpItem.item_quantity)
-                                    //        innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
-                                    //}
-
 
                                 }
 
                             }
-                            //else if(!rfpItem.is_company_product)
-                            //{
-                            //    if(rfpItem.product_category.category_id == entryPermitList[i].items[j].product_category.category_id &&
-                            //    rfpItem.product_type.type_id == entryPermitList[i].items[j].product_type.type_id &&
-                            //    rfpItem.product_brand.brand_id == entryPermitList[i].items[j].product_brand.brand_id &&
-                            //    rfpItem.product_model.model_id == entryPermitList[i].items[j].product_model.model_id)
-                            //    {
-                            //        if (!entryPermitList[i].items[j].product_model.has_serial_number)
-                            //        {
-                            //            CheckBox entryPermitItemCheckBox = new CheckBox();
-                            //            entryPermitItemCheckBox.Style = (Style)FindResource("checkBoxStyle");
-                            //            entryPermitItemCheckBox.Margin = new Thickness(10);
-                            //            entryPermitItemCheckBox.Width = 500;
-                            //            entryPermitItemCheckBox.Checked += OnCheckEntryPermitItem;
-                            //            entryPermitItemCheckBox.Unchecked += OnUnCheckEnrtyPermitItem;
-
-                            //            WrapPanel entryPermitItemCheckBoxContentWrapPanel = new WrapPanel();
-                            //            TextBlock entryPermitCheckBoxContent = new TextBlock();
-                            //            entryPermitCheckBoxContent.TextWrapping = TextWrapping.Wrap;
-
-                            //            entryPermitCheckBoxContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} ";
-
-                            //            Label availableQuantityLabel = new Label();
-                            //            availableQuantityLabel.Style = (Style)FindResource("labelStyle");
-                            //            availableQuantityLabel.Margin = new Thickness(0);
-                            //            availableQuantityLabel.Content = "Quantity:";
-
-                            //            TextBox availableQuantityTextBox = new TextBox();
-                            //            availableQuantityTextBox.Style = (Style)FindResource("microTextBoxStyle");
-                            //            availableQuantityTextBox.Margin = new Thickness(0);
-                            //            availableQuantityTextBox.Text = entryPermitList[i].items[j].quantity.ToString();
-                            //            availableQuantityTextBox.IsEnabled = false;
-
-                            //            Label reservedQuantityLabel = new Label();
-                            //            reservedQuantityLabel.Style = (Style)FindResource("labelStyle");
-                            //            reservedQuantityLabel.Margin = new Thickness(0);
-                            //            reservedQuantityLabel.Width = 170;
-                            //            reservedQuantityLabel.Content = "Realeased Quantity:";
-
-                            //            TextBox reservedQuantity = new TextBox();
-                            //            reservedQuantity.Style = (Style)FindResource("microTextBoxStyle");
-                            //            reservedQuantity.Margin = new Thickness(0);
-                            //            reservedQuantity.TextChanged += OnTextChangedReservedQuantity;
-                            //            reservedQuantity.IsEnabled = false;
-
-                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(entryPermitCheckBoxContent);
-                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityLabel);
-                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(availableQuantityTextBox);
-                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantityLabel);
-                            //            entryPermitItemCheckBoxContentWrapPanel.Children.Add(reservedQuantity);
-
-                            //            entryPermitItemCheckBox.Content = entryPermitItemCheckBoxContentWrapPanel;
-                            //            innerStackPanel.Children.Add(entryPermitItemCheckBox);
-                            //        }
-                            //        else
-                            //        {
-                            //            WrapPanel entryPermitItemContentWrapPanel = new WrapPanel();
-                            //            TextBlock entryPermitContent = new TextBlock();
-                            //            entryPermitContent.TextWrapping = TextWrapping.Wrap;
-                            //            entryPermitContent.Style = (Style)FindResource("tableSubItemTextblock");
-                            //            entryPermitContent.Width = 300;
-                            //            entryPermitContent.Text = $@"Entry Permit {entryPermitList[i].entry_permit_id} :{entryPermitList[i].items[j].product_category.category_name} - {entryPermitList[i].items[j].product_type.product_name} - {entryPermitList[i].items[j].product_brand.brand_name} - {entryPermitList[i].items[j].product_model.model_name} - {entryPermitList[i].items[j].product_specs.spec_name} ";
-
-                            //            Label serialNumber = new Label();
-                            //            serialNumber.Style = (Style)FindResource("labelStyle");
-                            //            serialNumber.Margin = new Thickness(0);
-                            //            serialNumber.Width = 200;
-                            //            serialNumber.Content = $"Serial Number :{entryPermitList[i].items[j].product_serial_number} ";
-
-                            //            entryPermitItemContentWrapPanel.Children.Add(entryPermitContent);
-                            //            entryPermitItemContentWrapPanel.Children.Add(serialNumber);
-                            //            if (innerStackPanel.Children.Count <= rfpItem.item_quantity)
-                            //                innerStackPanel.Children.Add(entryPermitItemContentWrapPanel);
-                            //        }
-                            //    }
-                            //}
                         }
                     }
 
@@ -1739,13 +1271,6 @@ namespace _01electronics_inventory
 
         private void OnUnCheckEnrtyPermitItem(object sender, RoutedEventArgs e)
         {
-            //CheckBox entryPermitItemCheckBox = (CheckBox)sender;
-            //WrapPanel entryCheckBoxContent = entryPermitItemCheckBox.Content as WrapPanel;
-            //TextBox reservedQuantity = entryCheckBoxContent.Children[4] as TextBox;
-            //reservedQuantity.IsEnabled = false;
-            //reservedQuantity.Clear();
-         
-            //checkedItemsCounterLabel.Content = checkedItemsCounter;
             CheckBox checkedItem = (CheckBox)sender;
             if(isRFP)
             {
@@ -1963,28 +1488,6 @@ namespace _01electronics_inventory
             WrapPanel choicePanel = Home.Children[0] as WrapPanel;
 
             ComboBox choiceComboBox = choicePanel.Children[1] as ComboBox;
-
-
-            //WrapPanel genericCategoryPanel=Home.Children[1] as WrapPanel;
-
-            //ComboBox genericCategoryComboBox=genericCategoryPanel.Children[1] as ComboBox;
-
-
-            //WrapPanel genericProductPanel = Home.Children[2] as WrapPanel;
-
-            //ComboBox genericProductComboBox = genericProductPanel.Children[1] as ComboBox;
-
-
-
-            //WrapPanel genericBrandPanel = Home.Children[3] as WrapPanel;
-
-            //ComboBox genericBrandComboBox = genericBrandPanel.Children[1] as ComboBox;
-
-
-
-            //WrapPanel genericModelPanel = Home.Children[4] as WrapPanel;
-
-            //ComboBox genericModelComboBox = genericModelPanel.Children[1] as ComboBox;
 
 
 
@@ -2915,7 +2418,6 @@ namespace _01electronics_inventory
                 projectName.Text = workOrder.GetprojectName();
 
             }
-
             else if (addReleasePermitPage.rfp.GetMaintContract().GetMaintContractSerial() != 0)
             {
                 MaintenanceContract maintenanceContract = new MaintenanceContract();
@@ -2946,8 +2448,6 @@ namespace _01electronics_inventory
 
 
             }
-
-
             else
             {
 
@@ -2955,8 +2455,6 @@ namespace _01electronics_inventory
 
                 projectName.Text = "01ELECTRONICS";
             }
-
-
 
             rfpsItemsComboBox.Items.Clear();
 
@@ -2989,17 +2487,13 @@ namespace _01electronics_inventory
         {
             ComboBox rfpItemsComboBox=sender as ComboBox;
 
-
-
             if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.model_name != "")
             {
-
-
                 if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].product_model.has_serial_number == true)
                 {
                     if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
-                        System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        System.Windows.Forms.MessageBox.Show("Insufficient rfp item quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                         return;
 
@@ -3012,10 +2506,7 @@ namespace _01electronics_inventory
 
                     }
 
-
-
                 }
-
                 else {
 
                     Grid rfpCard = rfpItemsComboBox.Parent as Grid;
@@ -3040,7 +2531,7 @@ namespace _01electronics_inventory
 
                     if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
-                        System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        System.Windows.Forms.MessageBox.Show("Insufficient rfp item quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                         return;
 
@@ -3050,7 +2541,6 @@ namespace _01electronics_inventory
                 }
 
             }
-
             else
             {
 
@@ -3058,8 +2548,7 @@ namespace _01electronics_inventory
                 {
                     if (addReleasePermitPage.rfpItems[rfpItemsComboBox.SelectedIndex].item_quantity < addReleasePermitPage.serialProducts[rfpItemsComboBox.SelectedIndex])
                     {
-                        System.Windows.Forms.MessageBox.Show("RfpItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
+                        System.Windows.Forms.MessageBox.Show("Insufficient rfp item quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                         return;
 
@@ -3075,8 +2564,6 @@ namespace _01electronics_inventory
 
 
                 }
-
-
                 else
                 {
 
@@ -3110,9 +2597,6 @@ namespace _01electronics_inventory
 
 
                 }
-
-
-
             }
 
         }
@@ -3197,11 +2681,10 @@ namespace _01electronics_inventory
 
                 if (parentWindow.releasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productQuantity < parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
                 {
-                     System.Windows.Forms.MessageBox.Show("OrderItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                     System.Windows.Forms.MessageBox.Show("Insufficient order item quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     return;
                 }
             }
-
             else {
 
 
@@ -3227,7 +2710,7 @@ namespace _01electronics_inventory
 
                 if (parentWindow.releasePermitPage.workOrder.GetOrderProductsList()[orderItemsComboBox.SelectedIndex].productQuantity < parentWindow.releasePermitPage.serialProducts[orderItemsComboBox.SelectedIndex])
                 {
-                    System.Windows.Forms.MessageBox.Show("OrderItemQuantity are not enough", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show("Insufficient order item quantity", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                     return;
 
@@ -3286,7 +2769,6 @@ namespace _01electronics_inventory
 
         }
 
-
         private void OnCompanyModelComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox companyModelComboBox= sender as ComboBox;
@@ -3309,6 +2791,7 @@ namespace _01electronics_inventory
 
             WrapPanel companySpecsPanel = home.Children[5] as WrapPanel;
             ComboBox companySpecsComboBox = companySpecsPanel.Children[1] as ComboBox;
+
             if(companyModelComboBox.SelectedIndex !=-1)
             {
                 ComboBoxItem categoryItem = companyCategoryComboBox.SelectedItem as ComboBoxItem;
@@ -3318,12 +2801,6 @@ namespace _01electronics_inventory
 
                 if (choiceComboBox.SelectedIndex ==1)
                 {
-
-                    //if(!commonQueries.GetModelSpecsNames(Int32.Parse(categoryItem.Tag.ToString()), Int32.Parse(productItem.Tag.ToString()), Int32.Parse(brandItem.Tag.ToString()), Int32.Parse(modelItem.Tag.ToString()), ref specs))
-                    //     return;
-
-                    // companySpecsComboBox.Items.Clear();
-                    // specs.ForEach(a => companySpecsComboBox.Items.Add(a.spec_name));
                     if (workOrder.GetOrderSerial() != 0)
                     {
                         for (int i = 0; i < workOrder.GetOrderProductsList().Count(); i++)
